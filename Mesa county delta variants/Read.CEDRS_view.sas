@@ -45,6 +45,7 @@ PROC contents data=CEDRS_view  varnum ;  run;
  |  The following date fields are character variables instead of a numeric variable with date format.
  |    OnsetDate, onsetdate_proxy, onsetdate_proxy_dist, ReportedDate, CollectionDate, DeathDate, 
  |    Earliest_CollectionDate, Data_pulled_as_of
+ |    --> ignore onsetdate_proxy; use onsetdate_proxy_dist instead (per Rachel S.)
  |    --> convert these fields to SAS date variables.
  |  Many of the character variables have length of $255.
  |    --> Use the macro "Shrink" to minimize the length of the character variables.
@@ -54,7 +55,7 @@ PROC contents data=CEDRS_view  varnum ;  run;
 ** 3. Modify SAS dataset per Findings **;
 DATA CEDRS_view_temp; set CEDRS_view(rename=
    (ID=tmp_ID ProfileID=tmp_ProfileID EventID=tmp_EventID
-    OnsetDate=tmp_OnsetDate OnsetDate_proxy=tmp_OnsetDate_proxy OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 
+    OnsetDate=tmp_OnsetDate  OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 
     ReportedDate=tmp_ReportedDate CollectionDate=tmp_CollectionDate  DeathDate=tmp_DeathDate
     Earliest_CollectionDate=tmp_Earliest_CollectionDate   Data_pulled_as_of=tmp_Data_pulled_as_of 
    )); 
@@ -65,28 +66,34 @@ DATA CEDRS_view_temp; set CEDRS_view(rename=
    EventID = cats(tmp_EventID);
 
 * Convert temporary character var for each date field to a date var *;
-   OnsetDate = input(tmp_onsetdate, yymmdd10.); format OnsetDate yymmdd10.;
+   OnsetDate            = input(tmp_onsetdate, yymmdd10.);            format OnsetDate yymmdd10.;
+   OnsetDate_proxy_dist = input(tmp_OnsetDate_proxy_dist, yymmdd10.); format OnsetDate_proxy_dist yymmdd10.;
+   ReportedDate         = input(tmp_ReportedDate, yymmdd10.);         format ReportedDate yymmdd10.;
+   CollectionDate       = input(tmp_CollectionDate, yymmdd10.);       format CollectionDate yymmdd10.;
+   DeathDate            = input(tmp_DeathDate, yymmdd10.);            format DeathDate yymmdd10.;
+   Earliest_CollectionDate = input(tmp_Earliest_CollectionDate, yymmdd10.); format Earliest_CollectionDate yymmdd10.;
+   Data_pulled_as_of     = input(tmp_Data_pulled_as_of, yymmdd10.);   format Data_pulled_as_of yymmdd10.;
 
-   DROP tmp_:  address: ;
+   DROP tmp_:  address:  OnsetDate_proxy ;
 run;
 
 
 ** 4. Shrink character variables in data set to shortest possible lenght (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
- %shrink(SQL_dsn_temp)
+ %shrink(CEDRS_view_temp)
 
 
 ** 5. Create libname for folder to store permanent SAS dataset (if desired) **;
-Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
+/*Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;*/
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA COVID.SQL_dsn ; set SQL_dsn_temp_ ;
+DATA CEDRS_view2 ; set CEDRS_view_temp_ ;
 run;
 
 
-   PROC contents data=COVID.SQL_dsn varnum; run;
+   PROC contents data=CEDRS_view2 varnum; run;
 
 
 

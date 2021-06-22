@@ -62,9 +62,9 @@ run;
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 title2;
 
-** 4. Number of records with a date for positive COVID test **;
+** 4. Number of records with ID, Hosp admit date, and a date for positive COVID test **;
    PROC means data= COVID.COPHS  n nmiss;
-      var Positive_Test;
+      var MR_Number Hosp_Admission Positive_Test;
 run;
    PROC freq data= COVID.COPHS;
       tables Positive_Test ;
@@ -74,11 +74,6 @@ run;
 
 *** Filter on POS COVID test AND CY21 only ***;
 ***----------------------------------------***;
-
-DATA COVID_Hosp_CY21;  set COVID.COPHS;
-   if Positive_Test ne .  AND  Hosp_Admission > '31DEC20'd ;
-run;
-title2 'Positive_Test ne .  AND  Hosp_Admission > 31DEC20';
 
    PROC format;
       value $WestSlope
@@ -100,6 +95,20 @@ title2 'Positive_Test ne .  AND  Hosp_Admission > 31DEC20';
       'HINSDALE' =  'Western Slope'
       other='Rest of Colorado' ;
 run;
+
+
+DATA COVID_Hosp_CY21;  set COVID.COPHS;
+   if Positive_Test ne .  AND  Hosp_Admission > '31DEC20'd ;
+   Region = put(County_of_Residence, $WestSlope. );
+run;
+title2 'Positive_Test ne .  AND  Hosp_Admission > 31DEC20';
+
+
+** 5. FILTERED: Number of records with ID, Hosp admit date, and a date for positive COVID test **;
+   PROC means data= COVID_Hosp_CY21  n nmiss;
+      var MR_Number Region Hosp_Admission Positive_Test;
+run;
+
 
 ** Hospitalizations by Western slope and ROC **;
    PROC freq data= COVID_Hosp_CY21;
@@ -124,6 +133,7 @@ run;
    /*  idlabel County_of_Residence;*/
       var Admits;
 run;
+
 DATA Admit_week_by_slope; set Admit_week_by_slope;
    if Hosp_Admission < '01AUG21'd;
    rename col1=ROC;

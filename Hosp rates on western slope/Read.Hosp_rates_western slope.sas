@@ -1,7 +1,7 @@
 /**********************************************************************************************
 PROGRAM:    Read.Hosp_rate_western slope
 AUTHOR:		Eric Bush
-CREATED:	   June 7, 2021
+CREATED:	   June 22, 2021
 MODIFIED:   060921:  remove macro Shrink from code and add %inc statement to read it instead	
 PURPOSE:	   Connect to dphe144 "CEDRS_view" and create associated SAS dataset
 INPUT:		[name of input data table(s)]
@@ -40,29 +40,52 @@ PROC contents data=COPHS  varnum ;  run;
 
 /*________________________________________________________________________________________________*
  | FINDINGS:                                                                 
- |    [ID vars] that are a numeric instead of character variable.    
- |    (These need to be converted to character prior to running SHRINK macro.     
- |    [Date vars] that are a character variable instead of a numeric variable with date format
+ |    No ID vars that I can recognize. Perhaps MR_Number but it is character variable.    
+ |    Several date vars that are a character variable:
+ |    
  *________________________________________________________________________________________________*/
+
+** determine format of dates in the char vars **;
+   PROC freq data=COPHS ;
+      tables Hospital_Admission_Date___MM_DD_
+            ICU_Admission_Date___MM_DD_YYYY_
+            DOB__MM_DD_YYYY_
+            Positive_COVID_19_Test_Date
+            Last_Day_in_ICU_During_Admission  ;  * date fields;
+run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA SQL_dsn_temp; set SQL_dsn(rename=(ID=tmp_ID onsetdate=tmp_onsetdate )); 
+DATA COPHS_temp; set COPHS; 
  
-* Convert temporary numeric ID variable character ID var using the CATS function *;
-   ID = cats(tmp_ID);
-
 * Convert temporary character var for each date field to a date var *;
-   OnsetDate = input(tmp_onsetdate, yymmdd10.); format OnsetDate yymmdd10.;
+   Hosp_Admission = input(Hospital_Admission_Date___MM_DD_, yymmdd10.); format Hosp_Admission yymmdd10.;
+   ICU_Admission = input(ICU_Admission_Date___MM_DD_YYYY_, yymmdd10.); format ICU_Admission yymmdd10.;
+   DOB = input(DOB__MM_DD_YYYY_, yymmdd10.); format DOB yymmdd10.;
+   Positive_Test = input(Positive_COVID_19_Test_Date, yymmdd10.); format Positive_Test yymmdd10.;
+   Last_Day_in_ICU = input(Last_Day_in_ICU_During_Admission, yymmdd10.); format Last_Day_in_ICU yymmdd10.;
 
-   DROP tmp_: ;
+   Label
+      Hosp_Admission = 'Hospital Admission date'
+      ICU_Admission = 'ICU Admission date'
+      DOB = 'Date of Birth'
+      Positive_Test = 'Positive COVID19 test date'
+      Last_Day_in_ICU = 'Last day in ICU during Admission'   ;
+
+   DROP 
+      Hospital_Admission_Date___MM_DD_ 
+      ICU_Admission_Date___MM_DD_YYYY_
+      DOB__MM_DD_YYYY_
+      Positive_COVID_19_Test_Date
+      Last_Day_in_ICU_During_Admission  ;
+
 run;
 
 
 ** 4. Shrink character variables in data set to shortest possible lenght (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
- %shrink(SQL_dsn_temp)
+ %shrink(COPHS_temp)
 
 
 ** 5. Create libname for folder to store permanent SAS dataset (if desired) **;
@@ -70,11 +93,11 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA COVID.SQL_dsn ; set SQL_dsn_temp_ ;
+DATA COVID.COPHS ; set COPHS_temp_ ;
 run;
 
 
-   PROC contents data=COVID.SQL_dsn varnum; run;
+   PROC contents data=COVID.COPHS varnum; run;
 
 
 

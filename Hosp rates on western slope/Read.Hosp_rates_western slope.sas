@@ -2,8 +2,8 @@
 PROGRAM:    Read.Hosp_rate_western slope
 AUTHOR:		Eric Bush
 CREATED:	   June 22, 2021
-MODIFIED:   060921:  remove macro Shrink from code and add %inc statement to read it instead	
-PURPOSE:	   Connect to dphe144 "CEDRS_view" and create associated SAS dataset
+MODIFIED:   	
+PURPOSE:	   Connect to dphe144 "hospital" and create associated SAS dataset
 INPUT:		[name of input data table(s)]
 OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ***********************************************************************************************/
@@ -27,9 +27,9 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
 LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** contains "CEDRS_view which is copy of CEDRS_dashboard_constrained";
 LIBNAME Hosp144    ODBC  dsn='COVID19' schema=hospital;  run;
 
-
+ 
 ** 2. Read in the first 50 records to create sample SAS dataset **;
-DATA COPHS; set Hosp144.COPHS(obs=50); run;    * <-- for building code add (obs=50) ;
+DATA COPHS; set Hosp144.COPHS; run;    * <-- for building code add (obs=50) ;
 
 ** Review contents of SAS dataset **;
 PROC contents data=COPHS  varnum ;  run;    
@@ -48,11 +48,17 @@ PROC contents data=COPHS  varnum ;  run;
 ** determine format of dates in the char vars **;
    PROC freq data=COPHS ;
       tables Hospital_Admission_Date___MM_DD_
-            ICU_Admission_Date___MM_DD_YYYY_
-            DOB__MM_DD_YYYY_
-            Positive_COVID_19_Test_Date
-            Last_Day_in_ICU_During_Admission  ;  * date fields;
+             ICU_Admission_Date___MM_DD_YYYY_
+             DOB__MM_DD_YYYY_
+             Positive_COVID_19_Test_Date
+             Discharge_Transfer__Death_Date__
+             Last_Day_in_ICU_During_Admission  ;  * date fields;
 run;
+
+   proc print data= COPHS;
+   where MR_Number='228438';
+   var MR_Number Discharge_Transfer__Death_Date__ ;
+   run;
 
 
 ** 3. Modify SAS dataset per Findings **;
@@ -63,6 +69,7 @@ DATA COPHS_temp; set COPHS;
    ICU_Admission = input(ICU_Admission_Date___MM_DD_YYYY_, yymmdd10.); format ICU_Admission yymmdd10.;
    DOB = input(DOB__MM_DD_YYYY_, yymmdd10.); format DOB yymmdd10.;
    Positive_Test = input(Positive_COVID_19_Test_Date, yymmdd10.); format Positive_Test yymmdd10.;
+   Date_left_facility = input(Discharge_Transfer__Death_Date__, yymmdd10.); format Date_left_facility yymmdd10.;
    Last_Day_in_ICU = input(Last_Day_in_ICU_During_Admission, yymmdd10.); format Last_Day_in_ICU yymmdd10.;
 
    Label
@@ -70,6 +77,7 @@ DATA COPHS_temp; set COPHS;
       ICU_Admission = 'ICU Admission date'
       DOB = 'Date of Birth'
       Positive_Test = 'Positive COVID19 test date'
+      Date_left_facility = 'Date of Discharge, Transfer, or Death'
       Last_Day_in_ICU = 'Last day in ICU during Admission'   ;
 
    DROP 
@@ -77,6 +85,7 @@ DATA COPHS_temp; set COPHS;
       ICU_Admission_Date___MM_DD_YYYY_
       DOB__MM_DD_YYYY_
       Positive_COVID_19_Test_Date
+      Discharge_Transfer__Death_Date__
       Last_Day_in_ICU_During_Admission  ;
 
 run;

@@ -43,7 +43,7 @@ title1 'dphe144 = COPHS';
       tables MR_Number / out=DupChk(where=(COUNT>1));
 /*   PROC print data=DupChk;  id MR_Number; var Count;  run;*/
 
-* 3: Print out dup records  *;
+* 3: Print out dup records (based on MR_Number)  *;
    proc sort data=COVID.COPHS(drop=filename)  out=COPHSdups  ; by MR_Number; run;
    proc sort data=DupChk  ; by MR_Number; run;
 DATA ChkCOPHSdups; merge COPHSdups DupChk(in=dup) ; 
@@ -54,23 +54,42 @@ run;
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
 
    PROC print data=ChkCOPHSdups ; 
-      var MR_Number Facility_Name Last_Name Gender Invasive_ventilator__Y_N_   Current_Level_of_care   Discharge_Transfer_Death_Disposi
-         Hosp_Admission ICU_Admission Date_Left_Facility Last_Day_in_ICU Count;
-      format Discharge_Transfer_Death_Disposi $20. Facility_Name $40. ;
+      id MR_Number ;
+      var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        
+          Discharge_Transfer_Death_Disposi   Date_Left_Facility  ;
+      format Last_Name $20.   Discharge_Transfer_Death_Disposi $20.  Facility_Name $40. ;
 title2 'List of dup records';
 run;
 
-** 4.a) explore missing positive test dates to see if they are mostly recent admissions **;
 
+* 3.b): Print out dup records with same Hospital admission date (i.e. bad dup)  *;
+   proc sort data=COVID.COPHS(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;
+   PROC print data=DupHospAdmit ; 
+      id MR_Number ;
+      var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        
+          Discharge_Transfer_Death_Disposi   Date_Left_Facility  ;
+      format Last_Name $10.   Discharge_Transfer_Death_Disposi $20. Facility_Name $32. ;
+title2 'List of dup records with same Hospital admission date';
+run;
+
+/*
+ | West Pines Hospital is mental facility associated with, i.e. on campus of, Exempla Lutheran Med Ctr.
+ | --> Delete dup record where Facility = 'West Pines Hospital'. So code to add to data step below is:
+     if MR_Number = 'M1373870' and Facility_Name = 'West Pines Hospital' then delete;
+     if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
+*/
+
+
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
 title2 'ALL records';
+
+** 4.a) explore missing positive test dates to see if they are mostly recent admissions **;
 
 * details *;
 proc print data=COVID.COPHS;
    where Positive_Test = .;
    var MR_Number Last_Name Gender County_of_Residence Hosp_Admission Date_left_facility;
 run;
-
-options ps=65 ls=110 ;     * Portrait pagesize settings *;
 
 * summary ;
    proc format; 
@@ -80,7 +99,6 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
       tables Positive_Test * Hosp_Admission /missing missprint norow nopercent;
       format Positive_Test YNfmt.        Hosp_Admission MONYY. ;
 run;
-
 
 
 ** 4. For ALL records, number with ID, Hosp admit date, and a date for positive COVID test **;
@@ -121,6 +139,11 @@ run;
 DATA COVID_Hosp_CY21;  set COVID.COPHS;
    if Hosp_Admission > '31DEC20'd  AND  (  (Hosp_Admission<'01JUN21'd  and Positive_Test ne .) OR (Hosp_Admission ge '01JUN21'd) )   ;
    Region = put(County_of_Residence, $WestSlope. );
+
+   * from DupChk code above (3.b) ;
+   if MR_Number = 'M1373870' and Facility_Name = 'West Pines Hospital' then delete;
+   if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
+
 run;
 title2 'Hosp_Admission in CY21 AND Positive_Test ne . unless Hosp_Admission in June21';
 

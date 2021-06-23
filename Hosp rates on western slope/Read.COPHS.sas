@@ -3,7 +3,9 @@ PROGRAM:    Read.COPHS
 AUTHOR:		Eric Bush
 CREATED:	   June 22, 2021
 MODIFIED:   	
-PURPOSE:	   Connect to dphe144 "hospital" and create associated SAS dataset
+PURPOSE:	   Connect to dphe144 "hospital" and create associated SAS dataset.
+            The main changes are to convert date fields to true SAS date variables AND
+            to shrink character variables to smallest possible size.
 INPUT:		[name of input data table(s)]
 OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ***********************************************************************************************/
@@ -11,7 +13,7 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
 /*________________________________________________________________________________________________________*
  | Table of contents:
  |    1. Use libname Hosp144 to access HOSPITAL schema.  See CEDRS.Libnames.sas
- |    Q. Get a list of SQL data tables in the schema using Proc Datasets;             <<---- HOW CAN I DO THIS WITH ODBC  ???
+ |    Q. Get a list of SQL data tables in the schema using Proc Datasets;           <<---- HOW CAN I DO THIS WITH ODBC  ???
  |    2. Make temporary copy of the COPHS data table in the Hospital schema 
  |       a) The first time, use obs=50 option. Review variables in PROC contents output.
  |       b. Record findings. See expected findings below.
@@ -45,24 +47,26 @@ PROC contents data=COPHS  varnum ;  run;
  *________________________________________________________________________________________________*/
 
 ** 3. determine format of dates in the char vars **;
-   PROC freq data=COPHS ;
-      tables Hospital_Admission_Date___MM_DD_
-             ICU_Admission_Date___MM_DD_YYYY_
-             DOB__MM_DD_YYYY_
-             Positive_COVID_19_Test_Date
-             Discharge_Transfer__Death_Date__
-             Last_Day_in_ICU_During_Admission  ;  * date fields;
-run;
+/*   PROC freq data=COPHS ;*/
+/*      tables Hospital_Admission_Date___MM_DD_*/
+/*             ICU_Admission_Date___MM_DD_YYYY_*/
+/*             DOB__MM_DD_YYYY_*/
+/*             Positive_COVID_19_Test_Date*/
+/*             Discharge_Transfer__Death_Date__*/
+/*             Last_Day_in_ICU_During_Admission  ;  * date fields;*/
+/*run;*/
 
 ** 3.a) explore obs with bad date value **;
-   proc print data= COPHS;
-   where MR_Number='228438';
-   var MR_Number Discharge_Transfer__Death_Date__ ;
-   run;
+/*   proc print data= COPHS;*/
+/*   where MR_Number='228438';*/
+/*   var MR_Number Discharge_Transfer__Death_Date__ ;*/
+/*   run;*/
 * --> value will get set to missing *;
 
 
 ** 4. Modify SAS dataset per Findings **;
+**____________________________________**;
+
 DATA COPHS_temp; set COPHS; 
  
 * Convert temporary character var for each date field to a date var *;

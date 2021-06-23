@@ -8,16 +8,19 @@ INPUT:		[name of input data table(s)]
 OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ***********************************************************************************************/
 
-/*________________________________________________________________________________________________________*
+/*--------------------------------------------------------------------------------------------------------*
  | Table of Contents - code for the following tasks:
  |    1. Proc contents of COPHS dataset
  |    2. Identify duplicate records. 
  |    3. Print selected variables for duplicate records.
- |    4. Number of records with a date for positive COVID test
- |       a. Explore records with missing positive COVID test date
+ |       a) Look at dup records with same Hospital admission date
+ |    4. Explore records with missing positive COVID test date 
+ |    5. N and Number missing for date variables: hospital admission and positive COVID test
+ |    6. Check that Grand county records are in Colorado and NOT Utah
  |  --> Filter on having date for POS COVID test AND hosp admission date > 12/31/20  <--
- |    5. Proc contents of filtered COPHS dataset =  COVID_Hosp_CY21
- |    6. Hospitalizations by Western slope and ROC
+ |    7. Proc contents of filtered COPHS dataset =  COVID_Hosp_CY21
+ |    8. Hospitalizations by Western slope and ROC
+ |       a) Denominator for two Western slope and ROC
  |    7. Hosp count by week for CY21. Out = Admit_week_by_slope
  |       ** Admit_week_by_slope --> export to Excel for charting
  |    8. Hosp count by day for CY21. Out = Admit_day_by_slope
@@ -25,7 +28,7 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
  |    9. Time sequence of hospital dates (to learn about defining "currently hospitalized"
  |   10. Define currently hospitalized.
  |   11. Create table of currently hospitalized per 100K
- *________________________________________________________________________________________________________*/
+ *--------------------------------------------------------------------------------------------------------*/
 
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
@@ -37,6 +40,10 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 options pageno=1;
 title1 'dphe144 = COPHS';
    PROC contents data=COVID.COPHS varnum; run;
+
+
+*** The first part of this code is focused on looking at data quality type issues ***;
+***_______________________________________________________________________________***;
 
 * 2: Identify duplicate records *;
    PROC FREQ data= COVID.COPHS  noprint;  
@@ -62,7 +69,7 @@ title2 'List of dup records';
 run;
 
 
-* 3.b): Print out dup records with same Hospital admission date (i.e. bad dup)  *;
+* 3.a): Print out dup records with same Hospital admission date (i.e. bad dup)  *;
    proc sort data=COVID.COPHS(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;
    PROC print data=DupHospAdmit ; 
       id MR_Number ;
@@ -72,19 +79,19 @@ run;
 title2 'List of dup records with same Hospital admission date';
 run;
 
-/*
+/*-----------------------------------------------------------------------------------------------------------------------*
+ | FINDINGS:
  | West Pines Hospital is mental facility associated with, i.e. on campus of, Exempla Lutheran Med Ctr.
  | --> Delete dup record where Facility = 'West Pines Hospital'. So code to add to data step below is:
      if MR_Number = 'M1373870' and Facility_Name = 'West Pines Hospital' then delete;
      if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
-*/
+*------------------------------------------------------------------------------------------------------------------------*/
 
 
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 title2 'ALL records';
 
-** 4.a) explore missing positive test dates to see if they are mostly recent admissions **;
-
+** 4. Explore missing positive test dates to see if they are mostly recent admissions **;
 * details *;
 proc print data=COVID.COPHS;
    where Positive_Test = .;
@@ -101,9 +108,25 @@ run;
 run;
 
 
-** 4. For ALL records, number with ID, Hosp admit date, and a date for positive COVID test **;
+** 5. Check that all Grand county records are in Colorado and NOT in Grand county, Utah **;
+   PROC freq data= COVID.COPHS;
+      where upcase(County_of_Residence) = 'GRAND';
+      tables  County_of_Residence * City * Zip_Code / list;
+run;
+/*-----------------------------------------------------------------------------------------------------------------------*
+ | FINDINGS:
+ | Zip codes for Grand county Utah include:  84515, 84532, 84540
+ | --> Delete records where Grand county Utah is place of residence. So code to add to data step below is:
+     if upcase(County_of_Residence) = 'GRAND' and Zip_Code in (84515, 84532, 84540) then delete;
+*------------------------------------------------------------------------------------------------------------------------*/
+
+
+*** Descriptive analysis on ALL records (unfiltered data). ***:
+***________________________________________________________***;
+
+** 6. N and number missing in ALL records for Hosp admit date and a date for positive COVID test **;
    PROC means data= COVID.COPHS  n nmiss;
-      var MR_Number Hosp_Admission Positive_Test;
+      var Hosp_Admission   Positive_Test ;
 run;
    PROC freq data= COVID.COPHS;
       tables Positive_Test ;
@@ -111,8 +134,10 @@ run;
 run;
 
 
-*** Filter on POS COVID test AND CY21 only ***;
-***----------------------------------------***;
+*** The second part of this code filters data and addresses issues described above ***;
+*** Descriptive analysis in this section is on the filtered data.                  ***:
+*** Filter on CY21 only AND POS COVID test (if prior to June). Remove n=2 dups.    ***;
+***________________________________________________________________________________***;
 
    PROC format;
       value $WestSlope
@@ -140,31 +165,34 @@ DATA COVID_Hosp_CY21;  set COVID.COPHS;
    if Hosp_Admission > '31DEC20'd  AND  (  (Hosp_Admission<'01JUN21'd  and Positive_Test ne .) OR (Hosp_Admission ge '01JUN21'd) )   ;
    Region = put(County_of_Residence, $WestSlope. );
 
-   * from DupChk code above (3.b) ;
+   * from DupChk code above ;
    if MR_Number = 'M1373870' and Facility_Name = 'West Pines Hospital' then delete;
    if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
+
+   * from Grand county check code above ;
+   if upcase(County_of_Residence) = 'GRAND' and Zip_Code in (84515, 84532, 84540) then delete;
 
 run;
 title2 'Hosp_Admission in CY21 AND Positive_Test ne . unless Hosp_Admission in June21';
 
 
-** 5. FILTERED: Number of records with ID, Hosp admit date, and a date for positive COVID test **;
+** 7. FILTERED: Number of records with ID, Hosp admit date, and a date for positive COVID test **;
    PROC means data= COVID_Hosp_CY21  n nmiss;
       var Hosp_Admission Positive_Test;
 run;
 
 
-** 6. Hospitalizations by Western slope and ROC **;
+** 8. Hospitalizations by Western slope and ROC **;
    PROC freq data= COVID_Hosp_CY21;
       tables Region ;
       title3 'Hospitalizations by Western slope and ROC';
 run;
 
-** 6.a) Denominator for two regions of Colorado **;
+** 8.a) Denominator for two regions of Colorado **;
 
 
 
-** 7. Hosp count by week for CY21 **;
+** 9. Hosp count by week for CY21 **;
 **--------------------------------**;
 
    /* This code is to create a dataset meant for exporting to Excel for charting */
@@ -187,7 +215,7 @@ run;
 run; 
 
 
-** 8. Hosp count by day since April 1, 2021 **;
+** 10. Hosp count by day since April 1, 2021 **;
 **__________________________________________**;
 
   /* This code is to create a dataset meant for exporting to Excel for charting */
@@ -210,14 +238,14 @@ run;
 run; 
 
 
-** 9. Time sequence of selected date variables **;
+** 11. Time sequence of selected date variables **;
    PROC print data= COVID_Hosp_CY21(obs=44);
       var Hosp_Admission  ICU_Admission  last_day_in_ICU   Date_left_facility ;
 run;
 /*  Seems that patients with Hosp_Admission date but have missing date for "Date_left_facility" are currently hospitalized. */
 
 
-** 10. Define currently hospitalized **;
+** 12. Define currently hospitalized **;
 data currentHosp; set COVID_Hosp_CY21;
    if Hosp_Admission = . AND  Date_left_facility = .  then Currently_Hospitalized=.;
    else if Hosp_Admission ne . AND  Date_left_facility = . then Currently_Hospitalized=1;
@@ -232,7 +260,7 @@ run;
 run;
 
 
-** 11. Create table of currently hospitalized per 100K **;
+** 13. Create table of currently hospitalized per 100K **;
    PROC freq  data= currentHosp  noprint;
       where Currently_Hospitalized ne .;
       tables Currently_Hospitalized  * Region / out=CurrHosp;

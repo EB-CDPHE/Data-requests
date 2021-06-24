@@ -15,6 +15,7 @@ OUTPUT:	COVID.COPHS_Preg
  |    2. Frequency of gender 
  |    3. Frequency of unknown DOB.
  |    4. N and number missing hospital admission date. --> impute with ICU admission date. 
+ |    5. Frequency of Pregnant_at_Admit
  |    5. Create dataset for target population
  |       a) Filter out records with bad age data
  |       b) Fix Gender values
@@ -53,11 +54,19 @@ run;
    proc print data= COVID.COPHS_Preg ;  where Hosp_Admit_Date=.;  var MR_Number Last_name DOB Hosp_Admit_Date ICU_Admit_Date Gender; run;     *<-- Age_at_Admit=.;
 
 
-* 5. Calculate Age at admission into Hospital *;
-Data CaseAge ; set COVID.COPHS_Preg ;
+* 5. Frequency of unknown DOB *;
+   PROC freq data= COVID.COPHS_Preg;  *where DOB = '01JAN1900'd;  tables Pregnant_at_Admit; run;
+   * FINDINGS:  some records have 'y' or 'yes' instead of 'Y';
+
+
+* 6. Calculate Age at admission into Hospital *;
+Data Cases_CBF_tmp ; set COVID.COPHS_Preg ;
 * ignore records with DOB = Jan 1, 1990, i.e. unknown DOB ;
 * ignore records with DOB during 2020 or 2021, i.e. 3 infants with COVID;
    where '01JAN1900'd < DOB < '01JAN2020'd;
+
+* fix pregnant at admission values *;
+   if Pregnant_at_Admit in ('y', 'yes') then Pregnant_at_Admit='Y';
 
 * fix gender values *;
    if Gender='F' then Gender='Female';

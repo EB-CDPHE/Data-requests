@@ -28,10 +28,7 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ** 1. Libname to access [SQL database name] using ODBC **;
 LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** contains "CEDRS_view which is copy of CEDRS_dashboard_constrained";
 
-** 2. Read in the first 50 records to create sample SAS dataset **;
-DATA COPHS; set dbo144.populations; run;    * <-- for building code add (obs=50) ;
-
-** 2.a) Review contents of SAS dataset **;
+** 2. Review contents of SAS dataset **;
 PROC contents data=dbo144.populations  varnum ;  run;    
 
 /*----------------------------------------------------------------------------------------------*

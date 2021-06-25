@@ -16,11 +16,11 @@ OUTPUT:	COVID.COPHS_Preg
  |    3. Frequency of unknown DOB.
  |    4. N and number missing hospital admission date. --> impute with ICU admission date. 
  |    5. Frequency of Pregnant_at_Admit
- |    5. Create dataset for target population
+ |    6. Create dataset for target population
  |       a) Filter out records with bad age data
  |       b) Fix Gender values
  |       c) Calculate Age at admission into Hospital
- |    6. Description of variables to be used to define target population
+ |    7. Description of variables to be used to define target population
  |       a) univariate stats of good Age_at_Admit
  |       b) frequency of gender and categorization of Age_at_Admit
  |       c) Final N for target population
@@ -59,7 +59,7 @@ run;
    * FINDINGS:  some records have 'y' or 'yes' instead of 'Y';
 
 
-* 6. Calculate Age at admission into Hospital *;
+* 6. Create dataset for target population *;
 Data Cases_CBF_tmp ; set COVID.COPHS_Preg ;
 * ignore records with DOB = Jan 1, 1990, i.e. unknown DOB ;
 * ignore records with DOB during 2020 or 2021, i.e. 3 infants with COVID;
@@ -94,7 +94,7 @@ run;
 *** Description of variables to be used to define target population. ***;
 ***__________________________________________________________________***;
 
-* 6.a) univariate stats of good Age_at_Admit *;
+* 7.a) univariate stats of good Age_at_Admit *;
    PROC univariate data= CaseAge ;
       var Age_at_Admit;
 run;
@@ -106,13 +106,13 @@ run;
          41-high = 'Over 40' ;
 run;
 
-* 6.b) frequency of gender and categorization of Age_at_Admit *;
+* 7.b) frequency of gender and categorization of Age_at_Admit *;
    PROC freq data = CaseAge ;
       tables Gender  Age_at_Admit  ;
       format Age_at_Admit Age_Grp. ;
 run;
 
-* 6.c) Final N for target population *;
+* 7.c) Final N for target population *;
    proc sort data=caseage out=casesbygender; by Gender;
    PROC freq data = casesbygender ;
       where gender='Female';

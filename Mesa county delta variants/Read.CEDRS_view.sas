@@ -29,7 +29,7 @@ LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** contains "CEDR
 
 
 ** 2. Read in the first 50 records to create sample SAS dataset **;
-DATA CEDRS_view; set dbo144.CEDRS_view(obs=50); run;    * <-- for building code add (obs=50) ;
+DATA CEDRS_view; set dbo144.CEDRS_view; run;    * <-- for building code add (obs=50) ;
 
 ** Review contents of SAS dataset **;
 PROC contents data=CEDRS_view  varnum ;  run;    

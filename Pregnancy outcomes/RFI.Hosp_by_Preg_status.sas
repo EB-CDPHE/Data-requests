@@ -88,7 +88,7 @@ DATA COVID.Cases_CBF; set Cases_CBF_tmp ;
 run;
 
 
-* COPHS for target pop *;
+* Contents for target pop *;
    PROC contents data=COVID.Cases_CBF varnum ;  run;
 
 
@@ -101,6 +101,16 @@ run;
    PROC freq data= COVID.Cases_CBF ;
       tables Pregnant_at_Admit ;
 run;
+
+
+** Population of two regions **;
+   PROC means data=COVID.county_population  n sum  maxdec=0;
+      var population ;
+      class County ;
+      format County $WestSlope.;
+run;
+/* FINDINGS:  WS=486582 and ROC=5277394  */
+
 
 
 ** ?. Hosp count by week by pregnancy status at admission - ALL COLORADO **;
@@ -126,6 +136,13 @@ run;
       ID Hosp_Admit_Date;
 run; 
 
+
+
+
+proc freq data= COVID.Cases_CBF;
+      where Pregnant_at_Admit ne 'n/a';
+tables Region * Pregnant_at_Admit /CMH ;
+run;
 
 
 

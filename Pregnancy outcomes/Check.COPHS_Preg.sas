@@ -122,3 +122,17 @@ run;
 run;
 
 
+* summary report of bad data *;
+   PROC print data= COVID.COPHS_Preg ; 
+      where Pregnant_at_Admit in ('y', 'yes'); 
+      id MR_Number; var  Pregnant_at_Admit   Gender    ;
+   PROC print data= COVID.COPHS_Preg ; 
+      where Gender='F';
+      id MR_Number; var  Pregnant_at_Admit   Gender    ;
+   PROC print data= COVID.COPHS_Preg ; 
+      where Gender='M' ;
+      id MR_Number; var  Pregnant_at_Admit   Gender    ;
+run;
+
+
+

@@ -1,9 +1,10 @@
 /**********************************************************************************************
-PROGRAM: Explore.[CEDRS_SQL_table]
+PROGRAM: Check.[CEDRS_SQL_table]
 AUTHOR:  Eric Bush
 CREATED: June 8, 2021
 MODIFIED:	
-PURPOSE:	After a SQL data table has been read using Read.CEDRS_SQL_table, this program can be used to explore the SAS dataset
+PURPOSE:	This code offers a menu of data checks for newly created SAS dataset.
+         For example, a dataset that is created from a SQL data table that has been read using Read.[CEDRS_SQL_table] program. 
 INPUT:		[name of input data table(s)]
 OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ***********************************************************************************************/
@@ -14,12 +15,13 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
  |    Complete libname statement to point to SAS dataset created with the matching Read.* program.
  |    A. Explore Admin variables such as ID variables.
  |       1. Check for duplicate records. 
- |       2. Print selected admin variables for specific record.
- |       3. Check of missing values in Admin variables
-
+ |       2. Print selected admin variables for specific duplicate records.
+ |       3. Check of missing values in Admin variables - char var (or categorical data)
+ |       4. Check of missing values in Admin variables - numeric var
+ |
  |    B. Explore Event Dates.
- |       1. Time sequence of selected date variables
- |       2. Frequency of CEDRS cases by various time groupings
+ |       1. Check completeness of selected date variables
+ |       2. Check for invalid date values via Proc Freq and various time formats
  |
  |    C. Explore Demographic variables.
  |       1. Print selected demographic variables for specific record.
@@ -37,11 +39,11 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 *** A. Admin variables ***;
 ***-----------------***;
-** --> for CEDRS, each record should have a unique (ProfileID || EventID)  **;
 
-* A.1: Identify duplicate records *;
+* A.1: Check for (and identify) duplicate records *;
+   ** --> for CEDRS, each record should have a unique (ProfileID || EventID)  **;
    PROC FREQ data= COVID.SQL_dsn  noprint;  
-      tables ProfileID * EventID / out=DupChk(where= count>1);
+      tables ProfileID * EventID / out=DupChk(where= count>1);    * <-- output ID's for dup records into DupChk dataset;
    PROC print data=DupChk;  id ProfileID;  run;
 
 * A.2: Print out record for specific Profile ID (or subsitute or add Event ID) *;
@@ -51,23 +53,27 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
       var EventID  LastName FirstName ReportedDate ;
 run;
 
-* A.3: Check for missing values in Admin variables *;
-   proc freq data= COVID.SQL_dsn;
+* A.3: Check for missing values in Admin variables - char var *;
+   PROC freq data= COVID.SQL_dsn;
      tables ID * ProfileID * EventID /list missing missprint;
+run;
+
+* A.4: Check for missing values in Admin variables - numeric var *;
+   PROC means data= COVID.SQL_dsn  n nmiss ;
+     var Hosp_Date;
 run;
 
 
 *** B. Event dates  ***;
 ***-----------------***;
 
-** B.1 Time sequence of selected date variables **;
+** B.1 Check completeness of selected date variables **;
    PROC print data= COVID.SQL_dsn;
       ID ID ;
       var OnsetDate_proxy_dist  Earliest_CollectionDate  CollectionDate  ReportedDate  DeathDate  ;
 run;
 
-** B.2 Frequency of confirmed and probable cases by various time groupings (e.g. Month, Day of week, Week) **;
-
+** B.2 Check for invalid date values via Proc Freq and various time formats (e.g. Month, Day of week, Week) **;
    PROC freq data= COVID.SQL_dsn;  tables reporteddate;  format reporteddate MONYY. ;  run;
    PROC freq data= COVID.SQL_dsn;  tables reporteddate;  format reporteddate DOWNAME. ; run;
    PROC freq data= COVID.SQL_dsn;  tables reporteddate;  format reporteddate WeekW5. ; run;

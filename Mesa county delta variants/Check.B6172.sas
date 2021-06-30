@@ -69,6 +69,9 @@ run;
 
 
 
+*** Code to run to edit COVID.B6172 dataset to use for RFI analysis ***;
+***vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv***;
+
 * 3. Edit data per above findings *;
 DATA B6172_temp ;  set COVID.B6172 ;
    County = scan(CountyAssigned,1);
@@ -84,6 +87,10 @@ PROC sort data=B6172_temp  out=B6172_edit  NoDup ;  by _ALL_;  run;
 
 * 5. Contents of new dataset with edits *;
    PROC contents data= B6172_edit varnum ;  run;
+
+***^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^***;
+*** Code to run to edit COVID.B6172 dataset to use for RFI analysis ***;
+
 
 
 * 6. Check edits *;

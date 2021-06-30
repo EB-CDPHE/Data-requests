@@ -3,7 +3,7 @@ PROGRAM:  Read.B6172
 AUTHOR:		Eric Bush
 CREATED:	June 9, 2021
 MODIFIED:	063021:  Modify to be consistent with READ.SQL_DSN template
-PURPOSE:	Connect to ?????? and create associated SAS dataset
+PURPOSE:	Connect to CEDRS backend and create associated SAS dataset
 INPUT:		SQL code from Bre joins data tables from CEDRS Warehouse:  CEDRS66.zDSI_Profiles, CEDRS66.zDSI_Events, CEDRS66.zDSI_LabTests 
 OUTPUT:		COVID.Denom4_B1_617_2_CO
 ***********************************************************************************************/

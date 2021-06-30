@@ -17,8 +17,10 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
  | Programs to run prior to this code:
  | 1. Pull data from CEDRS using READ.CEDRS_view.  Creates COVID.CEDRS_view 
  | 2. Pull data on variants using READ.B6172.  Creates work.B6172_edit
+ | 3. Mesa.formats.sas program
  *________________________________________________________________________________________*/
 
+%inc 'C:\Users\eabush\Documents\GitHub\Data-requests\Mesa county delta variants\Mesa.formats';
 
 /*________________________________________________________________________________________*
  | Table of contents for RFI code:

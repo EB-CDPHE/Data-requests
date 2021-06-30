@@ -34,7 +34,7 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
 ** Access the final SAS dataset that was created in the Read.* program that matches this Explore.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-   PROC contents data=COVID.SQL_dsn varnum; run;
+   PROC contents data=COVID.SQL_dsn varnum; run;         * <-- use final dataset name from Read.[SQL table].sas program ;
 
 
 *** A. Admin variables ***;

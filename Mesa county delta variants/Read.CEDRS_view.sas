@@ -85,11 +85,11 @@ run;
 
 
 ** 5. Create libname for folder to store permanent SAS dataset (if desired) **;
-/*Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;*/
+Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA CEDRS_view2 ; set CEDRS_view_temp_ ;
+DATA COVID.CEDRS_view ; set CEDRS_view_temp_ ;
 run;
 
 

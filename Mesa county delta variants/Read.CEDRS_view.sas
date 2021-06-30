@@ -93,7 +93,7 @@ DATA COVID.CEDRS_view ; set CEDRS_view_temp_ ;
 run;
 
 
-   PROC contents data=CEDRS_view2 varnum; run;
+   PROC contents data=COVID.CEDRS_view varnum; run;
 
 
 

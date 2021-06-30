@@ -27,14 +27,14 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
  |    b. work.B6172_edit dataset from dphe66
  |
  | 2. Demographics for confirmed and probable cases
- | --> filtered dataset = NOT MESA county (work.Not_Mesa144)
+ | --> filtered dataset = NOT MESA county AND >Apr 5, 2021 (work.Not_Mesa144)
  |    a) Time reference period
  |    b) Number of cases (confirmed or probable)
  |    c) Age statistics on cases (confirmed or probable)
  |    d) Demographics for cases (confirmed or probable)
  |
  | 3. Demographics for confirmed and probable cases
- | --> filtered dataset = ONLY MESA county (work.Mesa144)
+ | --> filtered dataset = ONLY MESA county AND >Apr 5, 2021 (work.Mesa144)
  |    a) Time reference period
  |    b) Number of cases (confirmed or probable)
  |    c) Age statistics on cases (confirmed or probable)

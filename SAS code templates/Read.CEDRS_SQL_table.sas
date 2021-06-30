@@ -54,13 +54,16 @@ PROC contents data=&SQL_dsn  varnum ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA &SQL_dsn._temp; set &SQL_dsn(rename=(ID=tmp_ID onsetdate=tmp_onsetdate ));     * <-- rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
+DATA &SQL_dsn._temp; set &SQL_dsn(rename=(ID=tmp_ID onsetdate=tmp_onsetdate ReportedDate=tmp_ReportedDate ));     * <-- rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
  
 * Convert temporary numeric ID variable character ID var using the CATS function *;
    ID = cats(tmp_ID);
 
 * Convert temporary character var for each date field to a date var *;
    OnsetDate = input(tmp_onsetdate, yymmdd10.); format OnsetDate yymmdd10.;
+
+* Extract date part of a datetime variable  *;
+   ReportedDate = datepart(tmp_ReportedDate);   format ReportedDate yymmdd10.;
 
    DROP tmp_: ;
 run;

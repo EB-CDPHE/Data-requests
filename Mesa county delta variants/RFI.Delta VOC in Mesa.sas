@@ -4,7 +4,7 @@ AUTHOR:  Eric Bush
 CREATED: June 9, 2021
 MODIFIED:	
 PURPOSE:	Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		[name of input data table(s)]
+INPUT:		COVID.CEDRS_view   work.B6172_edit
 OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ***********************************************************************************************/
 

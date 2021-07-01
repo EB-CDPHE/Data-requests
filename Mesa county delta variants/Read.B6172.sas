@@ -2,7 +2,8 @@
 PROGRAM:  Read.B6172
 AUTHOR:		Eric Bush
 CREATED:	June 9, 2021
-MODIFIED:	063021:  Modify to be consistent with READ.SQL_DSN template
+MODIFIED:	070121:  Modified where clause to include Delta Plus variants
+            063021:  Modify to be consistent with READ.SQL_DSN template
 PURPOSE:	Connect to CEDRS backend and create associated SAS dataset
 INPUT:		SQL code from Bre joins data tables from CEDRS Warehouse:  CEDRS66.zDSI_Profiles, CEDRS66.zDSI_Events, CEDRS66.zDSI_LabTests 
 OUTPUT:		COVID.Denom4_B1_617_2_CO
@@ -21,21 +22,22 @@ LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK
 
 ****************************************;
 *BKawasaki 6-8-2021*********************;
-*B.1.617.2s in Mesa County**************;
-*                                       ;
+*B.1.617.2s in Mesa County**************;  * <-- I removed this restriction from the where clause to get variants for ALL of Colorado;
 ****************************************;
 
-		/***B.1.617.2s in Mesa County***/
+		/*** B.1.617.2s in Colorado ***/
 PROC SQL;
-   create table denominator_ALL_B6172
-   as select distinct d.ProfileID, d.LastName, d.FirstName, d.MiddleName, d.Birthdate/*, input(d.BirthDate, anydtdtm.) as DOBdate fortmat=dtdate9.*/, d.Gender, e.EventID, e.Disease, e.EventStatus, e.countyassigned,
-   e.EntryMethod, e.ReportedDate, e.Age, e.AgeType, e.Outcome, l.TestType, l.ResultText, l.QuantitativeResult, l.ResultDate, l.CreateDate
+   create table denominator_ALL_B6172plus
+   as select distinct   d.ProfileID, d.LastName, d.FirstName, d.MiddleName, d.Birthdate/*, input(d.BirthDate, anydtdtm.) as DOBdate fortmat=dtdate9.*/, d.Gender, 
+                        e.EventID, e.Disease, e.EventStatus, e.countyassigned, e.EntryMethod, e.ReportedDate, e.Age, e.AgeType, e.Outcome, 
+                        l.TestType, l.ResultText, l.QuantitativeResult, l.ResultDate, l.CreateDate
 	
 	from CEDRS66.zDSI_Profiles d
 	left join CEDRS66.zDSI_Events e on d.ProfileID = e.ProfileID
 	left join CEDRS66.zDSI_LabTests l on e.EventID = l.EventID
 
-	where d.ProfileID ne . and e.Deleted ne 1 and e.EventID ne . and l.TestType='COVID-19 Variant Type' and (l.ResultText='B.1.617.2 - for surveillance only. Not diagnostic' or l.QuantitativeResult like '%B.1.617.2%')
+	where d.ProfileID ne . and e.Deleted ne 1 and e.EventID ne . and l.TestType='COVID-19 Variant Type' and 
+      (l.ResultText='B.1.617.2 - for surveillance only. Not diagnostic' OR l.QuantitativeResult like '%B.1.617.2%'  OR  index(l.QuantitativeResult,'AY.2')>0 )
       and e.disease ='COVID-19' and e.EventStatus in ('Probable','Confirmed')  
 
 	group by e.EventID  ;

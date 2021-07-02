@@ -4,7 +4,7 @@ AUTHOR:		Eric Bush
 CREATED:	June 9, 2021
 MODIFIED:	070121:  Pull out code that fixes dataset and put into separate program
 PURPOSE:	Explore created SAS dataset using various edit checks
-INPUT:		COVID.B6172
+INPUT:		COVID.B6172        OR    
 OUTPUT:		printed output
 ***********************************************************************************************/
 
@@ -21,6 +21,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
  | 2. Print out selected fields for ALL duplicate records (if there are LOTS of them)
  |  OR
  | 2. Print out duplicate records for each Profile ID (if there are FEW of them)
+ | 3. Check County_assigned variable
  |
  | Edit checks for FIXED SAS dataset
  | 3. Check edits; run frequency of key variables
@@ -79,11 +80,20 @@ run;
 
 
 
+* 3. Check County_Assigned variable *;
+DATA B6172_Ck3; set COVID.B6172;
+   County = scan(CountyAssigned,1,',');
+   PROC freq data=B6172_Ck3; 
+      tables  County * CountyAssigned /list; 
+run;
+/*
+ | FINDINGS:
+ | County_Assigned variable is in form of "County name, CO".
+ | FIX: create new County variable from first 'word' of County_Assigned
+*/
 
 
 * 4. Check edits *;
-
-PROC freq data=B6172_edit; tables  County * CountyAssigned /list; run;
 
    proc print data= B6172_edit(obs=50) ;
    id profileid ;  var gender disease eventstatus county entrymethod agetype outcome testtype resulttext eventid age birthdate reporteddate;

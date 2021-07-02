@@ -1,11 +1,11 @@
 /**********************************************************************************************
-PROGRAM:  Explore.B6172
+PROGRAM:  Check.B6172
 AUTHOR:		Eric Bush
 CREATED:	June 9, 2021
-MODIFIED:	
-PURPOSE:	Explore created SAS dataset
+MODIFIED:	070121:  Pull out code that fixes dataset and put into separate program
+PURPOSE:	Explore created SAS dataset using various edit checks
 INPUT:		COVID.B6172
-OUTPUT:		VOC_CO
+OUTPUT:		printed output
 ***********************************************************************************************/
 
 
@@ -16,14 +16,14 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 /*________________________________________________________________________________________________________*
- | Table of Contents:
+ | Edits checks for READ SQL data table:
  | 1. Identify Profile IDs with duplicate records  
- | 2. Print out duplicate records for each Profile ID
- | 3. Make edits to the data per findings from data checks
- | 4. Remove records that have duplicate values for ALL variables
- | --> filtered dataset (de-duplicated)
- | 5. PROC Contents of dataset with edits
- | 6. Check edits; run frequency of key variables
+ | 2. Print out selected fields for ALL duplicate records (if there are LOTS of them)
+ |  OR
+ | 2. Print out duplicate records for each Profile ID (if there are FEW of them)
+ |
+ | Edit checks for FIXED SAS dataset
+ | 3. Check edits; run frequency of key variables
  *________________________________________________________________________________________________________*/
 
 
@@ -32,28 +32,38 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 * 1. Identify Profile IDs with duplicate records *;
    PROC FREQ data= COVID.B6172 noprint;  
-      tables ProfileID * EventID / out=DupChk(where= count>1);
+      tables ProfileID * EventID / out=DupChk(where=(count>1));
    PROC print data=DupChk; 
       id ProfileID;
 run;
+/*
+ | FINDINGS:
+ | This seems to be a regular occurrence. There are different types of dups.
+ | Some differ on ResultDate. Fix: keep record with most recent (latest) ResultDate.
+ | Some with identical ResultDate differ on CreateDate. Fix: keep record with latest date.
+ | Some are identical on all varibles. Fix: keep last observation.
+ | Can accomplish all of these fixes but sorting by ResultDate and keeping last one.
+*/
 
-* 2. Print out duplicate records for each Profile ID identified as having duplicate records *;
-   PROC print data= COVID.B6172;
-      where ProfileID='1650460';
-      id ProfileID; 
-      var EventID  lastname firstname birthdate gender disease eventstatus countyassigned entrymethod CreateDate ResultDate reporteddate age outcome testtype resulttext quantitativeresult  ;
+
+* 2. Print out selected fields for ALL duplicate records *;
+   proc sort data= COVID.B6172  out= B6172sort ;  by ProfileID  EventID ResultDate CreateDate ;
+Data DupOnly;  merge B6172sort DupChk(in=Dup) ;  
+ by ProfileID  EventID ;
+ if Dup;
+ run;
+
+ options ps=50 ls=150 ;     * Landscape pagesize settings *;
+   PROC print data= DupOnly;
+      id ProfileID ; 
+      var EventID gender birthdate ResultDate CreateDate  entrymethod  resulttext quantitativeresult  ;
+      format lastname $15. ;
 run;
-** FINDING:  the difference in the two records is in quantitativeresult.  Delete record with null result  **;
 
-/*proc print data= COVID.B6172;*/
-/*where profileid='1666508';*/
-/*id profileID; */
-/*var EventID  lastname firstname birthdate gender disease eventstatus countyassigned entrymethod reporteddate age outcome testtype resulttext quantitativeresult;*/
-/*run;*/
-** FINDING:  the difference in the two records is in resulttext.  Delete record where resulttext contains "6.1.1"  **;
-** UPDATE: the dup records for this ProfileID is now resolved in source dataset ;
-  
-   PROC print data= COVID.B6172;
+/*     OR      */
+
+* 2. Print out duplicate records for specific Profile ID identified as having duplicate records *;
+    PROC print data= COVID.B6172;
       where ProfileID='1658113';
       id ProfileID; 
       var EventID  lastname firstname birthdate gender disease eventstatus countyassigned entrymethod CreateDate ResultDate reporteddate age outcome testtype resulttext quantitativeresult  ;
@@ -69,31 +79,9 @@ run;
 
 
 
-*** Code to run to edit COVID.B6172 dataset to use for RFI analysis ***;
-***vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv***;
-
-* 3. Edit data per above findings *;
-DATA B6172_temp ;  set COVID.B6172 ;
-   County = scan(CountyAssigned,1);
-   if ProfileID in ('1650460', '1658113', '1685685') then DO;
-      if EventID = '1159166' and quantitativeresult='' then delete;
-      if EventID = '1167191' and ResultDate = '07JUN21'd then delete;
-   END;
-run;
-
-* 4. Remove records that have duplicate values for ALL variables *;
-PROC sort data=B6172_temp  out=B6172_edit  NoDup ;  by _ALL_;  run;
 
 
-* 5. Contents of new dataset with edits *;
-   PROC contents data= B6172_edit varnum ;  run;
-
-***^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^***;
-*** Code to run to edit COVID.B6172 dataset to use for RFI analysis ***;
-
-
-
-* 6. Check edits *;
+* 4. Check edits *;
 
 PROC freq data=B6172_edit; tables  County * CountyAssigned /list; run;
 

@@ -6,7 +6,7 @@ MODIFIED:	070121:  Modified where clause to include Delta Plus variants
             063021:  Modify to be consistent with READ.SQL_DSN template
 PURPOSE:	Connect to CEDRS backend and create associated SAS dataset
 INPUT:		SQL code from Bre joins data tables from CEDRS Warehouse:  CEDRS66.zDSI_Profiles, CEDRS66.zDSI_Events, CEDRS66.zDSI_LabTests 
-OUTPUT:		COVID.Denom4_B1_617_2_CO
+OUTPUT:		B6172_read
 ***********************************************************************************************/
 
 
@@ -49,7 +49,7 @@ PROC SQL;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA B6172; 
+DATA B6172_temp; 
    set denominator_ALL_B6172(rename=
                               (ProfileID=tmp_ProfileID 
                                EventID=tmp_EventID
@@ -80,7 +80,7 @@ run;
 ** 4. Shrink character variables in data set to shortest possible lenght (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
- %shrink(B6172)
+ %shrink(B6172_temp)
 
 
  ** 5. Create libname for folder to store permanent SAS dataset (if desired) **;
@@ -88,11 +88,11 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA COVID.B6172 ; set B6172_;
+DATA B6172_read ; set B6172_temp_;
 run;
 
 
-   PROC contents data=COVID.B6172 varnum; run;
+   PROC contents data=B6172_read varnum; run;
 
 
 

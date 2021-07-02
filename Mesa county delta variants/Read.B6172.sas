@@ -27,7 +27,7 @@ LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK
 
 		/*** B.1.617.2s in Colorado ***/
 PROC SQL;
-   create table denominator_ALL_B6172plus
+   create table denominator_ALL_B6172
    as select distinct   d.ProfileID, d.LastName, d.FirstName, d.MiddleName, d.Birthdate/*, input(d.BirthDate, anydtdtm.) as DOBdate fortmat=dtdate9.*/, d.Gender, 
                         e.EventID, e.Disease, e.EventStatus, e.countyassigned, e.EntryMethod, e.ReportedDate, e.Age, e.AgeType, e.Outcome, 
                         l.TestType, l.ResultText, l.QuantitativeResult, l.ResultDate, l.CreateDate
@@ -37,7 +37,7 @@ PROC SQL;
 	left join CEDRS66.zDSI_LabTests l on e.EventID = l.EventID
 
 	where d.ProfileID ne . and e.Deleted ne 1 and e.EventID ne . and l.TestType='COVID-19 Variant Type' and 
-      (l.ResultText='B.1.617.2 - for surveillance only. Not diagnostic' OR l.QuantitativeResult like '%B.1.617.2%'  OR  index(l.QuantitativeResult,'AY.2')>0 )
+      ( index(l.ResultText,'B.1.617.2')>0   OR   l.QuantitativeResult like '%B.1.617.2%'   OR   index(l.QuantitativeResult,'AY.2')>0 )
       and e.disease ='COVID-19' and e.EventStatus in ('Probable','Confirmed')  
 
 	group by e.EventID  ;

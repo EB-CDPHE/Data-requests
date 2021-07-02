@@ -4,7 +4,7 @@ AUTHOR:  Eric Bush
 CREATED: June 9, 2021
 MODIFIED:	
 PURPOSE:	Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		COVID.CEDRS_view   work.B6172_edit
+INPUT:		COVID.CEDRS_view   COVID.B6172_fix
 OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ***********************************************************************************************/
 
@@ -67,7 +67,7 @@ options pageno=1;
       title1 'dphe144 - CEDRS_view (a copy of CEDRS_dashboard_constrained)';
 run;
 
- PROC contents data= B6172_edit varnum ;
+ PROC contents data= COVID.B6172_fix varnum ;
       title1 'dphe66 - SQL join of several data tables';
 run;
 
@@ -76,6 +76,7 @@ run;
 ***_______________________________________________________***;
 
 options pageno=1;
+title1;
 title2 'County = ALL but Mesa';
 
 DATA Not_Mesa144 ;  
@@ -188,7 +189,7 @@ PROC sort data= COVID.CEDRS_view(keep= ProfileID EventID Hospitalized  Reinfecti
    out=CEDRSkey; 
    by ProfileID EventID;
 
-PROC sort data= B6172_edit  out=B6172_key; by ProfileID EventID;
+PROC sort data= COVID.B6172_fix  out=B6172_key; by ProfileID EventID;
 run;
 
 DATA B6172_n_CEDRS;  merge CEDRSkey(in=C)  B6172_key(in=V);  

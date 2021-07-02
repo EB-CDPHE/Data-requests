@@ -4,7 +4,7 @@ AUTHOR:		Eric Bush
 CREATED:	June 9, 2021
 MODIFIED:	070121:  Pull out code that fixes dataset and put into separate program
 PURPOSE:	Explore created SAS dataset using various edit checks
-INPUT:		COVID.B6172        OR    
+INPUT:		COVID.B6172        OR     B6172_fix
 OUTPUT:		printed output
 ***********************************************************************************************/
 

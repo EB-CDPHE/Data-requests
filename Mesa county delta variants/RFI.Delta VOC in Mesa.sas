@@ -20,7 +20,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
  | 3. Mesa.formats.sas program
  *________________________________________________________________________________________*/
 
-%inc 'C:\Users\eabush\Documents\GitHub\Data-requests\Mesa county delta variants\Mesa.formats';
+%inc 'C:\Users\eabush\Documents\GitHub\Data-requests\Mesa county delta variants\Mesa.formats.sas';
 
 /*________________________________________________________________________________________*
  | Table of contents for RFI code:
@@ -103,7 +103,7 @@ run;
 run;
 
 ** c) Age statistics on cases (confirmed or probable) **;
-   PROC means data= Not_Mesa144  n  nmiss min p1 p5 p10 mean median p90 p95 p99 max   maxdec=1;
+   PROC means data= Not_Mesa144  n  nmiss min p1  p10 mean median p90  p99 max   maxdec=1;
       var  Age_at_Reported ;
       format ReportedDate  yymmdd10. ;
 run;
@@ -158,7 +158,7 @@ run;
 run;
 
 ** c) Age statistics on cases (confirmed or probable) **;
-   PROC means data= Mesa144  n  nmiss min p1 p5 p10 mean median p90 p95 p99 max   maxdec=1;
+   PROC means data= Mesa144  n  nmiss min p1  p10 mean median p90  p99 max   maxdec=1;
       var  Age_at_Reported ;
       format ReportedDate  yymmdd10. ;
 run;
@@ -229,17 +229,13 @@ run;
 run;
 
 ** 4. Age statistics on cases (confirmed or probable) with B.1.617.2 variant **;
-   PROC means data= Not_Mesa_B16172  n  nmiss min p1 p5 p10 mean median p90 p95 p99 max   maxdec=1;
+   PROC means data= Not_Mesa_B16172  n  nmiss min p1  p10 mean median p90  p99 max   maxdec=1;
       var  Age ;
 run;
-/*   PROC univariate data= Not_Mesa_B16172  freq  ;*/
-/*      var Age ;*/
-/*      id profileid;*/
-/*run;*/
 
 ** 5. Demographics for cases (confirmed or probable) with B.1.617.2 variant **;
    PROC freq data= Not_Mesa_B16172;
-      tables  Gender  Hospitalized  Outcome  Reinfection  Breakthrough  ;
+      tables  Gender  Hospitalized  Outcome  Reinfection  Breakthrough  / missing ;
       format  Gender $genderfmt.  Outcome $Outcome_2cat. ;
 run;
 
@@ -273,7 +269,7 @@ run;
 run;
 
 ** 4. Age statistics on cases (confirmed or probable) with B.1.617.2 variant **;
-   PROC means data= Mesa_B16172  n  nmiss min p1 p5 p10 mean median p90 p95 p99 max   maxdec=1;
+   PROC means data= Mesa_B16172  n  nmiss min p1  p10 mean median p90  p99 max   maxdec=1;
       var  Age ;
 run;
 

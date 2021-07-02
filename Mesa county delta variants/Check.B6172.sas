@@ -4,7 +4,7 @@ AUTHOR:		Eric Bush
 CREATED:	June 9, 2021
 MODIFIED:	070121:  Pull out code that fixes dataset and put into separate program
 PURPOSE:	Explore created SAS dataset using various edit checks
-INPUT:		COVID.B6172        OR     B6172_fix
+INPUT:		B6172_read        OR     B6172_fix
 OUTPUT:		printed output
 ***********************************************************************************************/
 
@@ -12,7 +12,7 @@ OUTPUT:		printed output
 ** Access the final SAS dataset that was created in the Read.* program that matches this Explore.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-   PROC contents data=COVID.B6172 varnum; run;
+   PROC contents data=B6172_read  varnum ; run;
 
 
 /*________________________________________________________________________________________________________*
@@ -32,7 +32,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 ***_______________________________________________________________________***;
 
 * 1. Identify Profile IDs with duplicate records *;
-   PROC FREQ data= COVID.B6172 noprint;  
+   PROC FREQ data= B6172_read noprint;  
       tables ProfileID * EventID / out=DupChk(where=(count>1));
    PROC print data=DupChk; 
       id ProfileID;
@@ -48,7 +48,7 @@ run;
 
 
 * 2. Print out selected fields for ALL duplicate records *;
-   proc sort data= COVID.B6172  out= B6172sort ;  by ProfileID  EventID ResultDate CreateDate ;
+   proc sort data= B6172_read  out= B6172sort ;  by ProfileID  EventID ResultDate CreateDate ;
 Data DupOnly;  merge B6172sort DupChk(in=Dup) ;  
  by ProfileID  EventID ;
  if Dup;
@@ -64,14 +64,14 @@ run;
 /*     OR      */
 
 * 2. Print out duplicate records for specific Profile ID identified as having duplicate records *;
-    PROC print data= COVID.B6172;
+    PROC print data= B6172_read;
       where ProfileID='1658113';
       id ProfileID; 
       var EventID  lastname firstname birthdate gender disease eventstatus countyassigned entrymethod CreateDate ResultDate reporteddate age outcome testtype resulttext quantitativeresult  ;
 run;
 ** FINDING:  the difference between the two is create date and result date variables.  Delete record with earlier result date  **;
 
-   PROC print data= COVID.B6172;
+   PROC print data= B6172_read;
       where ProfileID='1685685';
       id ProfileID; 
       var EventID  lastname firstname birthdate gender disease eventstatus countyassigned entrymethod CreateDate ResultDate reporteddate age outcome testtype resulttext quantitativeresult  ;
@@ -81,7 +81,7 @@ run;
 
 
 * 3. Check County_Assigned variable *;
-DATA B6172_Ck3; set COVID.B6172;
+DATA B6172_Ck3; set B6172_read;
    County = scan(CountyAssigned,1,',');
    PROC freq data=B6172_Ck3; 
       tables  County * CountyAssigned /list; 
@@ -95,13 +95,13 @@ run;
 
 * 4. Check edits *;
 
-   proc print data= B6172_edit(obs=50) ;
+   proc print data= B6172_fix(obs=50) ;
    id profileid ;  var gender disease eventstatus county entrymethod agetype outcome testtype resulttext eventid age birthdate reporteddate;
    format reporteddate mmddyy10.  ;
 /*   tables CountyAssigned ;*/
 run;
 
-   PROC freq data=B6172_edit; 
+   PROC freq data=B6172_fix; 
       tables gender disease eventstatus county entrymethod agetype outcome testtype resulttext  ; 
       format ResultText $variant.   ;
 run;

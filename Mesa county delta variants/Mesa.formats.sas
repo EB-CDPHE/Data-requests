@@ -13,7 +13,9 @@
 
       value $ Outcome_2cat
          'Patient died' = 'Died'
-         other = 'Not Died';
+         'Alive' = 'Not Died'
+         'Unknown' = 'Not Died'
+         '' = 'Not Died'  ;
 
       value wavefmt
          low - '13SEP20'd = 'pre-Wave'

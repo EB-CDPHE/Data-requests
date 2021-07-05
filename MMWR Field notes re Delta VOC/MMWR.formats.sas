@@ -17,6 +17,10 @@
          'Unknown' = 'Not Died'
          '' = 'Not Died'  ;
 
+      value AgeFmt
+         low-69 = '<70 years'
+         70-105 = '70+ years' ;
+
       value wavefmt
          low - '13SEP20'd = 'pre-Wave'
          '14SEP20'd to '03JAN21'd = 'Wave 1'

@@ -26,12 +26,13 @@ run;
 run;
 
 ** Contact variables **;
+* COMMENT out since all of the address: variables have been dropped;
 options ps=50 ls=150 ;
-   proc print data= COVID.CEDRS_view;
-      ID ProfileID ;
-      var homeless address1 address2 addressactual address_city address_cityactual address_zipcode address_zipactual address_zip4actual 
-          address_latitude address_longitude address_tract2000 address_state;
-run;
+/*   proc print data= COVID.CEDRS_view;*/
+/*      ID ProfileID ;*/
+/*      var homeless address1 address2 addressactual address_city address_cityactual address_zipcode address_zipactual address_zip4actual */
+/*          address_latitude address_longitude address_tract2000 address_state;*/ 
+/*run;*/
 
  /*
  / FINDINGS:                                                                 
@@ -47,7 +48,7 @@ run;
 options ps=65 ls=110 ;
    proc print data= COVID.CEDRS_view;
       ID ID ;
-      var onsetdate  onsetdate_proxy_dist  onsetdate_proxy 
+      var onsetdate  onsetdate_proxy_dist   
           reporteddate  collectiondate  deathdate
           vax_utd  earliest_collectiondate  data_pulled_as_of ;
 run;
@@ -56,7 +57,7 @@ run;
  / FINDINGS:                                                                 
    / All date fields are character variables. Q. Convert to date variables?
    / Onsetdate is sparse whereas onsetdate_proxy_dist and onsetdate_proxy are complete
-   / Onsetdate_proxy_dist and onsetdate_proxy are different dates. 
+   / Onsetdate_proxy_dist and onsetdate_proxy are different dates. RS says to use Onsetdate_proxy_dist.
    / Q. HOW are these created?
  */
 

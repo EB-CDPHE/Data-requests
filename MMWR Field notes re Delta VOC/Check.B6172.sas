@@ -99,7 +99,7 @@ run;
 run;
 
    PROC print data=B6172_read; 
-      where upcase(agetype) ^= 'YEARS'; 
+      where upcase(AgeType) ^= 'YEARS'; 
       id ProfileID;
       var EventID LastName Gender Age AgeType Birthdate CreateDate ResultDate;
 run;

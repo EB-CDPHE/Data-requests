@@ -95,13 +95,13 @@ run;
 
 * 4. Check edits *;
 
-   proc print data= B6172_fix(obs=50) ;
+   proc print data= COVID.B6172_fix(obs=50) ;
    id profileid ;  var gender disease eventstatus county entrymethod agetype outcome testtype resulttext eventid age birthdate reporteddate;
    format reporteddate mmddyy10.  ;
 /*   tables CountyAssigned ;*/
 run;
 
-   PROC freq data=B6172_fix; 
+   PROC freq data=COVID.B6172_fix; 
       tables gender disease eventstatus county entrymethod agetype outcome testtype resulttext  ; 
       format ResultText $variant.   ;
 run;

@@ -83,15 +83,22 @@ run;
 
 * 3. Check County_Assigned variable *;
 DATA B6172_Ck3; set B6172_read;
-   County = scan(CountyAssigned,1,',');
+   County = upcase(scan(CountyAssigned,1,','));
    PROC freq data=B6172_Ck3; 
       tables  County * CountyAssigned /list; 
 run;
-/*
+** check for "BAD COUNTY NAME" **;
+   PROC freq data= B6172_Ck3 ;
+      tables  County;
+      format County $CntyChk. ;
+run;
+
+/*-------------------------------------------------------------------------------*
  | FINDINGS:
  | County_Assigned variable is in form of "County name, CO".
  | FIX: create new County variable from first 'word' of County_Assigned
-*/
+ | No county values that are bad, i.e. do not match list of CO counties.
+ *-------------------------------------------------------------------------------*/
 
 * 4. Check Age type variable *;
    PROC freq data=B6172_read; 

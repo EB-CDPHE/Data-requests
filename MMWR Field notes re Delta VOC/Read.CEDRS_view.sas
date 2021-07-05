@@ -1,11 +1,11 @@
 /**********************************************************************************************
 PROGRAM:    Read.CEDRS_view      [ <-- from Read.CEDRS_SQL_table.sas template ]
 AUTHOR:		Eric Bush
-CREATED:	   July 2, 2021
+CREATED:	   July 5, 2021
 MODIFIED:   
 PURPOSE:	   Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		[name of input data table(s)]
-OUTPUT:		[name of output - SAS data tables, printed output, etc]
+INPUT:		dbo144.CEDRS_view
+OUTPUT:		COVID.CEDRS_view
 ***********************************************************************************************/
 
 /*________________________________________________________________________________________________________*
@@ -56,7 +56,8 @@ DATA CEDRS_view_temp; set CEDRS_view(rename=
    (ID=tmp_ID ProfileID=tmp_ProfileID EventID=tmp_EventID
     OnsetDate=tmp_OnsetDate  OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 
     ReportedDate=tmp_ReportedDate CollectionDate=tmp_CollectionDate  DeathDate=tmp_DeathDate
-    Earliest_CollectionDate=tmp_Earliest_CollectionDate   Data_pulled_as_of=tmp_Data_pulled_as_of 
+    Earliest_CollectionDate=tmp_Earliest_CollectionDate   Data_pulled_as_of=tmp_Data_pulled_as_of
+    Refreshed_on=tmp_refreshed_on
    )); 
  
 * Convert temporary numeric ID variable character ID var using the CATS function *;
@@ -72,6 +73,9 @@ DATA CEDRS_view_temp; set CEDRS_view(rename=
    DeathDate            = input(tmp_DeathDate, yymmdd10.);            format DeathDate yymmdd10.;
    Earliest_CollectionDate = input(tmp_Earliest_CollectionDate, yymmdd10.); format Earliest_CollectionDate yymmdd10.;
    Data_pulled_as_of     = input(tmp_Data_pulled_as_of, yymmdd10.);   format Data_pulled_as_of yymmdd10.;
+
+* Extract date part of a datetime variable  *;
+   Refreshed_on = datepart(tmp_refreshed_on);   format Refreshed_on yymmdd10.;
 
    DROP tmp_:  address:  OnsetDate_proxy ;
 run;

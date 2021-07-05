@@ -22,9 +22,10 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
  |  OR
  | 2. Print out duplicate records for each Profile ID (if there are FEW of them)
  | 3. Check County_assigned variable
+ | 4. Check AgeType values
  |
  | Edit checks for FIXED SAS dataset
- | 3. Check edits; run frequency of key variables
+ | 10. Check edits; run frequency of key variables
  *________________________________________________________________________________________________________*/
 
 
@@ -92,8 +93,26 @@ run;
  | FIX: create new County variable from first 'word' of County_Assigned
 */
 
+* 4. Check Age type variable *;
+   PROC freq data=B6172_read; 
+      tables AgeType;
+run;
 
-* 4. Check edits *;
+   PROC print data=B6172_read; 
+      where upcase(agetype) ^= 'YEARS'; 
+      id ProfileID;
+      var EventID LastName Gender Age AgeType Birthdate CreateDate ResultDate;
+run;
+/*----------------------------------------------------------------------------------------------*
+ | FINDINGS:
+ | Most all of the AgeType values are 'years' but a handful are days or months. 
+ | Look at birthdates for those where age type is not years to confirm newborn cases.
+ | FIX: create new variable for Age_Years and convert weeks/months to age.
+ | Format Age_Years variable to categorize cases into <70 and 70+ years of age.
+ *----------------------------------------------------------------------------------------------*/
+
+
+* 10. Check edits *;
 
    proc print data= COVID.B6172_fix(obs=50) ;
    id profileid ;  var gender disease eventstatus county entrymethod agetype outcome testtype resulttext eventid age birthdate reporteddate;
@@ -104,6 +123,9 @@ run;
    PROC freq data=COVID.B6172_fix; 
       tables gender disease eventstatus county entrymethod agetype outcome testtype resulttext  ; 
       format ResultText $variant.   ;
+run;
+   proc univariate data= COVID.B6172_fix;
+      var Age;
 run;
 
 

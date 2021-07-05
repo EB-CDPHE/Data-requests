@@ -43,6 +43,15 @@ options ps=50 ls=150 ;
    / DROP: addressactual  address_cityactual  address_zipactual  address_zip4actual
 */
 
+** Check ICU variable **;
+   PROC freq data= COVID.CEDRS_view ;
+      tables ICU;
+run;
+/*__________________*
+ | FINDINGS:    
+ | 95% have value "Unknown". Q. How does this differ from "no"? 
+ *__________________*/
+
 
 ** Date variables **;
 options ps=65 ls=110 ;

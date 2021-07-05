@@ -97,6 +97,7 @@ run;
    PROC freq data=B6172_read; 
       tables AgeType;
 run;
+   PROC univariate data= B6172_read; where upcase(AgeType)='YEARS'; var Age; run;
 
    PROC print data=B6172_read; 
       where upcase(AgeType) ^= 'YEARS'; 

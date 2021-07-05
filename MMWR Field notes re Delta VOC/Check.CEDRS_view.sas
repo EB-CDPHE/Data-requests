@@ -43,6 +43,21 @@ options ps=50 ls=150 ;
    / DROP: addressactual  address_cityactual  address_zipactual  address_zip4actual
 */
 
+** Check Age_at_Reported variable **;
+   PROC univariate data= COVID.CEDRS_view ;
+      var Age_at_Reported ;
+run;
+   PROC print data= COVID.CEDRS_view;
+      where Age_at_Reported > 105 ;
+      id ProfileID;
+      var EventID Age_Group Age_at_Reported ;
+run;
+/*____________________________________________________________________*
+ | FINDINGS:    
+ | N=23 obs with age > 105. FIX: set age to missing for when age>109
+ *____________________________________________________________________*/
+
+
 ** Check ICU variable **;
    PROC freq data= COVID.CEDRS_view ;
       tables ICU ;

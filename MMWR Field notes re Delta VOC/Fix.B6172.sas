@@ -17,7 +17,9 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 /*--------------------------------------------------------------------------------------------------------*
  | Fixes made in this code:
  |  1. Remove dup records by keeping record with latest ResultDate but also keep earliest create date
- |  2. Create County variable from County_Assigned that only includes county name (not ", CO" too)
+ |  2. Create new variables:
+ |    a) County variable from County_Assigned that only includes county name (not ", CO" too)
+ |    b) Age_Years by converts other age types (i.e. weeks, months) to years.
  *--------------------------------------------------------------------------------------------------------*/
 
 ** 1. FIX dups: Keep record with most recent ResultDate **;
@@ -37,6 +39,11 @@ run;
 ** 2. Create County variable from County_Assigned **;
 DATA COVID.B6172_fix ;  set B6172_nodup ;
    County = scan(CountyAssigned,1,',');         * <-- a) new county variable ;
+
+   if upcase(AgeType) = 'MONTHS' then Age_Years = Age/12;
+   if upcase(AgeType) = 'WEEKS'  then Age_Years = Age/52;
+   if upcase(AgeType) = 'YEARS'  then Age_Years = Age;
+   Label Age_Years = 'Age in years';
 
 run;
 

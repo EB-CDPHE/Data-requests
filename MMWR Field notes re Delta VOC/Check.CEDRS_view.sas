@@ -45,12 +45,103 @@ options ps=50 ls=150 ;
 
 ** Check ICU variable **;
    PROC freq data= COVID.CEDRS_view ;
-      tables ICU;
+      tables ICU ;
 run;
-/*__________________*
+/*____________________________________________________________________*
  | FINDINGS:    
  | 95% have value "Unknown". Q. How does this differ from "no"? 
- *__________________*/
+ *____________________________________________________________________*/
+
+
+** Check County variable **;
+** Must run proc format below first **;
+   PROC freq data= COVID.CEDRS_view ;
+      tables  CountyAssigned;
+      format CountyAssigned $CntyChk. ;
+run;
+
+data ChkCounty; set COVID.CEDRS_view;
+   keep ProfileID EventID CountyAssigned ChkCounty;
+   ChkCounty = put(CountyAssigned, $CntyChk.);
+   proc print data= ChkCounty; 
+      where ChkCounty='BAD COUNTY NAME';
+run;
+/*_________________________________________________*
+ | FINDINGS:    
+ | 71 records where County = "INTERNATIONAL". 
+ | FIX: exclude these records
+ *_________________________________________________*/
+
+
+   PROC format;   value $CntyChk
+   'ADAMS'        = 'ADAMS'
+   'ALAMOSA'      = 'ALAMOSA'
+   'ARAPAHOE'     = 'ARAPAHOE'
+   'ARCHULETA'    = 'ARCHULETA'
+   'BACA'         = 'BACA'
+   'BENT'         = 'BENT'
+   'BOULDER'      = 'BOULDER'
+   'BROOMFIELD'   = 'BROOMFIELD'
+   'CHAFFEE'      = 'CHAFFEE'
+   'CHEYENNE'     = 'CHEYENNE'
+   'CLEAR CREEK'  = 'CLEAR CREEK'
+   'CONEJOS'      = 'CONEJOS'
+   'COSTILLA'     = 'COSTILLA'
+   'CROWLEY'      = 'CROWLEY'
+   'CUSTER'       = 'CUSTER'
+   'DELTA'        = 'DELTA'
+   'DENVER'       = 'DENVER'
+   'DOLORES'      = 'DOLORES'
+   'DOUGLAS'      = 'DOUGLAS'
+   'EAGLE'        = 'EAGLE'
+   'ELBERT'       = 'ELBERT'
+   'EL PASO'      = 'EL PASO'
+   'FREMONT'      = 'FREMONT'
+   'GARFIELD'     = 'GARFIELD'
+   'GILPIN'       = 'GILPIN'
+   'GRAND'        = 'GRAND'
+   'GUNNISON'     = 'GUNNISON'
+   'HINSDALE'     = 'HINSDALE'
+   'HUERFANO'     = 'HUERFANO'
+   'JACKSON'      = 'JACKSON'
+   'JEFFERSON'    = 'JEFFERSON'
+   'KIOWA'        = 'KIOWA'
+   'KIT CARSON'   = 'KIT CARSON'
+   'LAKE'         = 'LAKE'
+   'LA PLATA'     = 'LA PLATA'
+   'LARIMER'      = 'LARIMER'
+   'LAS ANIMAS'   = 'LAS ANIMAS'
+   'LINCOLN'      = 'LINCOLN'
+   'LOGAN'        = 'LOGAN'
+   'MESA'         = 'MESA'
+   'MINERAL'      = 'MINERAL'
+   'MOFFAT'       = 'MOFFAT'
+   'MONTEZUMA'    = 'MONTEZUMA'
+   'MONTROSE'     = 'MONTROSE'
+   'MORGAN'       = 'MORGAN'
+   'OTERO'        = 'OTERO'
+   'OURAY'        = 'OURAY'
+   'PARK'         = 'PARK'
+   'PHILLIPS'     = 'PHILLIPS'
+   'PITKIN'       = 'PITKIN'
+   'PROWERS'      = 'PROWERS'
+   'PUEBLO'       = 'PUEBLO'
+   'RIO BLANCO'   = 'RIO BLANCO'
+   'RIO GRANDE'   = 'RIO GRANDE'
+   'ROUTT'        = 'ROUTT'
+   'SAGUACHE'     = 'SAGUACHE'
+   'SAN JUAN'     = 'SAN JUAN'
+   'SAN MIGUEL'   = 'SAN MIGUEL'
+   'SEDGWICK'     = 'SEDGWICK'
+   'SUMMIT'       = 'SUMMIT'
+   'TELLER'       = 'TELLER'
+   'WASHINGTON'   = 'WASHINGTON'
+   'WELD'         = 'WELD'
+   'YUMA'         = 'YUMA'
+
+   other = 'BAD COUNTY NAME';
+run;
+
 
 
 ** Date variables **;

@@ -28,6 +28,7 @@ proc sort data=B6172_read  out=B6172_sorted ; by ProfileID EventID  ;
 Data B6172_nodup; set B6172_sorted ;
    by ProfileID EventID  ;
    Earliest_CreateDate = min(CreateDate, lag(CreateDate));
+   format Earliest_CreateDate yymmdd10. ;
    if last.EventID;
    Drop CreateDate;
 run;
@@ -42,6 +43,4 @@ run;
 
 ** 3. Contents of new dataset with edits **;
    PROC contents data= COVID.B6172_fix  varnum ;  run;
-
-
 

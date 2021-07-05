@@ -21,6 +21,10 @@
          low-69 = '<70 years'
          70-105 = '70+ years' ;
 
+      value $MesaROC
+      'MESA' =  'MESA county'
+       other='NOT Mesa' ;
+
       value wavefmt
          low - '13SEP20'd = 'pre-Wave'
          '14SEP20'd to '03JAN21'd = 'Wave 1'

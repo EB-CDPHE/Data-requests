@@ -25,6 +25,10 @@
       'MESA' =  'MESA county'
        other='NOT Mesa' ;
 
+      value HospFmt
+      ., 0 =  0
+       1 = 1 ;
+
       value wavefmt
          low - '13SEP20'd = 'pre-Wave'
          '14SEP20'd to '03JAN21'd = 'Wave 1'

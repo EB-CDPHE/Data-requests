@@ -21,7 +21,7 @@
          low-69 = '<70 years'
          70-105 = '70+ years' ;
 
-      value $MesaROC
+      value $MesaFmt
       'MESA' =  'MESA county'
        other='NOT Mesa' ;
 

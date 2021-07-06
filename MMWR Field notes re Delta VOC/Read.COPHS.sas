@@ -42,8 +42,8 @@ PROC contents data=COPHS  varnum ;  run;
 
 /*___________________________________________________________________________________________________*
  | FINDINGS:                                                                 
- |    No ID vars that I can recognize. Perhaps MR_Number but it is character variable.    
- |    Several date vars that are a character variables are dumped into PROC freq to determine format     
+ |    MR_Number is only ID variable but it is already a character variable.    
+ |    Several date vars that are character variables are dumped into PROC freq to determine format     
  *___________________________________________________________________________________________________*/
 
 ** 3. determine format of dates in the char vars **;

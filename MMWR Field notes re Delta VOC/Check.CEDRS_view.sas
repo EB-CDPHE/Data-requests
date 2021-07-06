@@ -25,6 +25,21 @@ run;
      tables ID * ProfileID * EventID /list missing missprint;
 run;
 
+** Check for duplicate records **;
+
+* 1. Identify Profile IDs with duplicate records *;
+   PROC FREQ data= COVID.CEDRS_view noprint;  
+      tables  EventID / out=CEDRS_DupChk(where=(count>1));
+   PROC print data=CEDRS_DupChk; 
+      id EventID;
+run;
+
+/*__________________________________________________________________________________*
+ | FINDINGS:
+ | No duplicate records with EventID (and therefore with ProfileID - EventID).
+ *__________________________________________________________________________________*/
+
+
 ** Contact variables **;
 * COMMENT out since all of the address: variables have been dropped;
 options ps=50 ls=150 ;
@@ -56,6 +71,11 @@ run;
  | FINDINGS:    
  | N=23 obs with age > 105. FIX: set age to missing for when age>109
  *____________________________________________________________________*/
+
+** Completeness of date variables (for use to count cases) **;
+   PROC means data= COVID.CEDRS_view n nmiss;
+      var ReportedDate   CollectionDate   OnsetDate   OnsetDate_proxy_dist ;
+run;
 
 
 ** Check ICU variable **;

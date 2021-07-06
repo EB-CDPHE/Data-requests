@@ -1,7 +1,7 @@
 /**********************************************************************************************
 PROGRAM: RFI.DeltaVOC for MMWR.sas
 AUTHOR:  Eric Bush
-CREATED: June 9, 2021
+CREATED: July 5, 2021
 MODIFIED:	
 PURPOSE:	Connect to dphe144 "CEDRS_view" and create associated SAS dataset
 INPUT:		COVID.CEDRS_view   COVID.B6172_fix   COVID.County_Population
@@ -201,118 +201,27 @@ run;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ** a) Case count by Age and Region **;
-   PROC means data=MMWR_cases  maxdec=2 N nmiss  noprint ;
-      var ReportedDate  ;
-      class CountyAssigned  Age_at_Reported  ;
-      format  CountyAssigned   $MesaFmt.  Age_at_Reported AgeFmt.;
-      output out=MMWR_counts(drop=_FREQ_) n=CaseCounts;
-run;
-/*proc print data= MMWR_counts;  run;*/
-
-Data MMWR_count; set MMWR_counts;
-   if _TYPE_=1 then delete;
-   if _TYPE_=2 then _TYPE_=1;
-   rename CountyAssigned = County;
-run;
-proc print data= MMWR_count;  run;
-
-
-   ** b) Population totals for ... **;
-   ** ALL in county **;
-   PROC means data=County_Population  maxdec=2 sum   noprint ;
-      var Population  ;
-      class County   ;
-      format  County   $MesaFmt. ;
-      output out=Pop_All(drop=_FREQ_) sum=PopCount;
-run;
-proc print data= Pop_All;  
-title3 'Pop_All';
-run;
-
-    ** 0-69 year olds in county **;
-  PROC means data=County_Population  maxdec=2 sum   noprint ;
-      var Yrs0_69  ;
-      class County   ;
-      format  County   $MesaFmt. ;
-      output out=Pop_Yrs0_69(drop=_FREQ_) sum=PopCount;
-run;
-proc print data= Pop_Yrs0_69;  
-title3 'Pop_Yrs0_69';
-run;
-
-    ** 70-109 year olds in county **;
-  PROC means data=County_Population  maxdec=2 sum   noprint ;
-      var Yrs70_109  ;
-      class County   ;
-      format  County   $MesaFmt. ;
-      output out=Pop_Yrs70_109 sum=PopCount;
-run;
-proc print data= Pop_Yrs70_109;  
-title3 'Pop_Yrs70_109';
-run;
-
-
-  ** Put case counts and population totals together (by Age and Region);
-  proc sort data= MMWR_count out=MC; by County  _TYPE_  ;
-  proc sort data= MMWR_pop  out=MP;  by County  _TYPE_  ;
-DATA CasesPer100; merge MC  MP ;
-   by County _TYPE_;
-   if PopCount ne . then CasesPer100K = (CaseCounts/ (PopCount/100000) );
-   run;
-
-   ** c) Final table with calculated Cases per 100K population **;
-   PROC print data= CasesPer100; 
-      ID _TYPE_;
-run;
-
-
-
 ** 5. Hospitalizations by Age group and Region **;
 
    PROC freq data= MMWR_cases ;
-/*      tables  CountyAssigned  Age_at_Reported hospitalized;*/
-      tables CountyAssigned  * Age_at_Reported * hospitalized / nocol  ;
-     format    CountyAssigned   $MesaFmt.   Age_at_Reported AgeFmt. ;
+/*      tables  County  Age_at_Reported hospitalized;*/
+      tables County  * Age_at_Reported * hospitalized / nocol  ;
+      format   County $MesaFmt.   Age_at_Reported AgeFmt. ;
 run;
 
 
 
-** ICU **;
-/*   PROC freq data= MMWR_cases ;*/
-/*     tables  ICU  ;*/
-/*run;*/
+**   6. Admission to ICU among cases   **;
+/*--------------------------------------------------*
+ | There are three sources of ICU data:
+ | 1) CEDRS_view  (dphe144)
+ | 2. Surveillance form  (dphe66)
+ | 3. COPHS
+ *--------------------------------------------------*/
 
+**  1) ICU data from CEDRS_view   **;
    PROC freq data= COVID.CEDRS_view ;
-      tables ReportedDate * ICU /list;
+      tables ReportedDate * ICU /nocol norow nopercent;
       format ReportedDate monyy.;
 run;
 /*_________________________________________________________________________________________*
@@ -321,16 +230,29 @@ run;
  *_________________________________________________________________________________________*/
 
 
+**  2) ICU data from Surveillance form   **;
 
-   proc sort data=MMWR_cases  out=Cases_sort; by EventID;
-   proc sort data=SurvForm_read  out=CIF_sort; by EventID;
-Data Cases_w_ICU; merge Cases_sort(in=c)  CIF_sort ; 
-   by EventID;
-   if c;
+   PROC freq data=SurvForm_read ; 
+      /*tables ICU_SurvForm;*/
+      tables CreatedDate  * ICU_SurvForm / nocol norow nopercent missing missprint;
+      format CreatedDate  monyy. ;
 run;
-proc freq data= Cases_w_ICU;
-   tables ICU_SurvForm  / missing missprint;
-run;
+/*_____________________________________________________________________________________________*
+ | FINDINGS:    
+ | Can't use ICU variable from Surveillance Form because all values missing since June 2020!
+ *_____________________________________________________________________________________________*/
+
+
+**  3) ICU data from COPHS   **;
+
+   PROC contents data= COVID.COPHS      varnum;  run;
+   PROC contents data= COVID.COPHS_fix  varnum;  run;
+
+/*_____________________________________________________________________________________________*
+ | FINDINGS:    
+ | First, ID variable is MR_number. There is no ProfileID or EventID
+ | If can't merge to CEDRS then how do you calculate "admission to ICU among cases"?
+ *_____________________________________________________________________________________________*/
 
 
 

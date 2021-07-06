@@ -62,6 +62,11 @@ run;
 run;
 
 
+***----------------------***;
+***  SECTION 1 OF TABLE  ***;
+***  All COVID cases     ***;
+***----------------------***;
+
 ** 3. County Population data **;
    PROC contents data=COVID.County_Population; run;
 /*   PROC print data= COVID.County_Population; id county; run;*/
@@ -277,11 +282,120 @@ run;
 
 
 
+***-----------------------***;
+***  SECTION 2 OF TABLE   ***;
+***  Delta variant cases  ***;
+***-----------------------***;
+
+
+*** 9. Merge demographic variables from CEDRS with B6172 variant data ***;
+***___________________________________________________________________***;
+
+/*______________________________________________________________________________________________________*
+ | Code below adds demographic variables from above MMWR dataset to the B6172_fix dataset. 
+ | B6172_fix dataset is from variant of concern (B.1.617.2) in Colorado. 
+ | B6172_fix was created from SQL join supplied by Bre. See Read.B6172. 
+ | Read.B6172 creates COVID.B6172 and then Check.B6172 creates B6172_fix. 
+ | Merge demographic vars from CEDRS with B.1.617.2 variant data in B6172_fix. 
+ *______________________________________________________________________________________________________*/
+
+PROC sort data= MMWR_cases(keep= ProfileID EventID Hospitalized  Reinfection  Breakthrough Outcome)  
+   out=MMWRkey; 
+   by ProfileID EventID;
+
+PROC sort data= COVID.B6172_fix  out=B6172_key; by ProfileID EventID;
+run;
+
+DATA B6172_n_MMWR;
+   length County $ 11;
+   merge MMWRkey(in=M)  B6172_key(in=V);  
+   by ProfileID EventID;
+   if V ;                      * <--- which if any is correct? ;
+   format County $11.;
+   tmp_county=County;
+   County=upcase(tmp_county);
+   drop tmp_county;
+run;
+
+   PROC contents data= B6172_n_MMWR varnum ; run;
+
+
+** Delta rate for 0-69 yo by region **;
+**_________________________________**;
+
+** Cases in 0-69 yo by region **;
+   PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
+      where Age_at_Reported < 70;
+      var ReportedDate  ;
+      class   County  ;
+      format  County   $MesaFmt. ;
+      output out=N_Y_Deltas(drop=_FREQ_ _TYPE_) n=DeltaCounts;
+run;
+/*proc print data=N_Y_Deltas ; id County; run;*/
+
+** Calculation of Delta rate per 100K for 0-69 yo by region **;
+Data DeltaRate_Y; merge N_Y_Deltas  Y_Pop;  by county;
+   DeltasPer100K = (DeltaCounts / (Population/100000) );
+   Age_Group='0-69 yo';
+run;
+/*   PROC print data= DeltaRate_Y;  id county;   format DeltasPer100K 4.0;  run;*/
+
+
+** Delta rate for 70-109 yo by region **;
+**_________________________________**;
+   PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
+      where 69 < Age_at_Reported < 110;
+      var ReportedDate  ;
+      class   County  ;
+      format  County   $MesaFmt. ;
+      output out=N_O_Deltas(drop=_FREQ_ _TYPE_) n=DeltaCounts;
+run;
+/*proc print data=N_O_Deltas ; id County; run;*/
+
+** Calculation of Delta rate per 100K for 70-109 yo by region **;
+Data DeltaRate_O; merge N_O_Deltas  O_Pop;  by county;
+   DeltasPer100K = (DeltaCounts / (Population/100000) );
+   Age_Group='70-109 yo';
+/*   PROC print data= CaseRate_O;  id county;  format DeltasPer100K 4.0;  run;*/
+
+
+** Delta rate in ALL by region **;
+**_________________________________**;
+   PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
+      var ReportedDate  ;
+      class   County  ;
+      format  County   $MesaFmt. ;
+      output out=N_Deltas(drop=_FREQ_ _TYPE_) n=DeltaCounts;
+run;
+/*proc print data=N_Deltas ; id County; run;*/
+
+** Calculation of case rate per 100K for ALL by region **;
+Data DeltaRate_All; merge N_Deltas  All_Pop;  by county;
+   DeltasPer100K = (DeltaCounts / (Population/100000) );
+   Age_Group='ALL';
+/*   PROC print data= DeltaRate_All;   id county;  format DeltasPer100K 4.0;   run;*/
+
+
+** Put Delta rate stats for all three population groups together **;
+**______________________________________________________________**;
+
+Data DeltaRate100K_temp; set   DeltaRate_Y   DeltaRate_O  DeltaRate_All   ;
+   format DeltaCounts Population comma11.0   DeltasPer100K 5.0;
+   proc sort data= DeltaRate100K_temp  out= DeltaRate100K ;  by county;
+   PROC print data= DeltaRate100K ;  id County; by County;
+      var Age_Group DeltaCounts Population DeltasPer100K;
+run;
 
 
 
 
+** 9. Hospitalizations by Age group and Region **;
 
+   PROC freq data= B6172_n_MMWR ;
+      tables  County  Age_at_Reported hospitalized;
+      tables County  * Age_at_Reported * hospitalized / nocol  ;
+      format   County $MesaFmt.   Age_at_Reported AgeFmt. ;
+run;
 
 
 

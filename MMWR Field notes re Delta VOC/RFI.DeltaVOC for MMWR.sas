@@ -256,17 +256,32 @@ run;
 
 
 
+**   7. Case fatality ratio   **;
+
+   PROC freq data= MMWR_cases ;
+/*      tables  County  Age_at_Reported outcome;*/
+      tables County  * Age_at_Reported * outcome / nocol  ;
+      format   County $MesaFmt.   Age_at_Reported AgeFmt.   outcome $Outcome_2cat. ;
+run;
+
+
+
+**   8. Case fatality ratio among those hospitalized   **;
+
+   PROC freq data= MMWR_cases ;
+      where hospitalized=1;
+      tables  hospitalized;
+      tables County  * Age_at_Reported * outcome / nocol  ;
+      format   County $MesaFmt.   Age_at_Reported AgeFmt.   outcome $Outcome_2cat. ;
+run;
 
 
 
 
 
-*** 3. Demographics for Colorado Cases (minus Mesa cases) ***;
-***_______________________________________________________***;
 
-options pageno=1;
-title1;
-title2 'County = Mesa';
+
+
 
 
 

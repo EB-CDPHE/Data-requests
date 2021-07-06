@@ -48,13 +48,16 @@ run;
 
 ** 2. Contents of datasets to query for RFI **;
 **------------------------------------------**;
+** Impute missing collection dates in the most inclusive manner for time ref April 20-June 19, 2021 **;
+DATA FixCollDate; set COVID.CEDRS_view_fix;
+   if CollectionDate = . then CollectionDate=ReportedDate;
+run;
 
-DATA MMWR_cases; set COVID.CEDRS_view ;
-   where '20APR21'd le ReportedDate le '19JUN21'd;
+** Filter CEDRS data for analysis to records with collection date between Apr 20 - Jun 19 **;
+DATA MMWR_cases; set FixCollDate ;
+   where '20APR21'd le CollectionDate le '19JUN21'd;
    if CountyAssigned = 'INTERNATIONAL' then delete;
-   if Age_at_Reported > 109 then Age_at_Reported = .;
-/*   CountyGroup = put(CountyAssigned, $MesaFmt.);*/
-   rename CountyAssigned = County;
+   if Age_Years > 109 then Age_Years = .;
 run;
 
  PROC contents data= MMWR_cases varnum ;
@@ -118,7 +121,7 @@ run;
 
 ** Cases in 0-69 yo by region **;
    PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
-      where Age_at_Reported < 70;
+      where 0 < Age_Years < 70;
       var ReportedDate  ;
       class   County  ;
       format  County   $MesaFmt. ;
@@ -145,7 +148,7 @@ run;
 
 ** Cases in 70-109 yo by region **;
    PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
-      where 69 < Age_at_Reported < 110;
+      where 69 < Age_Years < 110;
       var ReportedDate  ;
       class   County  ;
       format  County   $MesaFmt. ;
@@ -191,6 +194,7 @@ run;
 Data CaseRate_All; merge N_Cases  All_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='ALL';
+run;
 /*   PROC print data= CaseRate_All;   id county;  format CasesPer100K 4.0;   run;*/
 
 
@@ -209,9 +213,9 @@ run;
 ** 5. Hospitalizations by Age group and Region **;
 
    PROC freq data= MMWR_cases ;
-/*      tables  County  Age_at_Reported hospitalized;*/
-      tables County  * Age_at_Reported * hospitalized / nocol  ;
-      format   County $MesaFmt.   Age_at_Reported AgeFmt. ;
+/*      tables  County  Age_Years hospitalized;*/
+      tables County  * Age_Years * hospitalized / nocol  ;
+      format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt. ;
 run;
 
 
@@ -264,9 +268,9 @@ run;
 **   7. Case fatality ratio   **;
 
    PROC freq data= MMWR_cases ;
-/*      tables  County  Age_at_Reported outcome;*/
-      tables County  * Age_at_Reported * outcome / nocol  ;
-      format   County $MesaFmt.   Age_at_Reported AgeFmt.   outcome $Outcome_2cat. ;
+/*      tables  County  Age_Years outcome;*/
+      tables County  * Age_Years * outcome / nocol  ;
+      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.   ;
 run;
 
 
@@ -276,8 +280,8 @@ run;
    PROC freq data= MMWR_cases ;
       where hospitalized=1;
       tables  hospitalized;
-      tables County  * Age_at_Reported * outcome / nocol  ;
-      format   County $MesaFmt.   Age_at_Reported AgeFmt.   outcome $Outcome_2cat. ;
+      tables County  * Age_Years * outcome / nocol  ;
+      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.  hospitalized HospFmt. ;
 run;
 
 
@@ -299,7 +303,7 @@ run;
  | Merge demographic vars from CEDRS with B.1.617.2 variant data in B6172_fix. 
  *______________________________________________________________________________________________________*/
 
-PROC sort data= MMWR_cases(keep= ProfileID EventID Hospitalized  Reinfection  Breakthrough Outcome)  
+PROC sort data= MMWR_cases(keep= ProfileID EventID Hospitalized  Reinfection  Breakthrough Outcome CollectionDate Age_Years)  
    out=MMWRkey; 
    by ProfileID EventID;
 
@@ -325,7 +329,7 @@ run;
 
 ** Cases in 0-69 yo by region **;
    PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
-      where Age_at_Reported < 70;
+      where 0 < Age_Years < 70;
       var ReportedDate  ;
       class   County  ;
       format  County   $MesaFmt. ;
@@ -344,7 +348,7 @@ run;
 ** Delta rate for 70-109 yo by region **;
 **_________________________________**;
    PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
-      where 69 < Age_at_Reported < 110;
+      where 69 < Age_Years < 110;
       var ReportedDate  ;
       class   County  ;
       format  County   $MesaFmt. ;
@@ -388,18 +392,29 @@ run;
 
 
 
-
-** 9. Hospitalizations by Age group and Region **;
-
+** 10. Delta Hospitalizations by Age group and Region **;
    PROC freq data= B6172_n_MMWR ;
-      tables  County  Age_at_Reported hospitalized;
-      tables County  * Age_at_Reported * hospitalized / nocol  ;
-      format   County $MesaFmt.   Age_at_Reported AgeFmt. ;
+      tables  County  Age_Years hospitalized / missing missprint;
+      tables County  * Age_Years * hospitalized / nocol  missing missprint ;
+      format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt.   ;
 run;
 
 
 
+**   11. Delta Case fatality ratio   **;
+   PROC freq data= B6172_n_MMWR ;
+/*      tables  County  Age_Years outcome;*/
+      tables County  * Age_Years * outcome / nocol  missing missprint ;
+      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.   ;
+run;
 
 
 
+**   12. Delta Case fatality ratio among those hospitalized   **;
+   PROC freq data= B6172_n_MMWR ;
+      where hospitalized=1;
+      tables  hospitalized;
+      tables County  * Age_Years * outcome / nocol missing missprint ;
+      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.  hospitalized HospFmt.  ;
+run;
 

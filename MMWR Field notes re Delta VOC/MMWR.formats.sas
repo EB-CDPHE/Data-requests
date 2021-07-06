@@ -15,7 +15,7 @@
          'Patient died' = 'Died'
          'Alive' = 'Not Died'
          'Unknown' = 'Not Died'
-         '' = 'Not Died'  ;
+         other = 'Not Died'  ;
 
       value AgeFmt
          0-69 = '<70 years'

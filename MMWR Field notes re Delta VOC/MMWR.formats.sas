@@ -18,7 +18,7 @@
          '' = 'Not Died'  ;
 
       value AgeFmt
-         low-69 = '<70 years'
+         0-69 = '<70 years'
          70-105 = '70+ years' ;
 
       value $MesaFmt

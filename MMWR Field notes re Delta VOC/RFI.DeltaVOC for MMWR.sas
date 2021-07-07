@@ -447,3 +447,14 @@ run;
 Data COVID_Events; set MMWR_cases; 
    keep ProfileID EventID County CollectionDate ReportedDate Age;
 run;
+
+
+
+*** export data to google drive ***;
+***-----------------------------***;
+
+libname mydata 'C:\Users\eabush\Documents\CDPHE\Requests\data';
+
+DATA mydata.MMWR_ICU ; set MMWR_ICU;  run;
+
+DATA mydata.B6172_n_MMWR ; set B6172_n_MMWR;  run;

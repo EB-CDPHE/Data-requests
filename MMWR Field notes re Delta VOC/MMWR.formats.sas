@@ -27,7 +27,8 @@
 
       value HospFmt
       ., 0 =  0
-       1 = 1 ;
+       1 = 1 
+         other=0;
 
       value wavefmt
          low - '13SEP20'd = 'pre-Wave'

@@ -213,8 +213,8 @@ run;
 ** 5. Hospitalizations by Age group and Region **;
 
    PROC freq data= MMWR_cases ;
-/*      tables  County  Age_Years hospitalized;*/
-      tables County  * Age_Years * hospitalized / nocol  ;
+      tables  County  Age_Years hospitalized;
+/*      tables County  * Age_Years * hospitalized / nocol  ;*/
       format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt. ;
 run;
 
@@ -262,6 +262,18 @@ run;
  | First, ID variable is MR_number. There is no ProfileID or EventID
  | If can't merge to CEDRS then how do you calculate "admission to ICU among cases"?
  *_____________________________________________________________________________________________*/
+
+
+** RUN the Key_merge.COPHS.CEDRS.sas program to link COPHS ICU admission to MMWRcases dataset. **;
+
+   proc freq data=MMWR_ICU ; tables ICU; run;
+   PROC means data= MMWR_ICU  n nmiss ;  var ICU_Admission hospitalized ICU; run;
+
+   PROC freq data= MMWR_ICU ;
+/*      tables  County  Age_Years hospitalized ICU;*/
+      tables County  * Age_Years * ICU / nocol  ;
+      format   County $MesaFmt.   Age_Years AgeFmt. ;* hospitalized HospFmt. ;
+run;
 
 
 

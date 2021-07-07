@@ -88,6 +88,7 @@ DATA MMWR_ICU; merge I_key(in=i)  M_key(in=m) ;
    if i=1 AND m=1;
    if ICU_Admission ne . then ICU=1; else ICU=0;
 run;
+/*   PROC print data=MMWR_ICU ; id ProfileID; run;*/
 
 ** Contents for final dataset for estimation **;
    PROC contents data=MMWR_ICU  varnum ; run;

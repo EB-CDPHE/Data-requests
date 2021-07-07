@@ -60,9 +60,10 @@ DATA MMWR_cases; set FixCollDate ;
    if Age_Years > 109 then Age_Years = .;
 run;
 
- PROC contents data= MMWR_cases varnum ;
+ PROC contents data= MMWR_cases  ;
       title1 'COVID.CEDRS_view obs between April 20 - June 19';
 run;
+
 
 
 ***----------------------***;
@@ -266,7 +267,7 @@ run;
 
 ** RUN the Key_merge.COPHS.CEDRS.sas program to link COPHS ICU admission to MMWRcases dataset. **;
 
-   proc freq data=MMWR_ICU ; tables ICU; run;
+   proc freq data=MMWR_ICU ; tables ICU ICU_Admission; run;
    PROC means data= MMWR_ICU  n nmiss ;  var ICU_Admission hospitalized ICU; run;
 
    PROC freq data= MMWR_ICU ;
@@ -434,3 +435,15 @@ run;
       format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.  hospitalized HospFmt.  ;
 run;
 
+
+
+*** Datasets for Rachel S. ***;
+***------------------------***;
+Data DeltaEvents; set B6172_n_MMWR; 
+   keep ProfileID EventID LastName FirstName ResultText Age BirthDate ReportedDate ResultDate;
+run;
+
+
+Data COVID_Events; set MMWR_cases; 
+   keep ProfileID EventID County CollectionDate ReportedDate Age;
+run;

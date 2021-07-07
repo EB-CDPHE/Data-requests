@@ -323,6 +323,9 @@ run;
 
    PROC contents data= B6172_n_MMWR varnum ; run;
 
+   PROC means data= B6172_n_MMWR n nmiss ;
+      var ReportedDate  ;
+run;
 
 ** Delta rate for 0-69 yo by region **;
 **_________________________________**;
@@ -360,6 +363,7 @@ run;
 Data DeltaRate_O; merge N_O_Deltas  O_Pop;  by county;
    DeltasPer100K = (DeltaCounts / (Population/100000) );
    Age_Group='70-109 yo';
+run;
 /*   PROC print data= CaseRate_O;  id county;  format DeltasPer100K 4.0;  run;*/
 
 
@@ -394,7 +398,7 @@ run;
 
 ** 10. Delta Hospitalizations by Age group and Region **;
    PROC freq data= B6172_n_MMWR ;
-      tables  County  Age_Years hospitalized / missing missprint;
+/*      tables  County  Age_Years hospitalized / missing missprint;*/
       tables County  * Age_Years * hospitalized / nocol  missing missprint ;
       format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt.   ;
 run;
@@ -413,7 +417,7 @@ run;
 **   12. Delta Case fatality ratio among those hospitalized   **;
    PROC freq data= B6172_n_MMWR ;
       where hospitalized=1;
-      tables  hospitalized;
+/*      tables  hospitalized;*/
       tables County  * Age_Years * outcome / nocol missing missprint ;
       format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.  hospitalized HospFmt.  ;
 run;

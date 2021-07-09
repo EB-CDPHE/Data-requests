@@ -17,7 +17,7 @@ DATA Profiles; set CEDRS66.Profiles;
   if Birthdate ne ''   AND   LastName ne ''   AND    FirstName  ne ''   ; 
   keep ProfileID LastName FirstName BirthDate ;
 run;
-/*   PROC contents data=Profiles  varnum ;  run;    */
+   PROC contents data=Profiles  varnum ;  run;    
 
    proc sort data=Profiles out=Profiles_sort; by BirthDate LastName FirstName ;  run;
 

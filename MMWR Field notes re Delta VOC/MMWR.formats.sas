@@ -22,8 +22,8 @@
          70-105 = '70+ years' ;
 
       value $MesaFmt
-      'MESA' =  'MESA county'
-       other='NOT Mesa' ;
+      'MESA'='MESA county'
+       other='NOT Mesa county' ;
 
       value HospFmt
       ., 0 =  0

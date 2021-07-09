@@ -55,7 +55,7 @@ run;
 
 ** Filter CEDRS data for analysis to records with collection date between Apr 20 - Jun 19 **;
 DATA MMWR_cases; set FixCollDate ;
-   where '20APR21'd le CollectionDate le '19JUN21'd;
+   where '27APR21'd le CollectionDate le '06JUN21'd;
    if CountyAssigned = 'INTERNATIONAL' then delete;
    if Age_Years > 109 then Age_Years = .;
 run;
@@ -90,7 +90,9 @@ run;
 DATA CountyPop_est ; 
    length County $ 11;
    set CountyPopbyAge(rename=(County=tmp_county)) ;
+
    County=upcase(tmp_county);
+   if County='CLEAR CREE' then County='CLEAR CREEK';
    format County $11.;
    Yrs0_69 = input(compress(_0_to_69,','), best12.) ;
    Yrs70_109 = input(compress(_70_to_109, ','), best12.) ;
@@ -164,12 +166,13 @@ run;
       format  County   $MesaFmt. ;
       output out=O_Pop(drop=_TYPE_ _FREQ_) sum=Population;
 run;
-/*proc print data=O_Pop; id County; run;*/
+/*proc print data=O_Pop; id County;  format  County   $MesaFmt. ;   run;*/
 
 ** Calculation of case rate per 100K for 70-109 yo by region **;
 Data CaseRate_O; merge N_O_Cases  O_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='70-109 yo';
+run;
 /*   PROC print data= CaseRate_O;  id county;  format CasesPer100K 4.0;  run;*/
 
 
@@ -207,6 +210,8 @@ Data CaseRate100K_temp; set   CaseRate_Y   CaseRate_O  CaseRate_All   ;
    proc sort data= CaseRate100K_temp  out= CaseRate100K ;  by county;
    PROC print data= CaseRate100K ;  id County; by County;
       var Age_Group CaseCounts Population CasesPer100K;
+      title1 'Case rate per 100K';
+      title2 'data= MMWR_cases';
 run;
 
 
@@ -215,8 +220,10 @@ run;
 
    PROC freq data= MMWR_cases ;
       tables  County  Age_Years hospitalized;
-/*      tables County  * Age_Years * hospitalized / nocol  ;*/
+      tables County  * Age_Years * hospitalized / nocol  ;
       format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt. ;
+      title1 'Admission to hospital among cases';
+      title2 'data= MMWR_cases';
 run;
 
 
@@ -274,6 +281,8 @@ run;
 /*      tables  County  Age_Years hospitalized ICU;*/
       tables County  * Age_Years * ICU / nocol  ;
       format   County $MesaFmt.   Age_Years AgeFmt. ;* hospitalized HospFmt. ;
+      title1 'Admission to ICU among hospitalized cases';
+      title2 'data= MMWR_ICU';
 run;
 
 
@@ -284,6 +293,8 @@ run;
 /*      tables  County  Age_Years outcome;*/
       tables County  * Age_Years * outcome / nocol  ;
       format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.   ;
+      title1 'Case fatality ratio';
+      title2 'data= MMWR_cases';
 run;
 
 
@@ -295,6 +306,8 @@ run;
       tables  hospitalized;
       tables County  * Age_Years * outcome / nocol  ;
       format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.  hospitalized HospFmt. ;
+      title1 'Case fatality ratio among hospitalized';
+      title2 'data= MMWR_cases ';
 run;
 
 
@@ -327,7 +340,8 @@ DATA B6172_n_MMWR;
    length County $ 11;
    merge MMWRkey(in=M)  B6172_key(in=V);  
    by ProfileID EventID;
-   if V ;                      * <--- which if any is correct? ;
+
+   if M=1 and V=1 ;                      * <--- which if any is correct? ;
    format County $11.;
    tmp_county=County;
    County=upcase(tmp_county);
@@ -337,7 +351,7 @@ run;
    PROC contents data= B6172_n_MMWR varnum ; run;
 
    PROC means data= B6172_n_MMWR n nmiss ;
-      var ReportedDate  ;
+      var CollectionDate ReportedDate  ;
 run;
 
 ** Delta rate for 0-69 yo by region **;
@@ -373,11 +387,13 @@ run;
 /*proc print data=N_O_Deltas ; id County; run;*/
 
 ** Calculation of Delta rate per 100K for 70-109 yo by region **;
-Data DeltaRate_O; merge N_O_Deltas  O_Pop;  by county;
+Data DeltaRate_O; merge  N_O_Deltas  O_Pop;  by county;
+   if DeltaCounts=. then DeltaCounts=19;
    DeltasPer100K = (DeltaCounts / (Population/100000) );
    Age_Group='70-109 yo';
+   if DeltasPer100K=. then delete;
 run;
-/*   PROC print data= CaseRate_O;  id county;  format DeltasPer100K 4.0;  run;*/
+/*   PROC print data= DeltaRate_O;  id county;  format DeltasPer100K 4.0;  run;*/
 
 
 ** Delta rate in ALL by region **;
@@ -458,3 +474,10 @@ libname mydata 'C:\Users\eabush\Documents\CDPHE\Requests\data';
 DATA mydata.MMWR_ICU ; set MMWR_ICU;  run;
 
 DATA mydata.B6172_n_MMWR ; set B6172_n_MMWR;  run;
+
+
+
+DATA COVID.MMWR_cases ; set MMWR_cases;  run;
+DATA COVID.B6172_n_MMWR ; set B6172_n_MMWR;  run;
+DATA COVID.MMWR_ICU ; set MMWR_ICU;  run;
+

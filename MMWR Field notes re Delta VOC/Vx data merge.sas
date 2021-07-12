@@ -77,13 +77,13 @@ run;
 
 
    PROC freq data= MMWR_Vx ;
-      where County = 'MESA' and UTD_flag='1';
+      where County ^= 'MESA' and UTD_flag='1';
 /*      tables  UTD_flag  Age_Years hospitalized;*/
       tables  Age_Years * hospitalized / nocol  ;
       format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt. ;
       title1 'Admission to hospital among cases';
       title2 'data= MMWR_Vx';
-      title3 'MESA county';
+      title3 'NOT MESA county';
 run;
 
 

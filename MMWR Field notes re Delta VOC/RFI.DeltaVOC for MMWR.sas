@@ -452,6 +452,17 @@ run;
 run;
 
 
+** Estimates for text in draft document **;
+**   13. Number of cases as of June 6th for ALL of Colorado and for Mesa (%) **;
+   PROC means data= COVID.B6172_fix n nmiss ;
+      where ReportedDate  < '07JUN21'd ;* AND  County='Mesa';
+      var  ReportedDate Age_years ;
+      title1 'from COVID.B6172_fix';
+/*      title2 'Delta variant cases from MESA county';*/
+      title2 'Delta variant cases from ALL Colorado counties';
+run;
+
+
 
 *** Datasets for Rachel S. ***;
 ***------------------------***;

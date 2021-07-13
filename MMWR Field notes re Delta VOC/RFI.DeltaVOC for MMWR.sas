@@ -46,22 +46,22 @@ run;
 run;
 
 
-** 2. Contents of datasets to query for RFI **;
-**------------------------------------------**;
-** Impute missing collection dates in the most inclusive manner for time ref April 20-June 19, 2021 **;
+** 2. Edit and filter datasets for defined target population **;
+**-----------------------------------------------------------**;
+** Impute missing collection dates  **;
 DATA FixCollDate; set COVID.CEDRS_view_fix;
    if CollectionDate = . then CollectionDate=ReportedDate;
 run;
 
-** Filter CEDRS data for analysis to records with collection date between Apr 20 - Jun 19 **;
+** Filter CEDRS data for analysis to records with collection date between Apr 20 - Jun 6 **;       *<-- Input Time reference period ;
 DATA MMWR_cases; set FixCollDate ;
-   where '27APR21'd le CollectionDate le '06JUN21'd;
+   where '27APR21'd le CollectionDate le '06JUN21'd;                                             *<-- Input Time reference period ;
    if CountyAssigned = 'INTERNATIONAL' then delete;
    if Age_Years > 109 then Age_Years = .;
 run;
 
  PROC contents data= MMWR_cases  ;
-      title1 'COVID.CEDRS_view obs between April 20 - June 19';
+      title1 'COVID.CEDRS_view obs between April 20 - June 6';
 run;
 
 
@@ -341,7 +341,7 @@ DATA B6172_n_MMWR;
    merge MMWRkey(in=M)  B6172_key(in=V);  
    by ProfileID EventID;
 
-   if M=1 and V=1 ;                      * <--- which if any is correct? ;
+   if V=1 ;                      * <--- which if any is correct? ;
    format County $11.;
    tmp_county=County;
    County=upcase(tmp_county);
@@ -452,7 +452,11 @@ run;
 run;
 
 
-** Estimates for text in draft document **;
+
+***----------------------------------------***;
+***  Estimates for text in draft document  ***;
+***----------------------------------------***;
+
 **   13. Number of cases as of June 6th for ALL of Colorado and for Mesa (%) **;
    PROC means data= COVID.B6172_fix n nmiss ;
       where ReportedDate  < '07JUN21'd ;* AND  County='Mesa';

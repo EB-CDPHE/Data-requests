@@ -10,17 +10,8 @@
 | 3   | Make edits to B16172 dataset                                                         |
 | 4   | Read in populations data|
 
-
----
-**
-## **How do I insert an extra space between these paragraphs?**   
-*****
----
- <!-- pagebreak -->
- <!-- pagebreak -->
-
-                    
-
+#
+                 
 ## SAS Programs in this folder:
 
 | Program name    | Input dsn      | Output dsn       | Purpose                                  
@@ -35,22 +26,15 @@
 | READ.COPHS| Hosp144.COPHS|COVID.COPHS|Create SAS dataset from COPHS hospital data|
 | READ.populations|dbo144.populations|COVID.County_Population|County population data to merge with ...|
 
-   
-      
-
-
-
-
-
-
-
-
-
-
-
-View font sizes:
-- ### Size 3
-- ## Size 2
+#
+---
+#
+## View font sizes:
 - # Size 1
+- ## Size 2
+- ### Size 3
+- #### Size 4
+- ##### Size 5
+- ###### Size 6
 
 

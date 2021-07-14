@@ -15,7 +15,8 @@ OUTPUT:		printed output
  | 3. Completeness of date variables
  | 4. Invalid values for ICU variable
  | 5. Invalid values for CountyAssigned variable
- | 6. 
+ | 6. Missing keys and differing formatting (ProfileID and EventID)
+ | 7. 
  *--------------------------------------------------------------------*/
 
 
@@ -201,3 +202,74 @@ run;
  | FINDINGS:  n=71 records where County = "INTERNATIONAL"  | 
  | FIX: exclude these records                              |
  *_________________________________________________________*/
+
+
+
+***  6. Missing ID variables and format of ID variables  ***;
+***------------------------------------------------------***;
+
+DATA ChkKeys; set COVID.CEDRS_view;
+   keep ProfileID EventID Reinfection CountyAssigned ReportedDate ProfileID_length EventID_length ;
+   ProfileID_length = length(ProfileID);
+   EventID_length   = length(EventID);
+run;
+proc contents data=ChkKeys; run;
+   PROC freq data= ChkKeys; 
+      tables ProfileID_length  EventID_length ;
+run;
+
+/*______________________________________________________________________________________________________*
+ | NOTE: a length=1 indicates a missing / blank value.
+ | FINDINGS:
+ |  No records have missing values for ProfileID or EventID (i.e. len=1).
+ |  EventID values are either 7 digits long (30% of records) or 6 digits long (70%).                     |
+ |  n=2593 records with 9 digit ProfileID values. All have ".1" appended to matching 7 digit ProfileID.  | 
+ *_______________________________________________________________________________________________________*/
+
+
+**  6.1)  Print records where ProfileID has length = 9  **;
+   PROC print data= ChkKeys ;
+      where ProfileID_length=9  ;
+      id ProfileID;
+run;
+   PROC freq data= COVID.CEDRS_view ;  tables  Reinfection;  run;
+
+/*____________________________________________________*
+ | FINDINGS:                                          |
+ | All records with ".1" are reinfection events.      |
+ | Q. Why not have seperate EventID for these?        |
+ | BUT not all records where reinfection=1 have ".1"  |
+ *____________________________________________________*/
+
+
+* Print records with missing ProfileID or EventID;
+   PROC print data= ChkKeys ;
+      where ProfileID_length=1  OR  EventID_length=1 ;
+run;
+
+   PROC print data= COVID.CEDRS_view ;
+      where ProfileID=''  OR  EventID='';
+/*      var ProfileID EventID ReportedDate ;*/
+run;
+
+/*___________________________________________________________*
+ | FINDINGS:  NO records have missing ProfileID or EventID.  |
+ *___________________________________________________________*/
+
+
+
+***  7. Missing ID variables  ***;
+***---------------------------***;
+
+* List of ID values for all records;
+   PROC freq data= COVID.CEDRS_view ;
+     tables ProfileID * EventID /list missing missprint;
+run;
+
+
+
+
+
+
+
+

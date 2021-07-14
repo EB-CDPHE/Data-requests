@@ -19,6 +19,17 @@ OUTPUT:		printed output
  *--------------------------------------------------------------------*/
 
 
+***  Access CEDRS.view using ODBC  ***;
+***--------------------------------***;
+
+LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** contains "CEDRS_view which is copy of CEDRS_dashboard_constrained";
+
+LIBNAME COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
+
+   PROC contents data=COVID.CEDRS_view varnum; run;
+
+
+
 ***  1. Duplicate records  ***;
 ***------------------------***;
 
@@ -73,6 +84,14 @@ run;
       var ReportedDate   CollectionDate   OnsetDate   OnsetDate_proxy_dist ;
 run;
 
+/*__________________________________________________________________*
+ | FINDINGS:                                                        |
+ |   Onsetdate is sparse.                                           |
+ |   Onsetdate_proxy_dist and onsetdate_proxy are different dates.  |
+ |   RS says to use Onsetdate_proxy_dist.                           |
+ | FIX: Drop Onsetdate_proxy variabe (in Read.CEDRS.sas)            |
+ *__________________________________________________________________*/
+
 
 
 ***  4. Check ICU variable  ***;
@@ -82,13 +101,13 @@ run;
       tables ICU ;
 run;
 
-/*__________________________________________________________________________*
- | FINDINGS:                                                                |
- | 95% have value "Unknown". Q. How does this differ from "no"?             |
- | per BK, "Unknown" = 'NO';                                                |
- |                                                                          |
- | FIX: create and apply ICU_fmt that combines "Unknown" with "NO" values.  |
- *__________________________________________________________________________*/
+/*____________________________________________________________________________*
+ | FINDINGS:                                                                  |
+ |   95% have value "Unknown". Q. How does this differ from "no"?             |
+ |   per BK, "Unknown" = 'NO';                                                |
+ |                                                                            |
+ | FIX: create and apply ICU_fmt that combines "Unknown" with "NO" values.    |
+ *____________________________________________________________________________*/
 
 
 

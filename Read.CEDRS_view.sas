@@ -47,13 +47,18 @@ PROC contents data=CEDRS_view  varnum ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA CEDRS_view_temp; set CEDRS_view(rename=
-   (ID=tmp_ID ProfileID=tmp_ProfileID EventID=tmp_EventID
-    OnsetDate=tmp_OnsetDate  OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 
-    ReportedDate=tmp_ReportedDate CollectionDate=tmp_CollectionDate  DeathDate=tmp_DeathDate
-    Earliest_CollectionDate=tmp_Earliest_CollectionDate   Data_pulled_as_of=tmp_Data_pulled_as_of
-    Refreshed_on=tmp_refreshed_on
-   )); 
+DATA CEDRS_view_temp; 
+   set CEDRS_view(rename=
+                 (ID=tmp_ID   ProfileID=tmp_ProfileID EventID=tmp_EventID
+                  OnsetDate=tmp_OnsetDate  
+                  OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 
+                  ReportedDate=tmp_ReportedDate 
+                  CollectionDate=tmp_CollectionDate  
+                  DeathDate=tmp_DeathDate
+                  Earliest_CollectionDate=tmp_Earliest_CollectionDate   
+                  Data_pulled_as_of=tmp_Data_pulled_as_of
+                  Refreshed_on=tmp_refreshed_on  
+                  )); 
  
 * Convert temporary numeric ID variable character ID var using the CATS function *;
    ID = cats(tmp_ID);

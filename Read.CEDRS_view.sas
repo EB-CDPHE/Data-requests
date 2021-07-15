@@ -49,7 +49,7 @@ PROC contents data=CEDRS_view  varnum ;  run;
 ** 3. Modify SAS dataset per Findings **;
 DATA CEDRS_view_temp; 
    set CEDRS_view(rename=
-                 (ID=tmp_ID   ProfileID=tmp_ProfileID EventID=tmp_EventID
+                 (ID=tmp_ID   ProfileID=tmp_ProfileID   EventID=tmp_EventID
                   OnsetDate=tmp_OnsetDate  
                   OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 
                   ReportedDate=tmp_ReportedDate 

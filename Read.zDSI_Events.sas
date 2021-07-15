@@ -14,8 +14,6 @@ OUTPUT:		COVID.zDSI_Events_read
  | 2. Create temp SAS dataset from SQL table and report findings
  | 3. Modify SAS dataset per Findings
  |    a) Convert temporary numeric ID variable character ID var using the CATS function
- |    b) Convert temporary character var for each date field to a date var
- |    c) Extract date part of a datetime variable
  | 4. Shrink character variables in data set to shortest possible length (based on longest value)
  | 5. Define library to store permanent SAS dataset
  | 6. Rename "shrunken" SAS dataset

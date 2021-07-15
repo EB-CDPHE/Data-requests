@@ -80,6 +80,8 @@ run;
 *** source:  https://demography.dola.colorado.gov/population/data/sya-county/   ***;
 *** define age group intervals 0-69 and 70-109 and download csv, clean up file, import into sas as CntyPopAge ***;
 
+%inc 'C:\Users\eabush\Documents\CDPHE\Requests\MMWR field notes re Delta VOC\CntyPopAge.import.sas'; 
+
    proc sort data= CntyPopAge; by County;
    PROC transpose data= CntyPopAge  out=CountyPopbyAge;
       by County;

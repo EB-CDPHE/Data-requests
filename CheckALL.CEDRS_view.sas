@@ -186,7 +186,7 @@ run;
 
 * Count of records by formatted County name;
    PROC freq data= COVID.CEDRS_view ;
-      tables  CountyAssigned;
+      tables CountyAssigned;
       format CountyAssigned $CntyChk. ;
 run;
 

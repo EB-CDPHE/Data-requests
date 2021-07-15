@@ -200,7 +200,7 @@ run;
 
 /*_________________________________________________________*
  | FINDINGS:  n=71 records where County = "INTERNATIONAL"  | 
- | FIX: exclude these records                              |
+ | FIX: exclude these records in RFI                       |
  *_________________________________________________________*/
 
 

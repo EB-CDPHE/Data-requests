@@ -71,10 +71,15 @@ run;
       var EventID Age_Group Age_at_Reported ;
 run;
 
-/*___________________________________________*
- | FINDINGS: N=23 obs with age > 105.        |
- | FIX: set age to missing for when age>109  |
- *___________________________________________*/
+/*___________________________________________________________*
+ | FINDINGS:                                                 |
+ | N=23 obs with age > 105.                                  |
+ | n=101 obs with age = missing.                             |
+ |                                                           |
+ | FIX:                                                      |
+ | Set Age_at_Reported to missing when age>109               |
+ | Impute Age from zDSI_Events for missing Age_at_Reported.  |
+ *___________________________________________________________*/
 
 
 

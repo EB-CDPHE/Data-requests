@@ -5,7 +5,7 @@ CREATED: July 14, 2021
 MODIFIED:	
 PURPOSE:	A single program to read CEDRS view
 INPUT:		dbo66.zDSI_Events
-OUTPUT:		COVID.zDSI_Events_read
+OUTPUT:		      zDSI_Events_read
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------*

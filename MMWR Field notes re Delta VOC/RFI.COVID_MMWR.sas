@@ -4,8 +4,8 @@ AUTHOR:  Eric Bush
 CREATED: July 5, 2021
 MODIFIED:	
 PURPOSE:	Generate estimates for new / revised table in MMWR Field Notes draft
-INPUT:		COVID.CEDRS_view   COVID.B6172_fix   COVID.County_Population
-OUTPUT:		[name of output - SAS data tables, printed output, etc]
+INPUT:		COVID.CEDRS_view_fix   COVID.County_Population   
+OUTPUT:		MMWR_cases   MMWR_ICU
 ***********************************************************************************************/
 
 ** Access the CEDRS.view using ODBC **;
@@ -16,8 +16,8 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 /*________________________________________________________________________________________*
  | Programs to run prior to this code:
  | 1. Pull data from CEDRS using READ.CEDRS_view.  Creates COVID.CEDRS_view 
- | 2. Pull data on variants using READ.B6172.sas.  Creates work.B6172_edit
- | 3. Make edits to B6172_read using Fix.B6172.sas. Creates B6172_fix.
+ | 2. Add new data checks (if needed) to CHECK.CEDRS_view.
+ | 3. Add new data edits and run FIX.CEDRS_view. Creates COVID.CEDDRS_view.fix
  | 4. MMWR.formats.sas creates formats for this program.
  *________________________________________________________________________________________*/
 
@@ -25,12 +25,12 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 /*______________________________________________________________________________________________________________*
  | Table of contents for RFI code:
- | 1. PROC contents for 
- |    a. COVID.CEDRS_view dataset from dphe144
- |    b. work.B6172_fix dataset from dphe66
- |
- | 2. Demographics for confirmed and probable cases
- | --> filtered dataset = MESA county AND ReportedDate between April 20 - June 19, 2021 (work.Not_Mesa144)
+ | 1. PROC contents for input datasets: 
+ |    a. COVID.CEDRS_view_fix dataset from dphe144
+ |    b. COVID.County_Population dataset from dphe66
+ | 2. PROC contents for main dataset for estimation:  MMWR_Cases
+ | --> filtered dataset = County NOT "International" AND  ReportedDate between April 20 - June 6, 2021 
+ | 3. Demographics for confirmed and probable cases
  *______________________________________________________________________________________________________________*/
 
 
@@ -41,13 +41,13 @@ options pageno=1;
       title1 'dphe144 - CEDRS_view_fix (a copy of CEDRS_dashboard_constrained)';
 run;
 
- PROC contents data= COVID.B6172_fix varnum ;
-      title1 'dphe66 - SQL join of several data tables';
-run;
+/* PROC contents data= COVID.B6172_fix varnum ;*/
+/*      title1 'dphe66 - SQL join of several data tables';*/
+/*run;*/
 
 
-** 2. Edit and filter datasets for defined target population **;
-**-----------------------------------------------------------**;
+*** 2.  Edit and filter datasets for defined target population  ***;
+***-------------------------------------------------------------***;
 
 ** Impute missing collection dates  **;
 DATA FixCollDate; set COVID.CEDRS_view_fix;
@@ -65,42 +65,32 @@ DATA MMWR_cases; set FixCollDate ;
 run;
 
  PROC contents data= MMWR_cases  ;
-      title1 'COVID.CEDRS_view obs between April 20 - June 6';                                    *<-- Input Time reference period ;
-run;
-
-
-** 3. Add county population and filter datasets for defined target population **;
-**-----------------------------------------------------------**;
-** 3. Merge County Population data to MMWR_Cases dataset  **;
-
-   proc sort data=COVID.County_Population  out=PopTot  ; by County;
-   proc sort data=MMWR_cases  out=MMWR_cases_cnty_sort  ; by County;
-
-DATA MMWR_cases_cnty; merge MMWR_cases_cnty_sort  PopTot;
-   by County;
-   Pop100k = population/100000;
-   CountyGrp = put(County, $MesaFmt.);
-run;
-proc contents data=MMWR_cases_cnty varnum; run;
-proc print data= MMWR_cases_cnty; 
-var eventid county countygrp population pop100k ;
+      title1 'CEDRS_view obs between April 20 - June 6';                                          *<-- Input Time reference period ;
 run;
 
 
 
-proc freq data=MMWR_cases_cnty ; tables countygrp * pop100k / out=trythis;
-/*      format  County   $MesaFmt. ;*/
-weight 
-run;
+/*   proc sort data=COVID.County_Population  out=PopTot  ; by County;*/
+/*   proc sort data=MMWR_cases  out=MMWR_cases_cnty_sort  ; by County;*/
+/**/
+/*DATA MMWR_cases_cnty; merge MMWR_cases_cnty_sort  PopTot;*/
+/*   by County;*/
+/*   Pop100k = population/100000;*/
+/*   CountyGrp = put(County, $MesaFmt.);*/
+/*run;*/
+/*proc contents data=MMWR_cases_cnty varnum; run;*/
+/*proc print data= MMWR_cases_cnty; */
+/*var eventid county countygrp population pop100k ;*/
+/*run;*/
 
-proc print data=trythis; 
-run;
 
 
+***  3. Table estimates  ***;
+***-----------------------**;
 
-** Row 1: Cate rate per 100k by County region **;
+**  Row 1: Case rate per 100k by region (Mesa vs ROC)  **;
 
-** case county by county region **;
+* Case count by region (Mesa vs ROC);
    PROC means data=MMWR_cases  maxdec=2 N nmiss  nway  ;
       var ReportedDate  ;
       class   County  ;
@@ -109,7 +99,7 @@ run;
 run;
 /*proc print data=CountyCases ; id County; run;*/
 
-** population county by county **;
+* Population count by region;
    PROC means data= COVID.County_Population  sum nway maxdec=0  ; 
       class County ;
       var Population;
@@ -118,34 +108,24 @@ run;
 run;
 /*   proc print data=CountyPop;   id County;   run;*/
 
-** Calculation of case rate per 100K by region **;
+* Calculation of case rate per 100K by region;
 Data CaseRate; merge CountyCases  CountyPop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
 run;
 
+ * Print case rate per 100K by region;
    PROC print data= CaseRate;  id county;   format CasesPer100K 4.0;  run;
-
-proc means data= CaseRate sum prt;
+   PROC means data= CaseRate sum ;
       class County ;
       var CasesPer100K;
       format  County   $MesaFmt. ;
 run;
 
 
-
-
-
-
-
-
-
-
-
-
-** Row 2: Hospitalizations among cases by County region **;
+**  Row 2: Hospitalizations among cases by region (Mesa vs ROC)  **;
 
    PROC freq data= MMWR_cases ;
-      tables  County  hospitalized;
+      tables  Hospitalized;
       tables County  *  hospitalized / nocol chisq ;
       format   County $MesaFmt.    hospitalized HospFmt. ;
       title2 'Admission to hospital among cases';
@@ -153,13 +133,18 @@ run;
 run;
 
 
-** Row 3: ICU Admissions among hospitalized cases by County region **;
+**  Row 3: ICU Admissions among hospitalized cases by County region  **;
 
 ** RUN the Key_merge.COPHS.CEDRS.sas program to link COPHS ICU admission to MMWRcases dataset. **;       * <-- NOTE;
+%inc 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\Key_merge.COPHS.CEDRS.sas';
 
-   proc freq data=MMWR_ICU ; tables ICU ICU_Admission; run;
-   PROC means data= MMWR_ICU  n nmiss ;  var ICU_Admission hospitalized ICU; run;
+* Number cases hospitalized and admited to ICU;
+/*   PROC freq data=MMWR_ICU ; tables ICU ICU_Admission; run;*/
+   PROC means data= MMWR_ICU  n nmiss ;  
+      var ICU_Admission hospitalized ICU; 
+run;
 
+* ICU Admissions among hospitalized cases;
    PROC freq data= MMWR_ICU ;
       where hospitalized=1;
       tables County  *  ICU / nocol chisq ;
@@ -169,9 +154,7 @@ run;
 run;
 
 
-
 **  Row 4: Case fatality ratio by County region  **;
-
    PROC freq data= MMWR_cases ;
       tables County  *  outcome / nocol chisq ;
       format   County $MesaFmt.    outcome $Outcome_2cat.   ;
@@ -180,9 +163,7 @@ run;
 run;
 
 
-
 **  Row 5: Case fatality ratio among hospitalized cases by County region **;
-
    PROC freq data= MMWR_cases ;
       where hospitalized=1;
       tables County  *  outcome / nocol chisq ;
@@ -193,19 +174,53 @@ run;
 
 
 
+***--------------------------------------***;
+***  Numbers for text in draft document  ***;
+***--------------------------------------***;
 
+**  Merge demographic variables from CEDRS with B6172 variant data  **;
+PROC sort data= MMWR_cases(keep= ProfileID EventID Hospitalized  Reinfection  Breakthrough Outcome CollectionDate Age_Years)  
+   out=MMWR_sort; 
+   by ProfileID EventID;
 
-
-
-
-
-
-
-**   13. Number of cases as of June 6th for ALL of Colorado and for Mesa (%) **;
-   PROC means data= B6172_n_MMWR n nmiss ;
-      where ReportedDate  < '07JUN21'd  AND  County='MESA';
-      var  ReportedDate Age_years ;
-      title1 'from COVID.B6172_fix';
-      title2 'Delta variant cases from MESA county';
-/*      title2 'Delta variant cases from ALL Colorado counties';*/
+PROC sort data= COVID.B6172_fix  out=B6172_key; by ProfileID EventID;
 run;
+
+DATA B6172_n_MMWR;
+   length County $ 11;
+   merge MMWR_sort(in=M)  B6172_key(in=V);  
+   by ProfileID EventID;
+   if V=1 ;                      * <--- which if any is correct? ;
+
+   if CollectionDate = . then CollectionDate=ReportedDate;
+   format County $11.;
+   tmp_county=County;
+   County=upcase(tmp_county);
+   drop tmp_county;
+run;
+
+
+**  Contents of MMWR_Cases data attached to Delta variant info  **;
+   PROC contents data= B6172_n_MMWR varnum ; run;
+
+
+ **  Count of cases with delta variant isolated  **;
+  PROC means data= B6172_n_MMWR n nmiss ;
+      var CollectionDate ReportedDate  ;
+run;
+
+
+**  Number of delta variants in Colorado and number (and %) in Mesa county as of June 6th  **;
+   PROC freq data= B6172_n_MMWR ;
+      where CollectionDate le '06JUN21'd ;
+      tables County ; 
+      format County $MesaFmt. ;
+run;
+
+
+
+
+
+
+
+

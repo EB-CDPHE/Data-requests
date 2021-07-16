@@ -1,8 +1,8 @@
 # Data-requests
 
-### This request is for estimates needed to complete table in the MMWR Field report manuscript.
+### This request is for estimates needed to complete table in the MMWR "Notes from the Field".
 
-|     | Steps taken to get data for revised table MMWR NFTF draft |
+|     | <p align="left">Steps taken to get data for revised table MMWR NFTF draft</p> |
 | --- | ------------------------------------------------------------------------------------ |
 |1| Run READ.CEDRS_view.sas to acquire data from dphe144 CEDRS_view. Creates CEDRS_view |
 |2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|
@@ -10,7 +10,7 @@
 |4| Run FIX.zDSI_Events to create Age_in_Years variable|
 |5| Run FIX.CEDRS_view to edit data in CEDRS_view and create CEDRS_view_fix
 |6| Run RFI.COVID_MMWR.sas to generate numbers for top half of revised table.  
-|   |  It makes use of the output from these SAS programs that get automatically run:
+|   | It makes use of the output from these SAS programs that get automatically run:
         1) MMWR.formats.sas
         2) Key_merge.COPHS.CEDRS.sas
 
@@ -42,6 +42,7 @@
 #
 ---
 #
+
 ## View font sizes:
 - # Size 1
 - ## Size 2
@@ -49,5 +50,6 @@
 - #### Size 4
 - ##### Size 5
 - ###### Size 6
+
 
 

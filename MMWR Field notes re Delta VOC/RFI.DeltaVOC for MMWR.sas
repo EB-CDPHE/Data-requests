@@ -326,8 +326,8 @@ run;
 /*______________________________________________________________________________________________________*
  | Code below adds demographic variables from above MMWR dataset to the B6172_fix dataset. 
  | B6172_fix dataset is from variant of concern (B.1.617.2) in Colorado. 
- | B6172_fix was created from SQL join supplied by Bre. See Read.B6172. 
- | Read.B6172 creates COVID.B6172 and then Check.B6172 creates B6172_fix. 
+ | B6172_read was created from SQL join supplied by Bre. See Read.B6172. 
+ | Read.B6172 creates COVID.B6172_read and then Fix.B6172 creates B6172_fix. 
  | Merge demographic vars from CEDRS with B.1.617.2 variant data in B6172_fix. 
  *______________________________________________________________________________________________________*/
 

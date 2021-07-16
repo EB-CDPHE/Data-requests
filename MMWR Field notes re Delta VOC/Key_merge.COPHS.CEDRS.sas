@@ -4,14 +4,14 @@ AUTHOR:		Eric Bush
 CREATED:	   July 5, 2021
 MODIFIED:   
 PURPOSE:	   Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		dbo144.CEDRS_view
-OUTPUT:		COVID.CEDRS_view
+INPUT:		dbo66.Profiles   COVID.COPHS_fix   MMWR_cases
+OUTPUT:		ICU_Key --> MMWR_ICU
 ***********************************************************************************************/
 
 ***  Create key from CEDRS66.Profiles   ***;
 ***_____________________________________***;
 
-LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK's libname ; 
+LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;        
 
 DATA Profiles; set CEDRS66.Profiles;    
   if Birthdate ne ''   AND   LastName ne ''   AND    FirstName  ne ''   ; 
@@ -19,8 +19,8 @@ DATA Profiles; set CEDRS66.Profiles;
 run;
    PROC contents data=Profiles  varnum ;  run;    
 
-   proc sort data=Profiles out=Profiles_sort; by BirthDate LastName FirstName ;  run;
 
+   proc sort data=Profiles out=Profiles_sort; by BirthDate LastName FirstName ;  run;
 DATA Profiles_key;   
    length COPHS_ID $ 100   ProfileID $ 15;  
    set Profiles_sort(rename=(ProfileID=tmp_ProfileID));  
@@ -37,11 +37,8 @@ run;
 ***  Create key from COVID.COPHS_fix   ***;
 ***____________________________________***;
 
-/*   PROC contents data=COVID.COPHS_fix  varnum ;  run;*/
    PROC sort  data= COVID.COPHS_fix(keep=DOB Last_Name First_Name ICU_Admission)  out=COPHS_sort; 
       by DOB Last_Name First_Name ;
-/*   PROC contents data=COPHS_sort ; run;*/
-
 DATA COPHS_key;   
    length COPHS_ID $ 100;   
    set COPHS_sort;
@@ -88,7 +85,7 @@ DATA MMWR_ICU; merge I_key(in=i)  M_key(in=m) ;
    if i=1 AND m=1;
    if ICU_Admission ne . then ICU=1; else ICU=0;
 run;
-   PROC print data=MMWR_ICU ; id ProfileID; run;
+/*   PROC print data=MMWR_ICU ; id ProfileID; run;*/
 
 ** Contents for final dataset for estimation **;
    PROC contents data=MMWR_ICU  varnum ; run;

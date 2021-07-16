@@ -1,8 +1,14 @@
 # Data-requests
 
-### This request is for estimates needed to complete table in the MMWR "Notes from the Field".
+## Backgroud: 
+### This request is for data needed to complete the table in the MMWR [Notes from the Field](https://docs.google.com/document/d/1Jla02O-FwNHoCOz3zqUEXd80KRmpGzljFKM7hfSf7T4/edit?ts=60f10e65).   
+### **Population**:  Confirmed and probable cases with collection dates between April 27 - June 6, 2021 (inclusive).  
+### **Outcomes**: case rate per 100k; hospitalization rate; ICU admission rate; case fatality ratio (for all cases and hospitalized cases only).  
+### **Groups**: Colorado regions defined as Mesa county versus all other counties ("ROC"). An earlier version of the table asked for outcomes by age (<70 yo and 70+ yo). 
+### The earlier version requested data for the same outcomes and groupings but for the population of delta variants isolated from confirmed and probable cases.
+#
 
-|     | <p align="left">Steps taken to get data for revised table MMWR NFTF draft</p> |
+|     | <p align="left">Steps taken to get data for revised table</p> |
 | --- | ------------------------------------------------------------------------------------ |
 |1| Run READ.CEDRS_view.sas to acquire data from dphe144 CEDRS_view. Creates CEDRS_view |
 |2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|
@@ -14,9 +20,7 @@
         1) MMWR.formats.sas
         2) Key_merge.COPHS.CEDRS.sas
 
-
-#
-                 
+#             
 ## SAS Programs in this folder:
 
 | Program name    | Input Dataset  | Output Dataset   | Purpose                                  
@@ -38,18 +42,4 @@
 |Fix.B6172|B6172_read|COVID.B6172_fix|Make edits to B6172.read dataset
 | READ.COPHS| Hosp144.COPHS|COVID.COPHS|Create SAS dataset from COPHS hospital data|
 | READ.populations|dbo144.populations|COVID.County_Population|County population data to merge with ...|
-
-#
----
-#
-
-## View font sizes:
-- # Size 1
-- ## Size 2
-- ### Size 3
-- #### Size 4
-- ##### Size 5
-- ###### Size 6
-
-
 

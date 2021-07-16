@@ -3,7 +3,7 @@ PROGRAM: Read.zDSI_Events
 AUTHOR:  Eric Bush
 CREATED: July 14, 2021
 MODIFIED:	
-PURPOSE:	A single program to read CEDRS view
+PURPOSE:	Access SQL table on Events
 INPUT:		dbo66.zDSI_Events
 OUTPUT:		      zDSI_Events_read
 ***********************************************************************************************/

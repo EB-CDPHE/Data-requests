@@ -1,0 +1,33 @@
+/**********************************************************************************************
+PROGRAM: Fix.zDSI_Events
+AUTHOR:  Eric Bush
+CREATED:	July 15, 2021
+MODIFIED:	
+PURPOSE:	Make data edits to zDSI_Events_read per edit checks in CHECK.zDSI_Events_read.sas
+INPUT:	zDSI_Events_read 
+OUTPUT:	zDSI_Events_fix
+***********************************************************************************************/
+
+/*---------------------------------------------------------------------------------------------*
+ | Fixes made in this code:
+ |  1. Convert Age for all Age_Types to age in years. Creates new variable: Age_in_Years  
+ *---------------------------------------------------------------------------------------------*/
+
+** Access the final SAS dataset that was created in the Read.* program that matches this Explore.* programn **;
+Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
+
+   PROC contents data=zDSI_Events_read varnum; run;
+
+
+** 1. Create Age in years variable from other Age Type records **;
+DATA zDSI_Events_fix ;  set zDSI_Events_read ;
+   if upcase(AgeType) = 'DAYS' then Age_Years = Age/365;
+   if upcase(AgeType) = 'WEEKS'  then Age_Years = Age/52;
+   if upcase(AgeType) = 'MONTHS' then Age_Years = Age/12;
+   if upcase(AgeType) = 'YEARS'  then Age_Years = Age;
+   Label Age_Years = 'Age in years';
+run;
+
+
+** 2. Contents of new dataset with edits **;
+   PROC contents data=zDSI_Events_fix varnum; run;

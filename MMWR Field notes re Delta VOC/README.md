@@ -10,7 +10,8 @@
 |3| Run READ.zDSI_Events to get Age. Creates zDSI_Events.read|
 |4| Run FIX.zDSI_Events to create Age_in_Years variable|
 |5| Run FIX.CEDRS_view to edit data in CEDRS_view and create CEDRS_view_fix
-|6| Run RFI.COVID_MMWR.sas to generate numbers for top half of revised table.  It also runs these SAS programs and makes use of the resulting output datasets:
+|6| Run RFI.COVID_MMWR.sas to generate numbers for top half of revised table.  
+|   |  It makes use of the output from these SAS programs that get automatically run:
         1) MMWR.formats.sas
         2) Key_merge.COPHS.CEDRS.sas
 |7| THE END |

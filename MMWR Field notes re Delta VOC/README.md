@@ -2,8 +2,7 @@
 
 ### This request is for estimates needed to complete table in the MMWR Field report manuscript.
 
-## Steps taken to get data for revised table MMWR NFTF draft:
-|     | Step                                                                                 |
+|     | Steps taken to get data for revised table MMWR NFTF draft |
 | --- | ------------------------------------------------------------------------------------ |
 |1| Run READ.CEDRS_view.sas to acquire data from dphe144 CEDRS_view. Creates CEDRS_view |
 |2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|
@@ -14,7 +13,6 @@
 |   |  It makes use of the output from these SAS programs that get automatically run:
         1) MMWR.formats.sas
         2) Key_merge.COPHS.CEDRS.sas
-|7| THE END |
 
 
 #

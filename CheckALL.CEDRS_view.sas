@@ -4,8 +4,8 @@ AUTHOR:  Eric Bush
 CREATED: July 14, 2021
 MODIFIED:	
 PURPOSE:	Comprehensive list (pulled across all RFI folders) of data checks for CEDRS view
-INPUT:		COVID.CEDRS_view   (?? change to:  COVID.CEDRS_read  ??)
-OUTPUT:		printed output
+INPUT:	CEDRS_view_read
+OUTPUT:	printed output
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------*
@@ -20,6 +20,9 @@ OUTPUT:		printed output
  *--------------------------------------------------------------------*/
 
 
+%LET ChkDSN = 'CEDRS_view_read';       * <-- ENTER name of CEDRS dataset to run data checks against;
+
+
 ***  Access CEDRS.view using ODBC  ***;
 ***--------------------------------***;
 
@@ -27,7 +30,7 @@ LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** contains "CEDR
 
 LIBNAME COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-   PROC contents data=COVID.CEDRS_view varnum; run;
+   PROC contents data= &ChkDSN varnum; run;
 
 
 
@@ -35,7 +38,7 @@ LIBNAME COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 ***------------------------***;
 
 * Identify duplicate records;
-   PROC FREQ data= COVID.CEDRS_view noprint;  
+   PROC FREQ data= &ChkDSN noprint;  
       tables  ProfileID * EventID / out=CEDRS_DupChk(where=(count>1));
 
 * Print list of duplicate records;
@@ -60,12 +63,12 @@ run;
 ***  2. Age_at_Reported values  ***;
 ***-----------------------------***;
 
-   PROC univariate data= COVID.CEDRS_view ;
+   PROC univariate data= &ChkDSN ;
       var Age_at_Reported ;
 run;
 
 * 2.1) Records where Age_at_Reported > 105;
-   PROC print data= COVID.CEDRS_view;
+   PROC print data= &ChkDSN;
       where Age_at_Reported > 105 ;
       id ProfileID;
       var EventID Age_Group Age_at_Reported ;
@@ -86,7 +89,7 @@ run;
 ***  3. Completeness of date variables (for use to count cases)  ***;
 ***---------------------------------------------------------------***;
 
-   PROC means data= COVID.CEDRS_view n nmiss;
+   PROC means data= &ChkDSN n nmiss;
       var ReportedDate   CollectionDate   OnsetDate   OnsetDate_proxy_dist ;
 run;
 
@@ -103,7 +106,7 @@ run;
 ***  4. Check ICU variable  ***;
 ***-------------------------***;
 
-   PROC freq data= COVID.CEDRS_view ;
+   PROC freq data= &ChkDSN ;
       tables ICU ;
 run;
 
@@ -190,13 +193,13 @@ run;
 run;
 
 * Count of records by formatted County name;
-   PROC freq data= COVID.CEDRS_view ;
+   PROC freq data= &ChkDSN ;
       tables CountyAssigned;
       format CountyAssigned $CntyChk. ;
 run;
 
 * Print records where County name is NOT valid;
-DATA ChkCounty; set COVID.CEDRS_view;
+DATA ChkCounty; set &ChkDSN;
    keep ProfileID EventID CountyAssigned ChkCounty;
    ChkCounty = put(CountyAssigned, $CntyChk.);
    PROC print data= ChkCounty; 
@@ -213,7 +216,7 @@ run;
 ***  6. Missing ID variables and format of ID variables  ***;
 ***------------------------------------------------------***;
 
-DATA ChkKeys; set COVID.CEDRS_view;
+DATA ChkKeys; set &ChkDSN;
    keep ProfileID EventID Reinfection CountyAssigned ReportedDate ProfileID_length EventID_length ;
    ProfileID_length = length(ProfileID);
    EventID_length   = length(EventID);
@@ -237,7 +240,7 @@ run;
       where ProfileID_length=9  ;
       id ProfileID;
 run;
-   PROC freq data= COVID.CEDRS_view ;  tables  Reinfection;  run;
+   PROC freq data= &ChkDSN ;  tables  Reinfection;  run;
 
 /*____________________________________________________*
  | FINDINGS:                                          |
@@ -252,7 +255,7 @@ run;
       where ProfileID_length=1  OR  EventID_length=1 ;
 run;
 
-   PROC print data= COVID.CEDRS_view ;
+   PROC print data= &ChkDSN ;
       where ProfileID=''  OR  EventID='';
 /*      var ProfileID EventID ReportedDate ;*/
 run;
@@ -267,7 +270,7 @@ run;
 ***---------------------------***;
 
 * List of ID values for all records;
-   PROC freq data= COVID.CEDRS_view ;
+   PROC freq data= &ChkDSN ;
      tables ProfileID * EventID /list missing missprint;
 run;
 

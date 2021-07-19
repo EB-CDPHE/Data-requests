@@ -6,14 +6,17 @@ This request is for data needed to complete a table in the presentation [B.1.617
 
 |     | <p align="left">Steps taken to get data for revised table</p> |
 | --- | ------------------------------------------------------------------------------------ |
-|1| Run READ.CEDRS_view.sas to acquire data from dphe144 CEDRS_view. Creates CEDRS_view |
+|1| Run Access.CEDRS_view to pull data from dphe144 CEDRS_view. Creates CEDRS_view |
 |2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|
-|3| Run READ.zDSI_Events to get Age. Creates zDSI_Events.read|
+|3| Run Access.zDSI_Events to access Events table and get Age. Creates zDSI_Events.read|
 |4| Run FIX.zDSI_Events to create Age_in_Years variable|
-|5| Run FIX.CEDRS_view to edit data in CEDRS_view and create CEDRS_view_fix
-|6| Run RFI.COVID_MMWR.sas to generate numbers for top half of revised table.  
+|5| Run FIX.CEDRS_view to edit data in CEDRS_view and add Age_in_Years. Creates CEDRS_view_fix
+|6| Run Access.B6172 to pull sequencing results for Delta variants.
+|7| Use Check.B6172 for data checks. Output informs edits made in Fix.B6172|
+|8| Run FIX.B6172 to edit data in B6172_Read. Edits include de-dup, county, age. Creates B6172_fix.
+|9| Run RFI.DeltaVOC_in_Mesa to generate numbers for the four columns in the table.  
 |   | It makes use of the output from these SAS programs that get automatically run:
-        1) MMWR.formats.sas
+        1) Mesa.formats.sas
         2) Key_merge.COPHS.CEDRS.sas
 
 #             
@@ -21,21 +24,11 @@ This request is for data needed to complete a table in the presentation [B.1.617
 
 | Program name    | Input Dataset  | Output Dataset   | Purpose                                  
 | --------------- | -------------- | ---------------- | ---------------------------------------| 
-| READ.CEDRS_view | dbo144.CEDRS_view (SQL data table) | COVID.CEDRS_view | Access CEDRS_view table and adjust variable types and length and save as SAS dataset|
-| Check.CEDRS_view| COVID.CEDRS_view|*N/A*|Conduct data quality checks|
-|READ.zDSI_Events|dbo66.zDSI_Events|work.zDSI_Events_read|Access Profiles table and adjust variable types and length and save as SAS dataset.
-|Fix.zDSI_Events|zDSI_Events_read|zDSI_Events_fix|Convert age for all age types to Age_in_Years
-| Fix.CEDRS_view|COVID.CEDRS_view; & zDSI_Events_fix|COVID.CEDRS_view_fix|Edit County and Age variables|
-|RFI.DeltaVOC for MMWR|CEDRS_view_fix; & B6172_fix; & County_Population|MMWR_Cases; & MMWR_ICU|Generate numbers for orginal table
-|RFI.COVID_MMWR|CEDRS_view_fix|MMWR_Cases; & MMWR_ICU|Generate numbers for revised table
-|MMWR_formats| *N/A* | *N/A* |Create user defined formats
-|Key_merge.COPHS.CEDRS|dbo66.Profiles; & COVID.COPHS_fix; & MMWR_cases|MMWR_ICU|Merge ICU data from COPHS into MMWR_Cases
+| EpiCurve.DeltaVOC_in_Mesa|**???**|*N/A*|Generate output used in Excel to chart epi curve|
+|Mesa_formats| *N/A* | *N/A* |Create user defined formats
+|RFI.DeltaVOC_in_Mesa|COVID.CEDRS_view_fix; & COVID.B6172_fix|Not_Mesa144; Mesa144; Not_Mesa_B16172; Mesa_B16172|Generate numbers for table in presentation
 ||
 |**RETIRED PROGRAMS:** | |
-| Read.B6172|SQL tables from CEDRS66 zDSI schema: <ul><li>Profiles</li><li>Events</li></ul><ul><li>LabTests</li></ul> |B6172_read|Create SAS dataset of variant cases|
-| Read.B6172|SQL tables (Profiles, Events, LabTests) from CEDRS66 zDSI schema |B6172_read|Create SAS dataset of variant cases|| READ.populations|dbo144.populations|COVID.County_Population|Create SAS dataset of county population data|
-|Check.B6172|B6172_read OR B6172_fix|*N/A*|Conduct data quality checks|
-|Fix.B6172|B6172_read|COVID.B6172_fix|Make edits to B6172.read dataset
-| READ.COPHS| Hosp144.COPHS|COVID.COPHS|Create SAS dataset from COPHS hospital data|
-| READ.populations|dbo144.populations|COVID.County_Population|County population data to merge with ...|
+| OLD_Check.CEDRS_view|*N/A*|*N/A*|Code for data checks; new version moved to parent directory|
+| OLD_Fix.B6172|*N/A*|*N/A*|Code for data checks; new version moved to parent directory|
 

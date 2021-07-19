@@ -7,30 +7,29 @@ PURPOSE:	 After a SQL data table has been read using Read.CEDRS_SQL_table, this 
 INPUT:	 COPHS_read
 OUTPUT:	 printed output
 ***********************************************************************************************/
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
+options ps=50 ls=150 ;     * Landscape pagesize settings *;
 
-/*--------------------------------------------------------------------------------------------------------*
+/*-----------------------------------------------------------------------------------------*
  | Check COPHS data for:
  | 1. Duplicate records (per MR_Number)
  | 1.1 Duplicate records with same Hospital admission date
  | 2. Missing positive test dates
  | 3. Check that Grand county records are in Colorado and NOT Utah
  | 4. Invalid values for County_of_Residence variable
- *--------------------------------------------------------------------------------------------------------*/
+ *-----------------------------------------------------------------------------------------*/
 
 
-%LET ChkDSN = 'COPHS_read';       * <-- ENTER name of CEDRS dataset to run data checks against;
+%LET ChkHospDSN = 'COPHS_read';       * <-- ENTER name of CEDRS dataset to run data checks against;
 
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-
-options ps=65 ls=110 ;     * Portrait pagesize settings *;
-options ps=50 ls=150 ;     * Landscape pagesize settings *;
 options pageno=1;
 title1 'dphe144 = COPHS';
 
-   PROC contents data= &ChkDSN varnum; run;
+   PROC contents data= &ChkHospDSN varnum; run;
 
 
 ***  1. Duplicate records  ***;

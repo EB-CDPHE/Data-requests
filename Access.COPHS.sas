@@ -7,7 +7,7 @@ PURPOSE:	   Connect to dphe144 "hospital" and create associated SAS dataset.
             The main changes are to convert date fields to true SAS date variables AND
             to shrink character variables to smallest possible size.
 INPUT:		Hosp144.COPHS
-OUTPUT:		COVID.COPHS
+OUTPUT:		        COPHS_read
 ***********************************************************************************************/
 
 /*________________________________________________________________________________________________________*
@@ -101,11 +101,11 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 7. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA COVID.COPHS ; set COPHS_temp_ ;
+DATA COPHS_read ; set COPHS_temp_ ;
 run;
 
 
 **  8. PROC contents of final dataset  **;
-   PROC contents data=COVID.COPHS varnum; run;
+   PROC contents data= COPHS_read varnum; run;
 
 

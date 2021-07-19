@@ -1,21 +1,23 @@
 /**********************************************************************************************
-PROGRAM: CheckALL.B6172
-AUTHOR:  Eric Bush
-CREATED: July 15, 2021
-MODIFIED:	070121:  Modified where clause to include Delta Plus variants
-            063021:  Modify to be consistent with READ.SQL_DSN template
-PURPOSE:	Connect to CEDRS backend and create associated SAS dataset
-INPUT:		COVID.B6172_read        OR     COVID.B6172_fix
-OUTPUT:		printed output
+PROGRAM:  CheckALL.B6172
+AUTHOR:   Eric Bush
+CREATED:  July 15, 2021
+MODIFIED: 070121:  Modified where clause to include Delta Plus variants
+          063021:  Modify to be consistent with READ.SQL_DSN template
+PURPOSE:	 Connect to CEDRS backend and create associated SAS dataset
+INPUT:	 B6172_read        OR     COVID.B6172_fix
+OUTPUT:	 printed output
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------*
- | Check B6172_read data for:
+ | > Check dataset = B6172_read           v                         
+ |   ___________________________________  v 
  | 1. Duplicate records (per ProfileID - EventID)
  | 2. Invalid values for CountyAssigned variable
  | 3. Check types of values for AgeType variable
  |
- | Check B6172_fix data for edits made:
+ | > Check dataset = COVID.B6172_fix      v
+ |   ___________________________________  v 
  | 4. Invalid values for ICU variable
  | 5. 
  *--------------------------------------------------------------------*/
@@ -24,14 +26,14 @@ LIBNAME COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 **  Access the final SAS dataset that was created in the READ.B6172 program  **;
 
-   PROC contents data=COVID.B6172_read  varnum ; run;
+   PROC contents data= B6172_read  varnum ; run;
 
 
 ***  1. Duplicate records  ***;
 ***------------------------***;
 
 * Identify duplicate records;
-   PROC FREQ data= COVID.B6172_read noprint;  
+   PROC FREQ data= B6172_read noprint;  
       tables ProfileID * EventID / out=DupChk(where=(count>1));
    PROC print data=DupChk; 
       id ProfileID;
@@ -48,7 +50,7 @@ run;
 
 
 * Print out selected fields for ALL duplicate records *;
-   proc sort data= COVID.B6172_read  out= B6172sort ;  by ProfileID  EventID ResultDate CreateDate ;
+   proc sort data= B6172_read  out= B6172sort ;  by ProfileID  EventID ResultDate CreateDate ;
 Data DupOnly;  merge B6172sort DupChk(in=Dup) ;  
  by ProfileID  EventID ;
  if Dup;
@@ -64,14 +66,14 @@ run;
 /*     OR      */
 
 * Print out duplicate records for specific Profile ID identified as having duplicate records *;
-    PROC print data= COVID.B6172_read;
+    PROC print data= B6172_read;
       where ProfileID='1658113';
       id ProfileID; 
       var EventID  lastname firstname birthdate gender disease eventstatus countyassigned entrymethod CreateDate ResultDate reporteddate age outcome testtype resulttext quantitativeresult  ;
 run;
 ** FINDING:  the difference between the two is create date and result date variables.  Delete record with earlier result date  **;
 
-   PROC print data= COVID.B6172_read;
+   PROC print data= B6172_read;
       where ProfileID='1685685';
       id ProfileID; 
       var EventID  lastname firstname birthdate gender disease eventstatus countyassigned entrymethod CreateDate ResultDate reporteddate age outcome testtype resulttext quantitativeresult  ;
@@ -154,7 +156,7 @@ run;
 
 
 * Print records where County name is NOT valid;
-DATA B6172_Ck2; set COVID.B6172_read;
+DATA B6172_Ck2; set B6172_read;
    keep ProfileID EventID County CountyAssigned ChkCounty;
    County = upcase(scan(CountyAssigned,1,','));
    ChkCounty = put(CountyAssigned, $CntyChk.);
@@ -175,7 +177,7 @@ run;
 ***-----------------------------***;
 
 * Frequency of values of AgeType;
-   PROC freq data= COVID.B6172_read; 
+   PROC freq data= B6172_read; 
       tables AgeType;
 run;
 
@@ -186,7 +188,7 @@ run;
 run;
 
  * Print extreme values of Age when AgeType = years;
-  PROC print data= COVID.B6172_read; 
+  PROC print data= B6172_read; 
       where upcase(AgeType) ^= 'YEARS'; 
       id ProfileID;
       var EventID LastName Gender Age AgeType Birthdate CreateDate ResultDate;
@@ -204,7 +206,7 @@ run;
 
 **  Access the edited SAS dataset that was created in the FIX.B6172 program  **;
 
-   PROC contents data=COVID.B6172_fix  varnum ; run;
+   PROC contents data= COVID.B6172_fix  varnum ; run;
 
 
 ***  4. Check edits  ***;
@@ -220,7 +222,7 @@ run;
 
 
 * Check edits to ... *;
-   PROC freq data=B6172_fix; 
+   PROC freq data=COVID.B6172_fix; 
       tables gender disease eventstatus county entrymethod agetype outcome testtype resulttext  ; 
       format ResultText $variant.   ;
 run;

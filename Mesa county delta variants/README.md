@@ -4,7 +4,7 @@
 This request is for data needed to complete a table in the presentation [B.1.617.2 in Colorado](https://docs.google.com/presentation/d/10v9o1mwOVWfGtpJpnd5A6Gr5hDkt4GlVSTkwXSMTLhE/edit?ts=60f1ca9b#slide=id.gdf56bc7d45_8_0). **Population**:  Confirmed and probable cases with reported dates after April 5, 2021 (inclusive). Any cases with delta variant. **Groups**: Colorado regions defined as Mesa county versus all other counties ("ROC"). **Data requested**: number of cases; median and mean age, age range, gender, hospitalization rate; mortality rate; percent reinfection, percent vaccine break-through case.  An earlier version of the table asked for outcomes by age (<70 yo and 70+ yo).  The earlier version requested data for the same outcomes and groupings but for the population of delta variants isolated from confirmed and probable cases.
 #
 ## Steps taken to get data for revised table
-|Run order| <p align="left">SAS programs used for data request</p> |
+| <p align="left">Run order</p> | <p align="left">SAS programs used for data request</p> |
 | --- | ------------------------------------------------------------------------------------ |
 |1| Run Access.CEDRS_view to pull data from dphe144 CEDRS_view. Creates CEDRS_view |
 |2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|

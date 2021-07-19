@@ -7,7 +7,7 @@ MODIFIED:	070121:  Modified where clause to include Delta Plus variants
 PURPOSE:	Connect to CEDRS backend and create associated SAS dataset
 INPUT:		SQL code from Bre joins data tables from CEDRS Warehouse:  CEDRS66.zDSI_Profiles, CEDRS66.zDSI_Events, CEDRS66.zDSI_LabTests 
             the join creates -->  work.denominator_ALL_B6172
-OUTPUT:		COVID.B6172_read
+OUTPUT:		B6172_read
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------------------------------------*
@@ -103,9 +103,9 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA COVID.B6172_read ; set B6172_temp_;
+DATA B6172_read ; set B6172_temp_;
 run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=COVID.B6172_read varnum; run;
+   PROC contents data= B6172_read varnum; run;

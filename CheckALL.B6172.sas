@@ -200,6 +200,8 @@ run;
  | Look at birthdates for those where age type is not years to confirm newborn cases.  |
  | FIX: create new variable for Age_Years and convert weeks/months to age.             |
  | Format Age_Years variable to categorize cases into <70 and 70+ years of age.        |
+ |                                                                                     |
+ | NOTE: THIS EDIT IS DONE VIA FIX.CEDRS_VIEW PROGRAM                              |
  *_____________________________________________________________________________________*/
 
 
@@ -209,8 +211,10 @@ run;
    PROC contents data= COVID.B6172_fix  varnum ; run;
 
 
-***  4. Check edits  ***;
-***------------------***;
+
+
+*** 4.  Post-edit checks ***;
+***------____------------***;
 
 * Check edits to ... *;
    PROC print data= COVID.B6172_fix(obs=50) ;

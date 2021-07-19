@@ -23,7 +23,7 @@ OUTPUT:	 COVID.CEDRS_view_fix
  | 4. Post-edit data checks on COVID.CEDRS_view_fix
  *-----------------------------------------------------------------------------------------------------------*/
 
-** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
+** Access the final SAS dataset that was created in the Access.* program and validated with the Check.* programn **;
 
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 

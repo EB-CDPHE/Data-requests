@@ -1,11 +1,11 @@
 /**********************************************************************************************
-PROGRAM: RFI.Western_slope_hosp
-AUTHOR:  Eric Bush
-CREATED: June 22, 2021
-MODIFIED:	
-PURPOSE:	After a SQL data table has been read using Read.CEDRS_SQL_table, this program can be used to explore the SAS dataset
-INPUT:		[name of input data table(s)]
-OUTPUT:		[name of output - SAS data tables, printed output, etc]
+PROGRAM:  RFI.Western_slope_hosp
+AUTHOR:   Eric Bush
+CREATED:  June 22, 2021
+MODIFIED: 	
+PURPOSE:	 After a SQL data table has been read using Read.CEDRS_SQL_table, this program can be used to explore the SAS dataset
+INPUT:	 COVID.COPHS_fix
+OUTPUT:	 [name of output - SAS data tables, printed output, etc]
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------------------------------------------*
@@ -37,23 +37,23 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 options pageno=1;
 title1 'dphe144 = COPHS';
 
-   PROC contents data=COVID.COPHS varnum; run;
+   PROC contents data=COVID.COPHS_fix varnum; run;
 
 
 *** Descriptive analysis on ALL records (unfiltered data). ***:
 ***________________________________________________________***;
 
 ** 2. N and number missing in ALL records for Hosp admit date and a date for positive COVID test **;
-   PROC means data= COVID.COPHS  n nmiss;
+   PROC means data= COVID.COPHS_fix  n nmiss;
       var Hosp_Admission   Positive_Test ;
 run;
-   PROC freq data= COVID.COPHS;
+   PROC freq data= COVID.COPHS_fix;
       tables Positive_Test ;
       format Positive_Test MONYY. ;
 run;
 
 
-*** The second part of this code filters data and addresses issues described above ***;
+*** The second part of this code filters data  ***;
 *** Descriptive analysis in this section is on the filtered data.                  ***:
 *** Filter on CY21 only AND POS COVID test (if prior to June). Remove n=2 dups.    ***;
 ***________________________________________________________________________________***;

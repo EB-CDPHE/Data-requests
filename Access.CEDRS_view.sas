@@ -8,7 +8,7 @@ INPUT:		dbo144.CEDRS_view
 OUTPUT:		       CEDRS_view_read
 ***********************************************************************************************/
 
-/*--------------------------------------------------------------------*
+/*------------------------------------------------------------------------------------------------*
  | What this program does:
  | 1. Define library to access COVID19 database on dbo144 server using ODBC
  | 2. Create temp SAS dataset from SQL table and report findings
@@ -20,7 +20,7 @@ OUTPUT:		       CEDRS_view_read
  | 5. Define library to store permanent SAS dataset
  | 6. Rename "shrunken" SAS dataset
  | 7. PROC contents of final dataset
- *--------------------------------------------------------------------*/
+ *------------------------------------------------------------------------------------------------*/
 
 ** 1. Libname to access COVID19 database on dbo144 server using ODBC **;
 LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** schema contains "CEDRS_view, a copy of CEDRS_dashboard_constrained";

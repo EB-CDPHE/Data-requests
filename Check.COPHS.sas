@@ -4,7 +4,7 @@ AUTHOR:   Eric Bush
 CREATED:  June 22, 2021
 MODIFIED: 071921: Update per other RFI patterns for SAS programs.	
 PURPOSE:	 After a SQL data table has been read using Read.CEDRS_SQL_table, this program can be used to explore the SAS dataset
-INPUT:	 COVID.COPHS
+INPUT:	 COPHS_read
 OUTPUT:	 printed output
 ***********************************************************************************************/
 
@@ -17,23 +17,27 @@ OUTPUT:	 printed output
  | 4. Invalid values for County_of_Residence variable
  *--------------------------------------------------------------------------------------------------------*/
 
-options ps=65 ls=110 ;     * Portrait pagesize settings *;
-options ps=50 ls=150 ;     * Landscape pagesize settings *;
+
+%LET ChkDSN = 'COPHS_read';       * <-- ENTER name of CEDRS dataset to run data checks against;
 
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
+
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
+options ps=50 ls=150 ;     * Landscape pagesize settings *;
 options pageno=1;
 title1 'dphe144 = COPHS';
 
-   PROC contents data=COVID.COPHS varnum; run;
+   PROC contents data= &ChkDSN varnum; run;
+
 
 ***  1. Duplicate records  ***;
 ***------------------------***;
 
 * Identify duplicate records;
-   PROC FREQ data= COVID.COPHS  noprint;  
+   PROC FREQ data= &ChkDSN  noprint;  
       tables MR_Number / out=Hosp_DupChk(where=(COUNT>1));
 
 * Print list of duplicate records;
@@ -49,7 +53,7 @@ run;
 run;
 
 * Use dup record list to filter COPHS data for just dups (based on MR_Number)  *;
-   proc sort data=COVID.COPHS(drop=filename)  out=COPHSdups  ; by MR_Number; run;
+   proc sort data= &ChkDSN(drop=filename)  out=COPHSdups  ; by MR_Number; run;
    proc sort data=Hosp_DupChk  ; by MR_Number; run;
 DATA ChkCOPHSdups; merge COPHSdups DupChk(in=dup) ; 
    by MR_Number; 
@@ -68,7 +72,7 @@ run;
 
 
 * 1.1): Print out dup records with same Hospital admission date (i.e. bad dup)  *;
-   proc sort data=COVID.COPHS(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;
+   proc sort data= &ChkDSN(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;
    PROC print data=DupHospAdmit ; 
       id MR_Number ;
       var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        
@@ -96,7 +100,7 @@ title2 'ALL records';
 ***-----------------------------------------------------------------------***;
 
 * details *;
-proc print data=COVID.COPHS;
+proc print data= &ChkDSN;
    where Positive_Test = .;
    var MR_Number Last_Name Gender County_of_Residence Hosp_Admission Date_left_facility;
 run;
@@ -104,7 +108,7 @@ run;
 * summary ;
    proc format; 
       value YNfmt  . = 'Missing date'  other='Have date' ;
-   PROC freq data= COVID.COPHS;
+   PROC freq data= &ChkDSN;
       where Hosp_Admission > '31DEC20'd  AND  Hosp_Admission < '31JUL21'd;
       tables Positive_Test * Hosp_Admission /missing missprint norow nopercent;
       format Positive_Test YNfmt.        Hosp_Admission MONYY. ;
@@ -114,7 +118,7 @@ run;
 
 ***  3. Check that all Grand county records are in Colorado and NOT in Grand county, Utah  ***;
 ***----------------------------------------------------------------------------------------***;
-   PROC freq data= COVID.COPHS;
+   PROC freq data= &ChkDSN;
       where upcase(County_of_Residence) = 'GRAND';
       tables  County_of_Residence * City * Zip_Code / list;
 run;
@@ -203,13 +207,13 @@ run;
 run;
 
 * Count of records by formatted County name;
-   PROC freq data= COVID.COPHS ;
+   PROC freq data= &ChkDSN ;
       tables County_of_Residence;
       format County_of_Residence $CntyChk. ;
 run;
 
 * Print records where County name is NOT valid;
-DATA ChkHospCounty; set COVID.COPHS;
+DATA ChkHospCounty; set &ChkDSN;
    keep MR_Number Facility_Name  Last_Name  First_Name  Hosp_Admission ;
    ChkCounty = put(CountyAssigned, $CntyChk.);
    PROC print data= ChkHospCounty; 

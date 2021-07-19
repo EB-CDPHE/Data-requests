@@ -13,7 +13,8 @@ OUTPUT:	zDSI_Events_fix
  |  1. Convert Age for all Age_Types to age in years. Creates new variable: Age_in_Years  
  *---------------------------------------------------------------------------------------------*/
 
-** Access the final SAS dataset that was created in the Read.* program that matches this Explore.* programn **;
+** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
+
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
    PROC contents data=zDSI_Events_read varnum; run;

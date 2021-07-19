@@ -60,17 +60,15 @@ PROC contents data=COPHS  varnum ;  run;
 
 
 ** 4. Modify SAS dataset per Findings **;
-**____________________________________**;
-
 DATA COPHS_temp;  set COPHS; 
  
 * Convert temporary character var for each date field to a date var *;
-   Hosp_Admission    = input(Hospital_Admission_Date___MM_DD_, yymmdd10.); format Hosp_Admission yymmdd10.;
-   ICU_Admission     = input(ICU_Admission_Date___MM_DD_YYYY_, yymmdd10.); format ICU_Admission yymmdd10.;
-   DOB               = input(DOB__MM_DD_YYYY_, yymmdd10.);                 format DOB yymmdd10.;
-   Positive_Test     = input(Positive_COVID_19_Test_Date, yymmdd10.);      format Positive_Test yymmdd10.;
-   Date_left_facility= input(Discharge_Transfer__Death_Date__, yymmdd10.); format Date_left_facility yymmdd10.;
-   Last_Day_in_ICU   = input(Last_Day_in_ICU_During_Admission, yymmdd10.); format Last_Day_in_ICU yymmdd10.;
+   Hosp_Admission    = input(Hospital_Admission_Date___MM_DD_, mmddyy10.); format Hosp_Admission mmddyy10.;
+   ICU_Admission     = input(ICU_Admission_Date___MM_DD_YYYY_, mmddyy10.); format ICU_Admission mmddyy10.;
+   DOB               = input(DOB__MM_DD_YYYY_, mmddyy10.);                 format DOB mmddyy10.;
+   Positive_Test     = input(Positive_COVID_19_Test_Date, mmddyy10.);      format Positive_Test mmddyy10.;
+   Date_left_facility= input(Discharge_Transfer__Death_Date__, mmddyy10.); format Date_left_facility mmddyy10.;
+   Last_Day_in_ICU   = input(Last_Day_in_ICU_During_Admission, mmddyy10.); format Last_Day_in_ICU mmddyy10.;
 
    Label
       Hosp_Admission = 'Hospital Admission date'
@@ -87,7 +85,6 @@ DATA COPHS_temp;  set COPHS;
       Positive_COVID_19_Test_Date
       Discharge_Transfer__Death_Date__
       Last_Day_in_ICU_During_Admission  ;
-
 run;
 
 
@@ -97,6 +94,7 @@ run;
  %shrink(COPHS_temp)
 
 *  --> output dsn will be "COPHS_temp_"   (NOTE: underscore appended to end of dsn) ;
+
 
 ** 6. Create libname for folder to store permanent SAS dataset (if desired) **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
@@ -109,16 +107,5 @@ run;
 
 **  8. PROC contents of final dataset  **;
    PROC contents data=COVID.COPHS varnum; run;
-
-
-
-
-
-
-
-
-
-
-
 
 

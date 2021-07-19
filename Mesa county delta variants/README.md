@@ -14,10 +14,9 @@ This request is for data needed to complete a table in the presentation [B.1.617
 |6| Run Access.B6172 to pull sequencing results for Delta variants.
 |7| Use Check.B6172 for data checks. Output informs edits made in Fix.B6172|
 |8| Run FIX.B6172 to edit data in B6172_Read. Edits include de-dup, county, age. Creates B6172_fix.
-|9| Run RFI.DeltaVOC_in_Mesa to generate numbers for the four columns in the table.  
-|   | It makes use of the output from these SAS programs that get automatically run:
-        1) Mesa.formats.sas
-        2) Key_merge.COPHS.CEDRS.sas
+|9| Run RFI.DeltaVOC_in_Mesa to generate numbers for the four columns in the table. It makes use of the output from these SAS programs that get automatically run:       
+     1) Mesa.formats.sas      
+     2) Key_merge.COPHS.CEDRS.sas
 
 #             
 ## SAS Programs in this folder:

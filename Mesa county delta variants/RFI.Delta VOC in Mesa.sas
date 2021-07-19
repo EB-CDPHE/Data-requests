@@ -5,7 +5,8 @@ CREATED:  June 9, 2021
 MODIFIED: 	
 PURPOSE:	 Connect to dphe144 "CEDRS_view" and create associated SAS dataset
 INPUT:	 COVID.CEDRS_view_fix   COVID.B6172_fix
-OUTPUT:	 printed output
+OUTPUT:	 Not_Mesa144     --> COL 1 output;   Mesa144     --> COL 2 output;  
+          Not_Mesa_B16172 --> COL 3 output;   Mesa_B16172 --> COL 4 output   
 ***********************************************************************************************/
 
 ** Access the CEDRS.view using ODBC **;
@@ -63,7 +64,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 options pageno=1;
 
 * 1. Contents of datasets to query for RFI *;
-   PROC contents data=COVID.CEDRS_view varnum;
+   PROC contents data= COVID.CEDRS_view_fix varnum;
       title1 'dphe144 - CEDRS_view (a copy of CEDRS_dashboard_constrained)';
 run;
 
@@ -80,7 +81,7 @@ title1;
 title2 'County = ALL but Mesa';
 
 DATA Not_Mesa144 ;  
-   set COVID.CEDRS_view;;
+   set COVID.CEDRS_view_fix;;
    if CountyAssigned ^= 'MESA'  AND ReportedDate ge '05APR21'd ;
    if Age_at_Reported > 105 then Age_at_Reported = . ;
 run;
@@ -135,7 +136,7 @@ options pageno=1;
 title2 'County = MESA';
 
 DATA Mesa144 ;  
-   set COVID.CEDRS_view;
+   set COVID.CEDRS_view_fix;
    if CountyAssigned = 'MESA'  AND ReportedDate ge '05APR21'd ;
 run;
 
@@ -185,7 +186,7 @@ run;
  | Merge demographic vars from CEDRS with B.1.617.2 variant data in B6172_edit. 
  *______________________________________________________________________________________________________*/
 
-PROC sort data= COVID.CEDRS_view(keep= ProfileID EventID Hospitalized  Reinfection  Breakthrough Outcome)  
+PROC sort data= COVID.CEDRS_view_fix(keep= ProfileID EventID Hospitalized  Reinfection  Breakthrough Outcome)  
    out=CEDRSkey; 
    by ProfileID EventID;
 

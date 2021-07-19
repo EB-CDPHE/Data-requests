@@ -1,11 +1,11 @@
 /**********************************************************************************************
-PROGRAM: RFI.DeltaVOC_in_Mesa.sas
-AUTHOR:  Eric Bush
-CREATED: June 9, 2021
-MODIFIED:	
-PURPOSE:	Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		COVID.CEDRS_view   COVID.B6172_fix
-OUTPUT:		[name of output - SAS data tables, printed output, etc]
+PROGRAM:  RFI.DeltaVOC_in_Mesa.sas
+AUTHOR:   Eric Bush
+CREATED:  June 9, 2021
+MODIFIED: 	
+PURPOSE:	 Connect to dphe144 "CEDRS_view" and create associated SAS dataset
+INPUT:	 COVID.CEDRS_view_fix   COVID.B6172_fix
+OUTPUT:	 printed output
 ***********************************************************************************************/
 
 ** Access the CEDRS.view using ODBC **;
@@ -17,7 +17,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
  | Programs to run prior to this code:
  | 1. Pull data from CEDRS using READ.CEDRS_view.  Creates COVID.CEDRS_view 
  | 2. Pull data on variants using READ.B6172.  Creates work.B6172_edit
- | 3. Mesa.formats.sas program
+ | 3. Mesa.formats.sas program.  See %include statement below.
  *________________________________________________________________________________________*/
 
 %inc 'C:\Users\eabush\Documents\GitHub\Data-requests\Mesa county delta variants\Mesa.formats.sas';

@@ -1,7 +1,7 @@
 # Data-requests
 
 ## Background: 
-This request is for data needed to complete the table in the MMWR [Notes from the Field](https://docs.google.com/document/d/1Jla02O-FwNHoCOz3zqUEXd80KRmpGzljFKM7hfSf7T4/edit?ts=60f10e65).  **Population**:  Confirmed and probable cases with collection dates between April 27 - June 6, 2021 (inclusive).  **Outcomes**: case rate per 100k; hospitalization rate; ICU admission rate; case fatality ratio (for all cases and hospitalized cases only).  **Groups**: Colorado regions defined as Mesa county versus all other counties ("ROC"). An earlier version of the table asked for outcomes by age (<70 yo and 70+ yo).  The earlier version requested data for the same outcomes and groupings but for the population of delta variants isolated from confirmed and probable cases.
+This request is for data needed to complete a table in the presentation [B.1.617.2 in Colorado](https://docs.google.com/presentation/d/10v9o1mwOVWfGtpJpnd5A6Gr5hDkt4GlVSTkwXSMTLhE/edit?ts=60f1ca9b#slide=id.gdf56bc7d45_8_0). **Population**:  Confirmed and probable cases with reported dates after April 5, 2021 (inclusive). Any cases with delta variant. **Groups**: Colorado regions defined as Mesa county versus all other counties ("ROC"). **Data requested**: number of cases; median and mean age, age range, gender, hospitalization rate; mortality rate; percent reinfection, percent vaccine break-through case.  An earlier version of the table asked for outcomes by age (<70 yo and 70+ yo).  The earlier version requested data for the same outcomes and groupings but for the population of delta variants isolated from confirmed and probable cases.
 #
 
 |     | <p align="left">Steps taken to get data for revised table</p> |

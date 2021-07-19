@@ -20,23 +20,21 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
  *-----------------------------------------------------------------------------------------*/
 
 
-%LET ChkHospDSN = 'COPHS_read';       * <-- ENTER name of CEDRS dataset to run data checks against;
+/*%LET ChkHospDSN = 'COPHS_read';       * <-- ENTER name of CEDRS dataset to run data checks against;*/
 
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-options pageno=1;
-title1 'dphe144 = COPHS';
 
-   PROC contents data= &ChkHospDSN varnum; run;
+   PROC contents data= COPHS_read varnum; run;
 
 
 ***  1. Duplicate records  ***;
 ***------------------------***;
 
 * Identify duplicate records;
-   PROC FREQ data= &ChkDSN  noprint;  
+   PROC FREQ data= COPHS_read  noprint;  
       tables MR_Number / out=Hosp_DupChk(where=(COUNT>1));
 
 * Print list of duplicate records;
@@ -45,16 +43,16 @@ title1 'dphe144 = COPHS';
 run;
 
 * Print record for specific MR_Number ID ;
-   PROC print data= Hosp_DupChk;
-      where MR_Number='1234567';
+   PROC print data= COPHS_read;
+      where MR_Number='1006415';
       id MR_Number; 
       var Facility_Name  Last_Name  First_Name  Hosp_Admission ;
 run;
 
 * Use dup record list to filter COPHS data for just dups (based on MR_Number)  *;
-   proc sort data= &ChkDSN(drop=filename)  out=COPHSdups  ; by MR_Number; run;
+   proc sort data= COPHS_read(drop=filename)  out=COPHSdups  ; by MR_Number; run;
    proc sort data=Hosp_DupChk  ; by MR_Number; run;
-DATA ChkCOPHSdups; merge COPHSdups DupChk(in=dup) ; 
+DATA ChkCOPHSdups; merge COPHSdups Hosp_DupChk(in=dup) ; 
    by MR_Number; 
    if dup;
 run;
@@ -71,7 +69,7 @@ run;
 
 
 * 1.1): Print out dup records with same Hospital admission date (i.e. bad dup)  *;
-   proc sort data= &ChkDSN(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;
+   proc sort data= COPHS_read(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;
    PROC print data=DupHospAdmit ; 
       id MR_Number ;
       var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        
@@ -99,15 +97,15 @@ title2 'ALL records';
 ***-----------------------------------------------------------------------***;
 
 * details *;
-proc print data= &ChkDSN;
+proc print data= COPHS_read;
    where Positive_Test = .;
-   var MR_Number Last_Name Gender County_of_Residence Hosp_Admission Date_left_facility;
+   var MR_Number  Last_Name Gender County_of_Residence  Hosp_Admission  Date_left_facility;
 run;
 
 * summary ;
    proc format; 
       value YNfmt  . = 'Missing date'  other='Have date' ;
-   PROC freq data= &ChkDSN;
+   PROC freq data= COPHS_read;
       where Hosp_Admission > '31DEC20'd  AND  Hosp_Admission < '31JUL21'd;
       tables Positive_Test * Hosp_Admission /missing missprint norow nopercent;
       format Positive_Test YNfmt.        Hosp_Admission MONYY. ;
@@ -117,7 +115,7 @@ run;
 
 ***  3. Check that all Grand county records are in Colorado and NOT in Grand county, Utah  ***;
 ***----------------------------------------------------------------------------------------***;
-   PROC freq data= &ChkDSN;
+   PROC freq data= COPHS_read;
       where upcase(County_of_Residence) = 'GRAND';
       tables  County_of_Residence * City * Zip_Code / list;
 run;
@@ -206,17 +204,16 @@ run;
 run;
 
 * Count of records by formatted County name;
-   PROC freq data= &ChkDSN ;
-      tables County_of_Residence;
+   PROC freq data= COPHS_read ;
+      tables County_of_Residence / missing missprint;
       format County_of_Residence $CntyChk. ;
 run;
 
 * Print records where County name is NOT valid;
-DATA ChkHospCounty; set &ChkDSN;
-   keep MR_Number Facility_Name  Last_Name  First_Name  Hosp_Admission ;
-   ChkCounty = put(CountyAssigned, $CntyChk.);
+DATA ChkHospCounty; set COPHS_read;
+   keep MR_Number Facility_Name County_of_Residence Last_Name  First_Name  Hosp_Admission ChkCounty;
+   ChkCounty = put(County_of_Residence, $CntyChk.);
    PROC print data= ChkHospCounty; 
       where ChkCounty='BAD COUNTY NAME';
 run;
-
 

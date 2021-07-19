@@ -5,7 +5,7 @@ CREATED: July 14, 2021
 MODIFIED:	
 PURPOSE:	A single program to read CEDRS view
 INPUT:		dbo144.CEDRS_view
-OUTPUT:		COVID.CEDRS_view
+OUTPUT:		       CEDRS_view_read
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------*
@@ -92,9 +92,9 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA COVID.CEDRS_view ; set CEDRS_view_temp_ ;
+DATA CEDRS_view_read ; set CEDRS_view_temp_ ;
 run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=COVID.CEDRS_view varnum; run;
+   PROC contents data= CEDRS_view_read  varnum ; run;

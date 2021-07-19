@@ -4,7 +4,7 @@ AUTHOR:  Eric Bush
 CREATED:	June 9, 2021
 MODIFIED:	
 PURPOSE:	Explore created SAS dataset
-INPUT:	      B6172_read
+INPUT:	COVID.B6172_read
 OUTPUT:	COVID.B6172_fix
 ***********************************************************************************************/
 
@@ -12,7 +12,7 @@ OUTPUT:	COVID.B6172_fix
 ** Access the final SAS dataset that was created in the Read.* program that matches this Explore.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-   PROC contents data=COVID.B6172 varnum; run;
+   PROC contents data=COVID.B6172_read varnum; run;
 
 /*
  | Fixes made in this code:
@@ -21,7 +21,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 */
 
 ** 1. FIX dups: Keep record with most recent ResultDate **;
-proc sort data=COVID.B6172  out=B6172_sorted ; by ProfileID EventID ResultDate CreateDate;
+proc sort data=COVID.B6172_read  out=B6172_sorted ; by ProfileID EventID ResultDate CreateDate;
 Data B6172_nodup; set B6172_sorted ;
    by ProfileID EventID  ;
    if last.EventID;

@@ -6,7 +6,7 @@ MODIFIED:   072021: Modify to be consistent with other "Access.*" programs.
 PURPOSE:	   Connect to dphe144 "populations" and create associated SAS dataset.
             Modify "group" variable so that it only contains county name.
 INPUT:		dbo144.populations
-OUTPUT:		[name of output - SAS data tables, printed output, etc]
+OUTPUT:		COVID.County_Population
 ***********************************************************************************************/
 
 /*---------------------------------------------------------------------------------------------------*

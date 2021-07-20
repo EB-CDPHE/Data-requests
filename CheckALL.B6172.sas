@@ -214,7 +214,7 @@ run;
 
 
 *** 4.  Post-edit checks ***;
-***------____------------***;
+***----------------------***;
 
 * Check edits to ... *;
    PROC print data= COVID.B6172_fix(obs=50) ;

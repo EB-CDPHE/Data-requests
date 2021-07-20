@@ -7,9 +7,9 @@ This was primarily a practice run for me as it was one of the first RFI's I resp
 ## Steps taken to get data for this RFI
 | <p align="left">Run order</p> | <p align="left">SAS programs used for data request</p> |
 | --- | ------------------------------------------------------------------------------------ |
-|1| Run Access.COPHS to pull data from hosp144 COPHS. Creates COPHS_read |
+|1| Run Access.COPHS to pull data from hosp144 COPHS.  Creates COPHS_read SAS dataset  |
 |2| Use Check.COPHS for data checks. Output informs edits made in Fix.COPHS|
-|3| Run FIX.COPHS to edit data in COPHS. Creates COPHS_fix
+|3| Run FIX.COPHS to edit data in COPHS.  Creates COPHS_fix SAS dataset 
 |4| Run Access.Populations to obtain county population data. 
 |5| Run RFI.Western_slope_hosp to generate hospitalization rates for Western slope counties and ROC.
 

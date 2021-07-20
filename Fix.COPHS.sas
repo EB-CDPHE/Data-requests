@@ -12,7 +12,8 @@ OUTPUT:	 COVID.COPHS_fix
  | Fixes made in this code:
  | 1. Remove duplicate records
  | 2. Restrict County_of_Residence = 'GRAND' to only Colorado
- | 3. Contents of final dataset
+ | 3. Hospital admission dates that appear wrong
+ | 4. Contents of final dataset
  *----------------------------------------------------------------------*/
 
 ** Contents of the input SAS dataset that was created in the Access.* program and validated with the Check.* programn **;
@@ -35,16 +36,33 @@ DATA COVID.COPHS_fix;  set COPHS_read;
 ** 2) Restrict County_of_Residence = 'GRAND' to only Colorado **;
    if upcase(County_of_Residence) = 'GRAND' and Zip_Code in (84515, 84532, 84540) then delete;
 
+** 3) Edit Hospital admission dates  **;
+   if Hosp_Admission = '01NOV2019'd then Hosp_Admission = '01NOV2020'd ;
+   if Hosp_Admission = '22MAR1921'd then Hosp_Admission = '22MAR2021'd ;
+   if Hosp_Admission = '28DEC2021'd then Hosp_Admission = '28DEC2020'd ;
+   if Hosp_Admission = '27DEC2021'd then DO;
+      Hosp_Admission = '27DEC2020'd ;
+      Positive_Test  = '27DEC2020'd ;
+      Date_Left_Facility = '30DEC2020'd ;
+      END;
+   if Hosp_Admission = '03JUL2018'd then Hosp_Admission = '01NOV2020'd ;
+
 run;
 
 
-**  3. Contents of final SAS dataset  **;
+**  4. Contents of final SAS dataset  **;
 
    PROC contents data=COVID.COPHS_fix varnum; run;
 
 
 
-*** 4.  Post-edit checks ***;
+*** 5.  Post-edit checks ***;
 ***----------------------***;
 
-
+  PROC print data= COVID.COPHS_fix ;
+      where  (. < Hosp_Admission < '01JAN20'd)  OR  (Hosp_Admission > '01DEC21'd) ;
+      id MR_Number ;
+      var Hosp_Admission Facility_Name First_Name Last_Name Gender DOB Positive_Test Date_Left_Facility City County_of_Residence  ;
+      format Facility_Name $45. First_Name Last_Name  $12.  City $15. ;
+      title2 'Extreme values of hospital admission dates from COPHS';
+run;

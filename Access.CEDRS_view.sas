@@ -26,11 +26,8 @@ OUTPUT:		       CEDRS_view_read
 LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** schema contains "CEDRS_view, a copy of CEDRS_dashboard_constrained";
 
 
-**  2. Create temp SAS dataset from SQL table  **;
-DATA CEDRS_view; set dbo144.CEDRS_view; run;    
-
-** Review contents of SAS dataset **;
-PROC contents data=CEDRS_view  varnum ;  run;    
+**  2. Review contents of SAS dataset  **;
+PROC contents data=dbo144.CEDRS_view  varnum ;  run;    
 
 /*________________________________________________________________________________________________*
  | FINDINGS:                                                                 
@@ -48,7 +45,7 @@ PROC contents data=CEDRS_view  varnum ;  run;
 
 ** 3. Modify SAS dataset per Findings **;
 DATA CEDRS_view_temp; 
-   set CEDRS_view(rename=
+   set dbo144.CEDRS_view(rename=
                  (ID=tmp_ID   ProfileID=tmp_ProfileID   EventID=tmp_EventID
                   OnsetDate=tmp_OnsetDate  
                   OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 

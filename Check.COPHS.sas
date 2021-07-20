@@ -17,6 +17,7 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
  | 2. Missing positive test dates
  | 3. Check that Grand county records are in Colorado and NOT Utah
  | 4. Invalid values for County_of_Residence variable
+ | 5. Invalid Hospital admission dates
  *-----------------------------------------------------------------------------------------*/
 
 
@@ -88,14 +89,11 @@ run;
  *_____________________________________________________________________________________________________________________*/
 
 
-options ps=65 ls=110 ;     * Portrait pagesize settings *;
-title2 'ALL records';
-
-
 
 ***  2. Missing positive test dates - are they mostly recent admissions?  ***;
 ***-----------------------------------------------------------------------***;
 
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
 * details *;
 proc print data= COPHS_read;
    where Positive_Test = .;
@@ -216,4 +214,44 @@ DATA ChkHospCounty; set COPHS_read;
    PROC print data= ChkHospCounty; 
       where ChkCounty='BAD COUNTY NAME';
 run;
+
+
+***  5. Invalid Hospital Admission dates  ***;
+***---------------------------------------***;
+
+**  Check range of hospital admission dates  **;
+   PROC freq data= COPHS_read ;
+      tables Hosp_Admission;
+run;
+
+**  Print out extreme observations  **;
+
+options ps=50 ls=150 ;     * Landscape pagesize settings *;
+
+  PROC print data= COPHS_read ;
+      where  (. < Hosp_Admission < '01JAN20'd)  OR  (Hosp_Admission > '01DEC21'd) ;
+      id MR_Number ;
+      var Hosp_Admission Facility_Name First_Name Last_Name Gender DOB Positive_Test Date_Left_Facility City County_of_Residence  ;
+      format Facility_Name $45. First_Name Last_Name  $12.  City $15. ;
+      title2 'Extreme values of hospital admission dates from COPHS';
+run;
+
+** Create dataset for exporting **;
+Data BadHospAdmit; set COPHS_read ;
+      where  (. < Hosp_Admission < '01JAN20'd)  OR  (Hosp_Admission > '01DEC21'd) ;
+run;
+
+/*___________________________________________________________________________________________________________________________*
+ | FINDINGS:
+ | 1) n=6 records admitted to Estes Park Medical Center 11/1/2019 - before the pandemic started in CO. 
+ |    They had positive test dates and left the hospital in fall 2020.
+ |    FIX: Change hospital admit date to 11/1/2020
+ | 2) n=1 admitted to Vail Health on 3/22/1921. 
+ |    FIX: Change hospital admit date to 3/22/2021.
+ | 3) n=2 will be admitted this December right after christmas. 
+ |    FIX: Change hospital admit date 2020 instead of 2021. 
+ | 4) MR_Number=CEUL2893910 was admitted on 7/3/18 and has yet to leave the facility. He had a positive test on 11/10/20.
+ | 5) MR_Number=161782665 was admitted on 11/30/2019 and left the facility on 4/9/2020. Tested positive on  3/18/2020.
+ |    This is plausible. If true, they would be one of the first COVID hospitalization in Colorado. 
+ *____________________________________________________________________________________________________________________________*/
 

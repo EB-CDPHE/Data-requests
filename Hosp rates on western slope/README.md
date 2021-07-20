@@ -4,7 +4,7 @@
 This data request by the Governor's office is for information comparing hospitalization rates in Western Slope versus ROC. **Population**:  Hospitalized COVID-19 cases in CY2021. **Groups**: Western slope counties versus all other counties ("ROC"). **Data requested**: Hospitalization rate.
 This was primarily a practice run for me as it was one of the first RFI's I responded to. The actual response came from Rachel S. See her slides [here](https://docs.google.com/presentation/d/1RC2lytD0srCm0iu_Mp2BcJgGrBH5IiCYlfSoe5qiXuw/edit?usp=sharing).
 #
-## Steps taken to get data for revised table
+## Steps taken to get data for this RFI
 | <p align="left">Run order</p> | <p align="left">SAS programs used for data request</p> |
 | --- | ------------------------------------------------------------------------------------ |
 |1| Run Access.COPHS to pull data from hosp144 COPHS. Creates COPHS_read |

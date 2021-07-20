@@ -23,4 +23,4 @@ This was primarily a practice run for me as it was one of the first RFI's I resp
 
 ## Additional notes
 Western slope counties include the 16 counties in the West and Northwest all-hazards homeland security regions.
-![map of regions](https://dhsem.colorado.gov/sites/dhsem/files/styles/image_card/public/Field%20Manager%20Map.jpg
+![map of regions](https://dhsem.colorado.gov/sites/dhsem/files/styles/image_card/public/Field%20Manager%20Map.jpg)

@@ -27,7 +27,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 ***-----------------------------------------------------------------***;
 
 DATA COVID.COPHS_fix;  set COPHS_read;
-   Region = put(County_of_Residence, $WestSlope. );
+/*   Region = put(County_of_Residence, $WestSlope. );*/
 
 ** 1) Remove duplicate record  **;
    if MR_Number = 'M1373870' and Facility_Name = 'West Pines Hospital' then delete;
@@ -47,16 +47,24 @@ DATA COVID.COPHS_fix;  set COPHS_read;
       END;
    if Hosp_Admission = '03JUL2018'd then Hosp_Admission = '01NOV2020'd ;
 
+** 4) Fix bad zip codes  **;
+   if Zip_Code in 
+      ('7481', '1450', '8327', '7442', '2657', '1012', '7821', '3801', '3234', '8234'
+      ('7960', '7670', '2906', '7090', '6870', '1844') 
+      then Zip_Code = cat('0', Zip_Code);
+   if Zip_Code in ('962', '794') then Zip_Code = cat('00', Zip_Code);
+   if Zip_Code in ('99999', 'UNKNO') then Zip_Code = '';
+
 run;
 
 
-**  4. Contents of final SAS dataset  **;
+**  5. Contents of final SAS dataset  **;
 
    PROC contents data=COVID.COPHS_fix varnum; run;
 
 
 
-*** 5.  Post-edit checks ***;
+*** 6.  Post-edit checks ***;
 ***----------------------***;
 
   PROC print data= COVID.COPHS_fix ;

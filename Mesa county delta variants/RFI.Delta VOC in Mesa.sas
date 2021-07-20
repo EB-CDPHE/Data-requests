@@ -3,7 +3,7 @@ PROGRAM:  RFI.DeltaVOC_in_Mesa.sas
 AUTHOR:   Eric Bush
 CREATED:  June 9, 2021
 MODIFIED: 	
-PURPOSE:	 Connect to dphe144 "CEDRS_view" and create associated SAS dataset
+PURPOSE:	 Code to obtain requested data re: 4 columns in table for COVID and Delta by Mesa vs ROC
 INPUT:	 COVID.CEDRS_view_fix   COVID.B6172_fix
 OUTPUT:	 Not_Mesa144     --> COL 1 output;   Mesa144     --> COL 2 output;  
           Not_Mesa_B16172 --> COL 3 output;   Mesa_B16172 --> COL 4 output   

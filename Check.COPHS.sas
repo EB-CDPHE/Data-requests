@@ -255,3 +255,80 @@ run;
  |    This is plausible. If true, they would be one of the first COVID hospitalization in Colorado. 
  *____________________________________________________________________________________________________________________________*/
 
+
+
+***  6. Invalid zip codes  ***;
+***------------------------***;
+**  Check range of zip codes  **;
+   PROC freq data= COPHS_read ;
+      tables Zip_Code ;
+run;
+/*___________________________________________________________________________________________________________________________*
+ | FINDINGS:
+ | Several issues with Zip_Code values.
+ | 1) n=22 zip codes only have 3 or 4 digits to them. In almost all cases these are missing leading 0 or 00.
+ |    FIX: Add leading 0's.
+ | 2) n=20 zip codes only have 1 or 2 digits. Most have an Address of "GENERAL DELIVERY".  What does that mean?
+ | 3) n=17 zip codes are missing
+ | 4) n=11 records have zip code=99999.
+ |    FIX: Zip code = missing
+ | 5) n=1 zip code = 'UNKNO'
+ |    FIX: Zip code = missing
+ *____________________________________________________________________________________________________________________________*/
+
+Data COPHS_Ck6 ; set COPHS_read;
+   ZipCode_length = length(Zip_Code);
+run;
+
+   PROC print data= COPHS_Ck6 ;
+      where ZipCode_length in (3, 4);
+      id MR_Number ;
+      var  Hosp_Admission Facility_Name Last_Name Address_Line_1  City Zip_Code County_of_Residence  Discharge_Transfer_Death_Disposi  ZipCode_length  ;
+      format Facility_Name $45.  Address_Line_1 $25.   First_Name Last_Name   $12.  Discharge_Transfer_Death_Disposi  City $15. ;
+run;
+/*___________________________________________________________________________________________________________________________*
+ | FINDINGS:
+ | City=WYCKOFF has Zip_Code=7481.  FIX: Change Zip_Code to 07481 (for Wyckoff, NJ).
+ | City=Groton has Zip_Code=1450.  FIX: Change Zip_Code to 01450 (for Groton, MA).
+ | City=Leesburg has Zip_Code=8327.  FIX: Change Zip_Code to 08327 (for Leesburg, NJ).
+ | City=Pompton Lakes has Zip_Code=7442.  FIX: Change Zip_Code to 07442 (for Pompton Lakes, NJ).
+ | City=Provincetown has Zip_Code=2657.  FIX: Change Zip_Code to 02657 (for Provincetown, MA).
+ | City=Auckland. This is a valid zip code for Auckland, New Zealand.
+ | City=Guatemala has Zip_Code=1012.  FIX: Change Zip_Code to 01012 (for Guatemala).
+ | City=Andover has Zip_Code=7821.  FIX: Change Zip_Code to 07821 (for Andover, NJ).
+ | City=Newington has Zip_Code=3801.  FIX: Change Zip_Code to 03801 (for Newington, NH).
+ | City=Epsom has Zip_Code=3234.  FIX: Change Zip_Code to 03234 (for Epsom, NH).
+ | City=Egg Harbor has Zip_Code=8234.  FIX: Change Zip_Code to 08234 (for Egg Harbor, NJ).
+ | City=Morristown has Zip_Code=7960.  FIX: Change Zip_Code to 07960 (for Morristown, NJ).
+ | City=Tenafly has Zip_Code=7670.  FIX: Change Zip_Code to 07670 (for Tenafly, NJ).
+ | City=Providence has Zip_Code=2906.  FIX: Change Zip_Code to 02906 (for Providence, RI).
+ | City=Westfield has Zip_Code=7090.  FIX: Change Zip_Code to 07090 (for Westfield, NJ).
+ | City=Old Greenwich has Zip_Code=6870.  FIX: Change Zip_Code to 06870 (for Old Greenwich, CT).
+ | City=Methuen has Zip_Code=1844.  FIX: Change Zip_Code to 01844 (for Methuen, MA).
+ |
+ | Zip_Code=962.  FIX: Change Zip_Code to 00962 (for Catano, PR).
+ | City=Barranquitas has Zip_Code=794.  FIX: Change Zip_Code to 00794 (for Barranquitas, PR).
+ *____________________________________________________________________________________________________________________________*/
+
+
+   PROC print data= COPHS_Ck6 ;
+      where ZipCode_length in (1, 2)   AND  Zip_Code ne '' ;
+      id MR_Number ;
+      var Last_Name  Hosp_Admission Facility_Name Address_Line_1  City Zip_Code County_of_Residence   ZipCode_length  ;
+      format Facility_Name $30.  Address_Line_1 $25.   First_Name Last_Name   $12.  Discharge_Transfer_Death_Disposi  City $15. ;
+run;
+
+
+   PROC print data= COPHS_read ;
+      where Zip_Code ='';
+      id MR_Number ;
+      var Last_Name  Hosp_Admission Facility_Name Address_Line_1  City  Zip_Code  County_of_Residence     ;
+      format Facility_Name $40.  Address_Line_1 $25.   First_Name Last_Name   $12.  Discharge_Transfer_Death_Disposi  City $15. ;
+run;
+
+   PROC print data= COPHS_read ;
+      where Zip_Code in ('99999','UNKNO');
+      id MR_Number ;
+      var Last_Name  Hosp_Admission Facility_Name Address_Line_1  City  Zip_Code  County_of_Residence     ;
+      format Facility_Name $40.  Address_Line_1 $25.   First_Name Last_Name   $12.  Discharge_Transfer_Death_Disposi  City $15. ;
+run;

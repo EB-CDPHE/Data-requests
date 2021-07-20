@@ -10,10 +10,15 @@ OUTPUT:	 COVID.COPHS_fix
 
 /*----------------------------------------------------------------------*
  | Fixes made in this code:
+ |    vv SAS dataset = COPHS_read  vv                 <-- READ dataset         
  | 1. Remove duplicate records
  | 2. Restrict County_of_Residence = 'GRAND' to only Colorado
  | 3. Hospital admission dates that appear wrong
- | 4. Contents of final dataset
+ | 4. Fix bad zip codes
+ | 5. Contents of final dataset
+ |
+ |    vv SAS dataset = COVID.COPHS_fix  vv            <-- FIX dataset         
+ | 6. Post edit checks
  *----------------------------------------------------------------------*/
 
 ** Contents of the input SAS dataset that was created in the Access.* program and validated with the Check.* programn **;
@@ -34,7 +39,7 @@ DATA COVID.COPHS_fix;  set COPHS_read;
    if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
 
 ** 2) Restrict County_of_Residence = 'GRAND' to only Colorado **;
-   if upcase(County_of_Residence) = 'GRAND' and Zip_Code in (84515, 84532, 84540) then delete;
+   if upcase(County_of_Residence) = 'GRAND' and Zip_Code in ('84515', '84532', '84540') then delete;
 
 ** 3) Edit Hospital admission dates  **;
    if Hosp_Admission = '01NOV2019'd then Hosp_Admission = '01NOV2020'd ;
@@ -50,7 +55,7 @@ DATA COVID.COPHS_fix;  set COPHS_read;
 ** 4) Fix bad zip codes  **;
    if Zip_Code in 
       ('7481', '1450', '8327', '7442', '2657', '1012', '7821', '3801', '3234', '8234'
-      ('7960', '7670', '2906', '7090', '6870', '1844') 
+       '7960', '7670', '2906', '7090', '6870', '1844') 
       then Zip_Code = cat('0', Zip_Code);
    if Zip_Code in ('962', '794') then Zip_Code = cat('00', Zip_Code);
    if Zip_Code in ('99999', 'UNKNO') then Zip_Code = '';

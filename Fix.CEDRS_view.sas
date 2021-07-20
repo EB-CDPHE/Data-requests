@@ -11,15 +11,13 @@ OUTPUT:	 COVID.CEDRS_view_fix
 /*-----------------------------------------------------------------------------------------------------------*
  | Fixes made in this code:
  |
- | > SAS dataset = CEDRS_view_read        v                         
- |   ___________________________________  v 
+ | vv SAS dataset = CEDRS_view_read  vv                 <-- READ dataset         
  | 1. Create County variable from County_Assigned that only includes county name (not ", CO" too)
  | 2. Impute missing values of Age_at_Reported with Age_in_Years from dphse66 zDSI_Events_fix. See NOTE.
  | 3. Contents of final dataset
  |
  |
- | > SAS dataset = COVID.CEDRS_view_fix   v
- |   ___________________________________  v 
+ | vv SAS dataset = COVID.CEDRS_view_fix   vv           <-- FIX dataset
  | 4. Post-edit data checks on COVID.CEDRS_view_fix
  *-----------------------------------------------------------------------------------------------------------*/
 

@@ -2,42 +2,53 @@
 PROGRAM:  RFI.Western_slope_hosp
 AUTHOR:   Eric Bush
 CREATED:  June 22, 2021
-MODIFIED: 	
-PURPOSE:	 After a SQL data table has been read using Read.CEDRS_SQL_table, this program can be used to explore the SAS dataset
-INPUT:	 COVID.COPHS_fix
-OUTPUT:	 [name of output - SAS data tables, printed output, etc]
+MODIFIED: 072021	
+PURPOSE:	 Code to obtain requested data re: hospitalization rates on western slope vs ROC
+INPUT:	 COVID.COPHS_fix   COVID.County_Population
+OUTPUT:	 COVID_Hosp_CY21 (filtered for CY21 and Colorado counties only)
 ***********************************************************************************************/
-
-/*--------------------------------------------------------------------------------------------------------*
- | Table of Contents - code for the following tasks:
- |    1. Proc contents of COPHS dataset 
- |    2. Number of records with date for Hospital admit and positive COVID test (ALL records - unfiltered)
- |  --> Filter on having date for POS COVID test AND hosp admission date > 12/31/20  <--
- |    3. Create filtered dataset =  COVID_Hosp_CY21
- |    4. Number of records with date for Hospital admit and positive COVID test  (Filtered dataset)
- |    5. Hospitalizations by two regions: Western slope and ROC
- |    6. Denominator for two regions: Western slope and ROC
- |    7. Hosp count by week for CY21. Out = Admit_week_by_slope
- |       ** Admit_week_by_slope --> export to Excel for charting
- |    8. Hosp count by day for CY21. Out = Admit_day_by_slope
- |       ** Admit_day_by_slope --> export to Excel for charting |    
- |       a) Denominator for two regions of Colorado
- |    9. Time sequence of hospital dates (to learn about defining "currently hospitalized"
- |   10. Define currently hospitalized.
- |   11. Create table of currently hospitalized per 100K
- *--------------------------------------------------------------------------------------------------------*/
-
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
 
+**  Access the folder with the final SAS dataset to be used in this code  **;
 
-** Access the final SAS dataset that was created in the Read.* program that matches this Explore.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-options pageno=1;
-title1 'dphe144 = COPHS';
+/*________________________________________________________________________________________________________*
+ | Programs to run prior to this code:
+ | 1. Pull data from hosp144.COPHS using Access.COPHS.  Creates COPHS_read.
+ | 2. Run any additional edit checks using Check.COPHS.
+ | 3. Edit data using FIX.COPHS. Creates COIVD.COPHS_fix.
+ | 4. Pull data from dbo144.populations using Access.Populations.  Creates COVID.County_Population.
+ *________________________________________________________________________________________________________*/
 
-   PROC contents data=COVID.COPHS_fix varnum; run;
+
+/*--------------------------------------------------------------------------------------------------------*
+ | Table of Contents - code for the following tasks:
+ | 1. Proc contents of COPHS dataset 
+ | 2. Number of records with date for Hospital admit and positive COVID test (ALL records - unfiltered)
+ |  vv  Filter on having date for POS COVID test AND hosp admission date ge 12/31/20  vv  <-- filtered
+ | 3. Create filtered dataset =  COVID_Hosp_CY21
+ | 4. Number of records with date for Hospital admit and positive COVID test  (Filtered dataset)
+ | 5. Hospitalizations by two regions: Western slope and ROC
+ | 6. Denominator for two regions: Western slope and ROC
+ | 7. Hosp count by week for CY21. Out = Admit_week_by_slope
+ |    ** Admit_week_by_slope --> export to Excel for charting
+ | 8. Hosp count by day for CY21. Out = Admit_day_by_slope
+ |    ** Admit_day_by_slope --> export to Excel for charting |    
+ |    a) Denominator for two regions of Colorado
+ | 9. Time sequence of hospital dates (to learn about defining "currently hospitalized"
+ | 10. Define currently hospitalized.
+ | 11. Create table of currently hospitalized per 100K
+ *--------------------------------------------------------------------------------------------------------*/
+
+
+options pageno=1;
+
+** 1. Contents of datasets to query for RFI **;
+   PROC contents data=COVID.COPHS_fix varnum; 
+      title1 'dphe144 = COPHS';
+run;
 
 
 *** Descriptive analysis on ALL records (unfiltered data). ***:
@@ -53,10 +64,8 @@ run;
 run;
 
 
-*** The second part of this code filters data  ***;
-*** Descriptive analysis in this section is on the filtered data.                  ***:
-*** Filter on CY21 only AND POS COVID test (if prior to June). Remove n=2 dups.    ***;
-***________________________________________________________________________________***;
+***  Descriptive analysis on COPHS data for CY21 AND POS COVID test (if prior to June).  ***;
+***______________________________________________________________________________________***;
 
    PROC format;
       value $WestSlope
@@ -80,17 +89,9 @@ run;
 run;
 
 ** 3. Create filtered dataset **;
-DATA COVID_Hosp_CY21;  set COVID.COPHS;
+DATA COVID_Hosp_CY21;  set COVID.COPHS_fix;
    if Hosp_Admission > '31DEC20'd  AND  (  (Hosp_Admission<'01JUN21'd  and Positive_Test ne .) OR (Hosp_Admission ge '01JUN21'd) )   ;
    Region = put(County_of_Residence, $WestSlope. );
-
-   * from DupChk code above ;
-   if MR_Number = 'M1373870' and Facility_Name = 'West Pines Hospital' then delete;
-   if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
-
-   * from Grand county check code above ;
-   if upcase(County_of_Residence) = 'GRAND' and Zip_Code in (84515, 84532, 84540) then delete;
-
 run;
 title2 'Hosp_Admission in CY21 AND Positive_Test ne . unless Hosp_Admission in June21';
 
@@ -108,7 +109,7 @@ run;
 run;
 
 ** 6. Denominator for two regions of Colorado **;
-   PROC means data=COVID.County_Population sum  maxdec=0 ;     * <-- see READ.Population;
+   PROC means data=COVID.County_Population sum  maxdec=0 ;     * <-- see Access.Population;
       var population;
       class County;
       format County $WestSlope. ;
@@ -116,12 +117,10 @@ run;
 
 
 ** 7. Hosp count by week for CY21 **;
-**--------------------------------**;
-
    /* This code is to create a dataset meant for exporting to Excel for charting */
    PROC freq data= COVID_Hosp_CY21 ;
       where Hosp_Admission < '01AUG21'd;                            * <-- to remove record with bad date;
-      tables  Hosp_Admission * Region / nopercent nocum missing missprint
+      tables Hosp_Admission * Region / nopercent nocum missing missprint
                                        out = Admit_week(rename= count=Admits) ;
       format Hosp_Admission WeekW5. ;
 run;

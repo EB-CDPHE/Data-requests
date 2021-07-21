@@ -1,6 +1,6 @@
 # Data-requests - Parent directory for data requests
 
-## Background
+## Background: 
 This is the parent directory for data requests, or RFI's (Requests for Information). Below are the typical steps taken to respond to data requests. Further documentation of a RFI can be found in corresponding OneNote folder. The README file in each subsequent folder should describe for the RFI the
         1) **Population**:  Individuals defined by place, time, and personal attributes.
         2) **Outcomes**:  The actual data being requested

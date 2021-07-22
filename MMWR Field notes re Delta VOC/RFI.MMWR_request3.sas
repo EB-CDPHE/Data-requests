@@ -15,7 +15,8 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 /*________________________________________________________________________________________*
  | Programs to run prior to this code:
- | 1. Pull data from CEDRS using READ.CEDRS_view.  Creates COVID.CEDRS_view 
+ | 1. Pull data from CEDRS using Access.CEDRS_view.  Creates CEDRS_view_read
+ | 2. Run FIX.CEDRS_view to make data edits to CEDRS_view.  Creates COVID.CEDRS_view_fix
  | 2. Pull data on variants using READ.B6172.sas.  Creates work.B6172_edit
  | 3. Make edits to B6172_read using Fix.B6172.sas. Creates B6172_fix.
  | 4. MMWR.formats.sas creates formats for this program.
@@ -75,140 +76,226 @@ run;
    PROC contents data=COVID.County_Population; run;
 /*   PROC print data= COVID.County_Population; id county; run;*/
 
+* Get total population for Mesa and ROC;
+proc means data= COVID.County_Population sum  maxdec=0;
+var population;
+class county;
+format county $MesaFmt. ;
+run;
 
-*** Find county population data by age ***;
+* Rachel S used source webpage to get county population for Mesa and ROC by age groups;
 *** source:  https://demography.dola.colorado.gov/population/data/sya-county/   ***;
-*** define age group intervals 0-69 and 70-109 and download csv, clean up file, import into sas as CntyPopAge ***;
+/*___________________________
+county	age	population
+Mesa	0-19	38708
+Mesa	20-39	38934
+Mesa	40-59	36129
+Mesa	60-79	33061
+Mesa	80+	8099
+Other	0-19	1380924
+Other	20-39	1646743
+Other	40-59	1431094
+Other	60-79	973995
+Other	80+	176292
+______________________________*/
 
-%inc 'C:\Users\eabush\Documents\CDPHE\Requests\MMWR field notes re Delta VOC\CntyPopAge.import.sas'; 
-
-   proc sort data= CntyPopAge; by County;
-   PROC transpose data= CntyPopAge  out=CountyPopbyAge;
-      by County;
-      id Age;
-      var Total;
+* Use total population and age group population together to create County population by age for Mesa and ROC;
+DATA CountyPopulation;
+   input County $  Yrs0_19  Yrs20_39  Yrs40_59  Yrs60_79  Yrs80plus TotalPop;
+   datalines;
+   MESA 38708   38934    36129   33061  8099   154933
+   ROC  1380924 1646743 1431094 973995 176292 5609043
+   ;
 run;
-
-DATA CountyPop_est ; 
-   length County $ 11;
-   set CountyPopbyAge(rename=(County=tmp_county)) ;
-
-   County=upcase(tmp_county);
-   if County='CLEAR CREE' then County='CLEAR CREEK';
-   format County $11.;
-   Yrs0_69 = input(compress(_0_to_69,','), best12.) ;
-   Yrs70_109 = input(compress(_70_to_109, ','), best12.) ;
-   County_population_est = Yrs0_69 +  Yrs70_109;
+DATA CountyPop; set CountyPopulation;
    Label
-      Yrs0_69    = 'Population for 0-69 year olds'
-      Yrs70_109  = 'Population for 70-109 year olds' ;
-   drop _NAME_  _0_to_69  _70_to_109  tmp_county;
-run;
+      Yrs0_19    = 'Population for 0-19 year olds'
+      Yrs20_39  = 'Population for 20-39 year olds' ;
+   format County $4.;
+RUN;
 
-
-*** Merge two sources of county population together ***;
-***-------------------------------------------------***;
-   proc sort data=COVID.County_Population  out=PopTot  ; by County;
-   proc sort data=CountyPop_est  out=PopAge ; by County;
-Data County_Population; merge  PopTot  PopAge  ;
-   by County;
-run;
-
-   PROC contents data=County_Population; run;
-   PROC print data= County_Population; id County; run;
+   PROC contents data=CountyPop; run;
+   PROC print data= CountyPop; id County; run;
 
 
 
 ** 4. Count of Cases and sum of Population by County and Age  **;
 
-** Case rate for 0-69 yo by region **;
+** Case rate for 0-19 yo by region **;
 **_________________________________**;
 
-** Cases in 0-69 yo by region **;
+** Cases in 0-19 yo by region **;
+**----------------------------**;
    PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
-      where 0 < Age_Years < 70;
+      where 0 le Age_Years < 20;
       var ReportedDate  ;
       class   County  ;
       format  County   $MesaFmt. ;
-      output out=N_Y_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+      output out=Y1_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+Data YrGrp1_Cases; set Y1_Cases(rename=(County=tmp_County));
+   County = put(tmp_County,$MesaFmt.);
+   drop tmp_County;
 run;
-/*proc print data=N_Y_Cases ; id County; run;*/
+/*   proc print data=YrGrp1_Cases ; id County; run;*/
+/*   proc contents data=YrGrp1_Cases ;  run;*/
 
-** Population of 0-69 yo by region **;
-   PROC means data= County_Population  sum nway noprint; 
-      class County ;
-      var Yrs0_69;
-      format  County   $MesaFmt. ;
-      output out=Y_Pop(drop=_TYPE_ _FREQ_) sum=Population;
+Data YrGrp1_Pop; length County $13; set CountyPop(rename=(Yrs0_19=Population));
+keep County Population;
+/*   proc contents data= YrGrp1_Pop; run;*/
+/*   proc print data=YrGrp1_Pop; id County; */
 run;
-/*proc print data=Y_pop; id County; run;*/
 
-** Calculation of case rate per 100K for 0-69 yo by region **;
-Data CaseRate_Y; merge N_Y_Cases  Y_Pop;  by county;
+** Calculation of case rate per 100K for 0-19 yo by region **;
+   proc sort data= YrGrp1_Cases; by County; run;
+   proc sort data=YrGrp1_Pop ; by County; run;
+Data YrGrp1_CaseRate; merge YrGrp1_Cases  YrGrp1_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
-   Age_Group='0-69 yo';
+   Age_Group='0-19 yo';
 run;
-/*   PROC print data= CaseRate_Y;  id county;   format CasesPer100K 4.0;  run;*/
+/*   PROC print data= YrGrp1_CaseRate;  id county;   format CasesPer100K 4.0;  run;*/
 
 
-** Cases in 70-109 yo by region **;
+** Cases in 20-39 yo by region **;
+**----------------------------**;
    PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
-      where 69 < Age_Years < 110;
+      where 20 le Age_Years < 40;
       var ReportedDate  ;
       class   County  ;
       format  County   $MesaFmt. ;
-      output out=N_O_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+      output out=Y2_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+Data YrGrp2_Cases; set Y2_Cases(rename=(County=tmp_County));
+   County = put(tmp_County,$MesaFmt.);
+   drop tmp_County;
 run;
-/*proc print data=N_O_Cases ; id County; run;*/
 
-** Population of 70-109 yo by region **;
-   PROC means data= County_Population  sum nway noprint; 
-      class County ;
-      var Yrs70_109 ;
-      format  County   $MesaFmt. ;
-      output out=O_Pop(drop=_TYPE_ _FREQ_) sum=Population;
+Data YrGrp2_Pop; length County $13; set CountyPop(rename=(Yrs20_39=Population));
+keep County Population;
 run;
-/*proc print data=O_Pop; id County;  format  County   $MesaFmt. ;   run;*/
 
-** Calculation of case rate per 100K for 70-109 yo by region **;
-Data CaseRate_O; merge N_O_Cases  O_Pop;  by county;
+** Calculation of case rate per 100K for 20-39 yo by region **;
+   proc sort data= YrGrp2_Cases; by County; run;
+   proc sort data=YrGrp2_Pop ; by County; run;
+Data YrGrp2_CaseRate; merge YrGrp2_Cases  YrGrp2_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
-   Age_Group='70-109 yo';
+   Age_Group='20-39 yo';
 run;
-/*   PROC print data= CaseRate_O;  id county;  format CasesPer100K 4.0;  run;*/
+   PROC print data= YrGrp2_CaseRate;  id county;   format CasesPer100K 4.0;  run;
 
 
-** Cases in ALL by region **;
+** Cases in 40-59 yo by region **;
+**----------------------------**;
    PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
+      where 40 le Age_Years < 60;
       var ReportedDate  ;
       class   County  ;
       format  County   $MesaFmt. ;
-      output out=N_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+      output out=Y3_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+Data YrGrp3_Cases; set Y3_Cases(rename=(County=tmp_County));
+   County = put(tmp_County,$MesaFmt.);
+   drop tmp_County;
 run;
-/*proc print data=N_O_Cases ; id County; run;*/
 
-** Population of ALL by region **;
-   PROC means data= County_Population  sum nway noprint; 
-      class County ;
-      var Population ;
+Data YrGrp3_Pop; length County $13; set CountyPop(rename=(Yrs40_59=Population));
+keep County Population;
+run;
+
+** Calculation of case rate per 100K for 40-59 yo by region **;
+   proc sort data= YrGrp3_Cases; by County; run;
+   proc sort data=YrGrp3_Pop ; by County; run;
+Data YrGrp3_CaseRate; merge YrGrp3_Cases  YrGrp3_Pop;  by county;
+   CasesPer100K = (CaseCounts/ (Population/100000) );
+   Age_Group='40-59 yo';
+run;
+   PROC print data= YrGrp3_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+
+
+** Cases in 60-79 yo by region **;
+**----------------------------**;
+   PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
+      where 60 le Age_Years < 80;
+      var ReportedDate  ;
+      class   County  ;
       format  County   $MesaFmt. ;
-      output out=All_Pop(drop=_TYPE_ _FREQ_) sum=Population;
+      output out=Y4_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+Data YrGrp4_Cases; set Y4_Cases(rename=(County=tmp_County));
+   County = put(tmp_County,$MesaFmt.);
+   drop tmp_County;
 run;
-/*proc print data=All_Pop; id County; run;*/
 
-** Calculation of case rate per 100K for ALL by region **;
-Data CaseRate_All; merge N_Cases  All_Pop;  by county;
+Data YrGrp4_Pop; length County $13; set CountyPop(rename=(Yrs60_79=Population));
+keep County Population;
+run;
+
+** Calculation of case rate per 100K for 60-79 yo by region **;
+   proc sort data= YrGrp4_Cases; by County; run;
+   proc sort data=YrGrp4_Pop ; by County; run;
+Data YrGrp4_CaseRate; merge YrGrp4_Cases  YrGrp4_Pop;  by county;
+   CasesPer100K = (CaseCounts/ (Population/100000) );
+   Age_Group='60-79 yo';
+run;
+   PROC print data= YrGrp4_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+
+
+** Cases in 80+ yo by region **;
+**----------------------------**;
+   PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
+      where 80 le Age_Years ;
+      var ReportedDate  ;
+      class   County  ;
+      format  County   $MesaFmt. ;
+      output out=Y5_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+Data YrGrp5_Cases; set Y5_Cases(rename=(County=tmp_County));
+   County = put(tmp_County,$MesaFmt.);
+   drop tmp_County;
+run;
+
+Data YrGrp5_Pop; length County $13; set CountyPop(rename=(Yrs80plus=Population));
+keep County Population;
+run;
+
+** Calculation of case rate per 100K for 80+ yo by region **;
+   proc sort data= YrGrp5_Cases; by County; run;
+   proc sort data=YrGrp5_Pop ; by County; run;
+Data YrGrp5_CaseRate; merge YrGrp5_Cases  YrGrp5_Pop;  by county;
+   CasesPer100K = (CaseCounts/ (Population/100000) );
+   Age_Group='80+ yo';
+run;
+   PROC print data= YrGrp5_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+
+
+** Total Cases by region **;
+**-----------------------**;
+   PROC means data=MMWR_cases  maxdec=2 N nmiss  nway noprint ;
+/*      where 80 le Age_Years ;*/
+      var ReportedDate  ;
+      class   County  ;
+      format  County   $MesaFmt. ;
+      output out=All_Cases(drop=_FREQ_ _TYPE_) n=CaseCounts;
+Data All_Cases; set All_Cases(rename=(County=tmp_County));
+   County = put(tmp_County,$MesaFmt.);
+   drop tmp_County;
+run;
+
+Data All_Pop; length County $13; set CountyPop(rename=(TotalPop=Population));
+keep County Population;
+run;
+
+** Calculation of case rate per 100K for 80+ yo by region **;
+   proc sort data= All_Cases; by County; run;
+   proc sort data=All_Pop ; by County; run;
+Data All_CaseRate; merge All_Cases  All_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='ALL';
 run;
-/*   PROC print data= CaseRate_All;   id county;  format CasesPer100K 4.0;   run;*/
+   PROC print data= All_CaseRate;  id county;   format CasesPer100K 4.0;  run;
 
 
-** Put Case rate stats for all three population groups together **;
+** Put Case rate stats for all population groups together **;
 **______________________________________________________________**;
 
-Data CaseRate100K_temp; set   CaseRate_Y   CaseRate_O  CaseRate_All   ;
-   format CaseCounts Population comma11.0   CasesPer100K 5.0;
+Data CaseRate100K_temp; 
+   set   YrGrp1_CaseRate   YrGrp2_CaseRate   YrGrp3_CaseRate   YrGrp4_CaseRate   YrGrp5_CaseRate   All_CaseRate   ;
+   format CaseCounts Population comma11.0   CasesPer100K 5.0 ;
    proc sort data= CaseRate100K_temp  out= CaseRate100K ;  by county;
    PROC print data= CaseRate100K ;  id County; by County;
       var Age_Group CaseCounts Population CasesPer100K;
@@ -223,7 +310,7 @@ run;
    PROC freq data= MMWR_cases ;
       tables  County  Age_Years hospitalized;
       tables County  * Age_Years * hospitalized / nocol  ;
-      format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt. ;
+      format   County $MesaFmt.   Age_Years Age5cat.  hospitalized HospFmt. ;
       title1 'Admission to hospital among cases';
       title2 'data= MMWR_cases';
 run;

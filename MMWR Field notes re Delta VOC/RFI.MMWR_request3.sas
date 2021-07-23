@@ -140,7 +140,7 @@ run;
 /*   proc contents data=YrGrp1_Cases ;  run;*/
 
 Data YrGrp1_Pop; length County $13; set CountyPop(rename=(Yrs0_19=Population));
-keep County Population;
+   keep County Population;
 /*   proc contents data= YrGrp1_Pop; run;*/
 /*   proc print data=YrGrp1_Pop; id County; */
 run;
@@ -169,7 +169,7 @@ Data YrGrp2_Cases; set Y2_Cases(rename=(County=tmp_County));
 run;
 
 Data YrGrp2_Pop; length County $13; set CountyPop(rename=(Yrs20_39=Population));
-keep County Population;
+   keep County Population;
 run;
 
 ** Calculation of case rate per 100K for 20-39 yo by region **;
@@ -179,7 +179,7 @@ Data YrGrp2_CaseRate; merge YrGrp2_Cases  YrGrp2_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='20-39 yo';
 run;
-   PROC print data= YrGrp2_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+/*   PROC print data= YrGrp2_CaseRate;  id county;   format CasesPer100K 4.0;  run;*/
 
 
 ** Cases in 40-59 yo by region **;
@@ -196,7 +196,7 @@ Data YrGrp3_Cases; set Y3_Cases(rename=(County=tmp_County));
 run;
 
 Data YrGrp3_Pop; length County $13; set CountyPop(rename=(Yrs40_59=Population));
-keep County Population;
+   keep County Population;
 run;
 
 ** Calculation of case rate per 100K for 40-59 yo by region **;
@@ -206,7 +206,7 @@ Data YrGrp3_CaseRate; merge YrGrp3_Cases  YrGrp3_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='40-59 yo';
 run;
-   PROC print data= YrGrp3_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+/*   PROC print data= YrGrp3_CaseRate;  id county;   format CasesPer100K 4.0;  run;*/
 
 
 ** Cases in 60-79 yo by region **;
@@ -223,7 +223,7 @@ Data YrGrp4_Cases; set Y4_Cases(rename=(County=tmp_County));
 run;
 
 Data YrGrp4_Pop; length County $13; set CountyPop(rename=(Yrs60_79=Population));
-keep County Population;
+   keep County Population;
 run;
 
 ** Calculation of case rate per 100K for 60-79 yo by region **;
@@ -233,7 +233,7 @@ Data YrGrp4_CaseRate; merge YrGrp4_Cases  YrGrp4_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='60-79 yo';
 run;
-   PROC print data= YrGrp4_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+/*   PROC print data= YrGrp4_CaseRate;  id county;   format CasesPer100K 4.0;  run;*/
 
 
 ** Cases in 80+ yo by region **;
@@ -250,7 +250,7 @@ Data YrGrp5_Cases; set Y5_Cases(rename=(County=tmp_County));
 run;
 
 Data YrGrp5_Pop; length County $13; set CountyPop(rename=(Yrs80plus=Population));
-keep County Population;
+   keep County Population;
 run;
 
 ** Calculation of case rate per 100K for 80+ yo by region **;
@@ -260,7 +260,7 @@ Data YrGrp5_CaseRate; merge YrGrp5_Cases  YrGrp5_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='80+ yo';
 run;
-   PROC print data= YrGrp5_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+/*   PROC print data= YrGrp5_CaseRate;  id county;   format CasesPer100K 4.0;  run;*/
 
 
 ** Total Cases by region **;
@@ -277,7 +277,7 @@ Data All_Cases; set All_Cases(rename=(County=tmp_County));
 run;
 
 Data All_Pop; length County $13; set CountyPop(rename=(TotalPop=Population));
-keep County Population;
+   keep County Population;
 run;
 
 ** Calculation of case rate per 100K for 80+ yo by region **;
@@ -287,7 +287,7 @@ Data All_CaseRate; merge All_Cases  All_Pop;  by county;
    CasesPer100K = (CaseCounts/ (Population/100000) );
    Age_Group='ALL';
 run;
-   PROC print data= All_CaseRate;  id county;   format CasesPer100K 4.0;  run;
+/*   PROC print data= All_CaseRate;  id county;   format CasesPer100K 4.0;  run;*/
 
 
 ** Put Case rate stats for all population groups together **;
@@ -308,8 +308,9 @@ run;
 ** 5. Hospitalizations by Age group and Region **;
 
    PROC freq data= MMWR_cases ;
-      tables  County  Age_Years hospitalized;
-      tables County  * Age_Years * hospitalized / nocol  ;
+/*      tables  County  Age_Years hospitalized;*/
+      tables             County  * hospitalized / nocol chisq ;
+      tables Age_Years * County  * hospitalized / nocol chisq ;
       format   County $MesaFmt.   Age_Years Age5cat.  hospitalized HospFmt. ;
       title1 'Admission to hospital among cases';
       title2 'data= MMWR_cases';
@@ -317,39 +318,7 @@ run;
 
 
 
-**   6. Admission to ICU among cases   **;
-/*--------------------------------------------------*
- | There are three sources of ICU data:
- | 1) CEDRS_view  (dphe144)
- | 2. Surveillance form  (dphe66)
- | 3. COPHS
- *--------------------------------------------------*/
-
-**  1) ICU data from CEDRS_view   **;
-   PROC freq data= COVID.CEDRS_view ;
-      tables ReportedDate * ICU /nocol norow nopercent;
-      format ReportedDate monyy.;
-run;
-/*_________________________________________________________________________________________*
- | FINDINGS:    
- | Can't use ICU variable from CEDRS_view because all values = 'Unknown' since July 2020!
- *_________________________________________________________________________________________*/
-
-
-**  2) ICU data from Surveillance form   **;
-
-   PROC freq data=SurvForm_read ; 
-      /*tables ICU_SurvForm;*/
-      tables CreatedDate  * ICU_SurvForm / nocol norow nopercent missing missprint;
-      format CreatedDate  monyy. ;
-run;
-/*_____________________________________________________________________________________________*
- | FINDINGS:    
- | Can't use ICU variable from Surveillance Form because all values missing since June 2020!
- *_____________________________________________________________________________________________*/
-
-
-**  3) ICU data from COPHS   **;
+**   6. Admission to ICU among cases per COPHS   **;
 
    PROC contents data= COVID.COPHS      varnum;  run;
    PROC contents data= COVID.COPHS_fix  varnum;  run;
@@ -368,8 +337,9 @@ run;
 
    PROC freq data= MMWR_ICU ;
 /*      tables  County  Age_Years hospitalized ICU;*/
-      tables County  * Age_Years * ICU / nocol  ;
-      format   County $MesaFmt.   Age_Years AgeFmt. ;* hospitalized HospFmt. ;
+      tables             County * ICU / nocol chisq ;
+      tables Age_Years * County * ICU / nocol chisq ;
+      format   County $MesaFmt.   Age_Years Age5cat. ;* hospitalized HospFmt. ;
       title1 'Admission to ICU among hospitalized cases';
       title2 'data= MMWR_ICU';
 run;
@@ -380,8 +350,9 @@ run;
 
    PROC freq data= MMWR_cases ;
 /*      tables  County  Age_Years outcome;*/
-      tables County  * Age_Years * outcome / nocol  ;
-      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.   ;
+      tables             County * outcome / nocol chisq ;
+      tables Age_Years * County * outcome / nocol chisq ;
+      format   County $MesaFmt.   Age_Years Age5cat.   outcome $Outcome_2cat.   ;
       title1 'Case fatality ratio';
       title2 'data= MMWR_cases';
 run;
@@ -392,9 +363,10 @@ run;
 
    PROC freq data= MMWR_cases ;
       where hospitalized=1;
-      tables  hospitalized;
-      tables County  * Age_Years * outcome / nocol  ;
-      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.  hospitalized HospFmt. ;
+/*      tables  hospitalized;*/
+      tables             County * outcome / nocol chisq ;
+      tables Age_Years * County * outcome / nocol chisq ;
+      format   County $MesaFmt.   Age_Years Age5cat.   outcome $Outcome_2cat.  hospitalized HospFmt. ;
       title1 'Case fatality ratio among hospitalized';
       title2 'data= MMWR_cases ';
 run;
@@ -407,138 +379,6 @@ run;
 ***-----------------------***;
 
 
-*** 9. Merge demographic variables from CEDRS with B6172 variant data ***;
-***___________________________________________________________________***;
-
-/*______________________________________________________________________________________________________*
- | Code below adds demographic variables from above MMWR dataset to the B6172_fix dataset. 
- | B6172_fix dataset is from variant of concern (B.1.617.2) in Colorado. 
- | B6172_read was created from SQL join supplied by Bre. See Read.B6172. 
- | Read.B6172 creates COVID.B6172_read and then Fix.B6172 creates B6172_fix. 
- | Merge demographic vars from CEDRS with B.1.617.2 variant data in B6172_fix. 
- *______________________________________________________________________________________________________*/
-
-PROC sort data= MMWR_cases(keep= ProfileID EventID Hospitalized  Reinfection  Breakthrough Outcome CollectionDate Age_Years)  
-   out=MMWRkey; 
-   by ProfileID EventID;
-
-PROC sort data= COVID.B6172_fix  out=B6172_key; by ProfileID EventID;
-run;
-
-DATA B6172_n_MMWR;
-   length County $ 11;
-   merge MMWRkey(in=M)  B6172_key(in=V);  
-   by ProfileID EventID;
-
-   if V=1 ;                      * <--- which if any is correct? ;
-   format County $11.;
-   tmp_county=County;
-   County=upcase(tmp_county);
-   drop tmp_county;
-run;
-
-   PROC contents data= B6172_n_MMWR varnum ; run;
-
-   PROC means data= B6172_n_MMWR n nmiss ;
-      var CollectionDate ReportedDate  ;
-run;
-
-** Delta rate for 0-69 yo by region **;
-**_________________________________**;
-
-** Cases in 0-69 yo by region **;
-   PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
-      where 0 < Age_Years < 70;
-      var ReportedDate  ;
-      class   County  ;
-      format  County   $MesaFmt. ;
-      output out=N_Y_Deltas(drop=_FREQ_ _TYPE_) n=DeltaCounts;
-run;
-/*proc print data=N_Y_Deltas ; id County; run;*/
-
-** Calculation of Delta rate per 100K for 0-69 yo by region **;
-Data DeltaRate_Y; merge N_Y_Deltas  Y_Pop;  by county;
-   DeltasPer100K = (DeltaCounts / (Population/100000) );
-   Age_Group='0-69 yo';
-run;
-/*   PROC print data= DeltaRate_Y;  id county;   format DeltasPer100K 4.0;  run;*/
-
-
-** Delta rate for 70-109 yo by region **;
-**_________________________________**;
-   PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
-      where 69 < Age_Years < 110;
-      var ReportedDate  ;
-      class   County  ;
-      format  County   $MesaFmt. ;
-      output out=N_O_Deltas(drop=_FREQ_ _TYPE_) n=DeltaCounts;
-run;
-/*proc print data=N_O_Deltas ; id County; run;*/
-
-** Calculation of Delta rate per 100K for 70-109 yo by region **;
-Data DeltaRate_O; merge  N_O_Deltas  O_Pop;  by county;
-   if DeltaCounts=. then DeltaCounts=19;
-   DeltasPer100K = (DeltaCounts / (Population/100000) );
-   Age_Group='70-109 yo';
-   if DeltasPer100K=. then delete;
-run;
-/*   PROC print data= DeltaRate_O;  id county;  format DeltasPer100K 4.0;  run;*/
-
-
-** Delta rate in ALL by region **;
-**_________________________________**;
-   PROC means data=B6172_n_MMWR  maxdec=2 N nmiss  nway noprint ;
-      var ReportedDate  ;
-      class   County  ;
-      format  County   $MesaFmt. ;
-      output out=N_Deltas(drop=_FREQ_ _TYPE_) n=DeltaCounts;
-run;
-/*proc print data=N_Deltas ; id County; run;*/
-
-** Calculation of case rate per 100K for ALL by region **;
-Data DeltaRate_All; merge N_Deltas  All_Pop;  by county;
-   DeltasPer100K = (DeltaCounts / (Population/100000) );
-   Age_Group='ALL';
-/*   PROC print data= DeltaRate_All;   id county;  format DeltasPer100K 4.0;   run;*/
-
-
-** Put Delta rate stats for all three population groups together **;
-**______________________________________________________________**;
-
-Data DeltaRate100K_temp; set   DeltaRate_Y   DeltaRate_O  DeltaRate_All   ;
-   format DeltaCounts Population comma11.0   DeltasPer100K 5.0;
-   proc sort data= DeltaRate100K_temp  out= DeltaRate100K ;  by county;
-   PROC print data= DeltaRate100K ;  id County; by County;
-      var Age_Group DeltaCounts Population DeltasPer100K;
-run;
-
-
-
-** 10. Delta Hospitalizations by Age group and Region **;
-   PROC freq data= B6172_n_MMWR ;
-/*      tables  County  Age_Years hospitalized / missing missprint;*/
-      tables County  * Age_Years * hospitalized / nocol  missing missprint ;
-      format   County $MesaFmt.   Age_Years AgeFmt.  hospitalized HospFmt.   ;
-run;
-
-
-
-**   11. Delta Case fatality ratio   **;
-   PROC freq data= B6172_n_MMWR ;
-/*      tables  County  Age_Years outcome;*/
-      tables County  * Age_Years * outcome / nocol  missing missprint ;
-      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.   ;
-run;
-
-
-
-**   12. Delta Case fatality ratio among those hospitalized   **;
-   PROC freq data= B6172_n_MMWR ;
-      where hospitalized=1;
-/*      tables  hospitalized;*/
-      tables County  * Age_Years * outcome / nocol missing missprint ;
-      format   County $MesaFmt.   Age_Years AgeFmt.   outcome $Outcome_2cat.  hospitalized HospFmt.  ;
-run;
 
 
 

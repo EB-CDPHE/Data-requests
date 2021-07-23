@@ -24,7 +24,6 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
  | 5. MMWR.formats.sas creates formats for this program.
  | 6. Pull data from COPHS using Access.COPHS.   Creates COPHS_read
  | 7. Make data edits to COPHS using FIX.COPHS.  Creates COVID.COPHS_fix
- | 8. Merge COPHS data on ICU admission to CEDRS data using Key_Merge.COPHS.CEDRS
  *_____________________________________________________________________________________________*/
 
 
@@ -57,9 +56,6 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 *  7. Submit Fix.COPHS  *;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\Fix.COPHS.sas';
-
-*  8. Submit Key_Merge.COPHS.CEDRS  *;
-%include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\Key_Merge.COPHS.CEDRS.sas';
 
 
 /*______________________________________________________________________________________________________________*
@@ -117,11 +113,14 @@ DATA MMWR_cases; set FixCollDate ;
    if Age_Years > 109 then Age_Years = .;
 run;
 
+
  ** 3. Contents of dataset to query for RFI **;
 PROC contents data= MMWR_cases  ;
       title1 'COVID.CEDRS_view obs between April 20 - June 6';
 run;
 
+
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\MMWR.formats.sas';
 
 
 ***----------------------***;
@@ -386,6 +385,9 @@ run;
 
 
 ** RUN the Key_merge.COPHS.CEDRS.sas program to link COPHS ICU admission to MMWRcases dataset. **;
+
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\Key_Merge.COPHS.CEDRS.sas';
+
 
    proc freq data=MMWR_ICU ; tables ICU ICU_Admission; run;
    PROC means data= MMWR_ICU  n nmiss ;  var ICU_Admission hospitalized ICU; run;

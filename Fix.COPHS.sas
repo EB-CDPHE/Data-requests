@@ -72,10 +72,10 @@ run;
 *** 6.  Post-edit checks ***;
 ***----------------------***;
 
-  PROC print data= COVID.COPHS_fix ;
-      where  (. < Hosp_Admission < '01JAN20'd)  OR  (Hosp_Admission > '01DEC21'd) ;
-      id MR_Number ;
-      var Hosp_Admission Facility_Name First_Name Last_Name Gender DOB Positive_Test Date_Left_Facility City County_of_Residence  ;
-      format Facility_Name $45. First_Name Last_Name  $12.  City $15. ;
-      title2 'Extreme values of hospital admission dates from COPHS';
-run;
+/*  PROC print data= COVID.COPHS_fix ;*/
+/*      where  (. < Hosp_Admission < '01JAN20'd)  OR  (Hosp_Admission > '01DEC21'd) ;*/
+/*      id MR_Number ;*/
+/*      var Hosp_Admission Facility_Name First_Name Last_Name Gender DOB Positive_Test Date_Left_Facility City County_of_Residence  ;*/
+/*      format Facility_Name $45. First_Name Last_Name  $12.  City $15. ;*/
+/*      title2 'Extreme values of hospital admission dates from COPHS';*/
+/*run;*/

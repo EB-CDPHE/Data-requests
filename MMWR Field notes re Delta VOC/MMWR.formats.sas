@@ -20,10 +20,16 @@
       value AgeFmt
          0-69 = '<70 years'
          70-105 = '70+ years' ;
+      value Age5cat
+         0-19 = '0-19 years'
+         20-39 = '20-39 years'
+         40-59 = '40-59 years'
+         60-79 = ' 60-79 years'
+         80-105 = '80-105 years' ;
 
       value $MesaFmt
-      'MESA'='MESA county'
-       other='NOT Mesa county' ;
+      'MESA'='MESA'
+       other='ROC' ;
 
       value HospFmt
       ., 0 =  0

@@ -4,8 +4,8 @@ AUTHOR:   Eric Bush
 CREATED:  July 5, 2021
 MODIFIED: 072221: redo table by age groups per CDC request	
 PURPOSE:	 Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:	 COVID.CEDRS_view   COVID.B6172_fix   COVID.County_Population
-OUTPUT:	 MMWR_cases
+INPUT:	 COVID.CEDRS_view   COVID.B6172_fix   COVID.County_Population  COVID.COPHS_fix
+OUTPUT:	 MMWR_cases   MMWR_ICU
 ***********************************************************************************************/
 
 ** Access the CEDRS.view using ODBC **;

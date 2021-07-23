@@ -4,9 +4,9 @@ AUTHOR:   Eric Bush
 CREATED:  June 9, 2021
 MODIFIED: 	
 PURPOSE:	 Code to obtain requested info re: selected stats for COVID and Delta by Mesa vs ROC
-INPUT:	 COVID.CEDRS_view_fix   COVID.B6172_fix
-OUTPUT:	 Not_Mesa144     --> COL 1 output;   Mesa144     --> COL 2 output;  
-          Not_Mesa_B16172 --> COL 3 output;   Mesa_B16172 --> COL 4 output   
+INPUT:	 COVID.CEDRS_view_fix            COVID.B6172_fix
+OUTPUT:	 Not_Mesa144 --> COL 1 output;   Not_Mesa_B16172 --> COL 3 output;  
+              Mesa144 --> COL 2 output;       Mesa_B16172 --> COL 4 output   
 ***********************************************************************************************/
 
 ** Access the CEDRS.view using ODBC **;
@@ -16,9 +16,13 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 /*________________________________________________________________________________________*
  | Programs to run prior to this code:
- | 1. Pull data from CEDRS using READ.CEDRS_view.  Creates COVID.CEDRS_view 
- | 2. Pull data on variants using READ.B6172.  Creates work.B6172_edit
- | 3. Mesa.formats.sas program.  See %include statement below.
+ | 1. Pull data from CEDRS using Access.CEDRS_view.  Creates CEDRS_view_read
+ | 2. Make data edits to CEDRS_view using FIX.CEDRS_view.  Creates COVID.CEDRS_view_fix
+ |    a. Pull data from Events using Access.zDSI_Events to get Age.  Creates zDSI_Events.read
+ |    b. Make data edits using Fix.zDSI_Events to create Age_in_Years. Creates zDSI_Events.fix
+ | 3. Pull data on variants using Access.B6172.  Creates B6172_read
+ | 4. Make data edits to B6172_read using Fix.B6172. Creates B6172_fix.
+ | 5. Mesa.formats.sas program.  See %include statement below.
  *________________________________________________________________________________________*/
 
 %inc 'C:\Users\eabush\Documents\GitHub\Data-requests\Mesa county delta variants\Mesa.formats.sas';

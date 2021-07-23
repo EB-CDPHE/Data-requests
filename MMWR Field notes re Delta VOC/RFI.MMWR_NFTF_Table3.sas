@@ -13,17 +13,19 @@ LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** contains "CEDR
 
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
-/*________________________________________________________________________________________*
+/*_____________________________________________________________________________________________*
  | Programs to run prior to this code:
  | 1. Pull data from CEDRS using Access.CEDRS_view.  Creates CEDRS_view_read
  | 2. Make data edits to CEDRS_view using FIX.CEDRS_view.  Creates COVID.CEDRS_view_fix
+ |    a. Pull data from Events using Access.zDSI_Events to get Age.  Creates zDSI_Events.read
+ |    b. Make data edits using Fix.zDSI_Events to create Age_in_Years. Creates zDSI_Events.fix
  | 3. Pull data on variants using Access.B6172.  Creates B6172_read
  | 4. Make data edits to B6172_read using Fix.B6172. Creates B6172_fix.
  | 5. MMWR.formats.sas creates formats for this program.
  | 6. Pull data from COPHS using Access.COPHS.   Creates COPHS_read
  | 7. Make data edits to COPHS using FIX.COPHS.  Creates COVID.COPHS_fix
  | 8. Merge COPHS data on ICU admission to CEDRS data using Key_Merge.COPHS.CEDRS
- *________________________________________________________________________________________*/
+ *_____________________________________________________________________________________________*/
 
 
 ***  Can run the files directly by submitting these statements:  ***;
@@ -35,7 +37,13 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 *  2. Submit Fix.CEDRS_view  *;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\Fix.CEDRS_view.sas';
 
-*  3. Submit Access.CEDRS_view  *;
+   *  a) Submit Access.zDSI_Events  *;
+   %include 'C:\Users\eabush\Documents\GitHub\Data-requests\Access.zDSI_Events.sas';
+
+   *  b) Submit Fix.zDSI_Events  *;
+   %include 'C:\Users\eabush\Documents\GitHub\Data-requests\Fix.zDSI_Events.sas';
+
+*  3. Submit Access.B6172  *;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\Access.B6172.sas';
 
 *  4. Submit Fix.B6172  *;
@@ -44,13 +52,13 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 *  5. Submit MMWR.formats.sas  *;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\MMWR.formats.sas';
 
-*  6. Submit Access.CEDRS_view  *;
+*  6. Submit Access.COPHS  *;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\Access.COPHS.sas';
 
-*  7. Submit Fix.CEDRS_view  *;
+*  7. Submit Fix.COPHS  *;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\Fix.COPHS.sas';
 
-*  8. Submit MMWR.formats.sas  *;
+*  8. Submit Key_Merge.COPHS.CEDRS  *;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\Key_Merge.COPHS.CEDRS.sas';
 
 

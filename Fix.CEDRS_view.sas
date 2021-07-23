@@ -4,7 +4,7 @@ AUTHOR:   Eric Bush
 CREATED:	 July 6, 2021
 MODIFIED: 	
 PURPOSE:	 Explore created SAS dataset
-INPUT:	 CEDRS_view_read    zDSI_Events_fix
+INPUT:	       CEDRS_view_read    zDSI_Events_fix
 OUTPUT:	 COVID.CEDRS_view_fix
 ***********************************************************************************************/
 
@@ -66,24 +66,24 @@ run;
 
 *** 4.  Post-edit checks ***;
 ***----------------------***;
-
-proc univariate data= COVID.CEDRS_view_fix; var Age_years; run;
-proc means data= COVID.CEDRS_view_fix  n nmiss min p1 p10 p25 median mean p75 p90 p99 max   maxdec=2; var Age_years; run;
-
-proc means data= COVID.CEDRS_view_fix  n nmiss min p10 p25 median mean p75 p90 max   maxdec=2; var Age_years; run;
-
-
-proc print data = MMWR_cases;
-where Age_years = .;
-id ProfileID;
-var EventID Age_Years Age Age_Group County CollectionDate ReportedDate hospitalized ;
-run;
-
-
-
-proc print data=MMWR_cases ;
-id ProfileID; var EventID Age Age_Group Age_at_reported Age_Years County ;
-run;
+/**/
+/*proc univariate data= COVID.CEDRS_view_fix; var Age_years; run;*/
+/*proc means data= COVID.CEDRS_view_fix  n nmiss min p1 p10 p25 median mean p75 p90 p99 max   maxdec=2; var Age_years; run;*/
+/**/
+/*proc means data= COVID.CEDRS_view_fix  n nmiss min p10 p25 median mean p75 p90 max   maxdec=2; var Age_years; run;*/
+/**/
+/**/
+/*proc print data = MMWR_cases;*/
+/*where Age_years = .;*/
+/*id ProfileID;*/
+/*var EventID Age_Years Age Age_Group County CollectionDate ReportedDate hospitalized ;*/
+/*run;*/
+/**/
+/**/
+/**/
+/*proc print data=MMWR_cases ;*/
+/*id ProfileID; var EventID Age Age_Group Age_at_reported Age_Years County ;*/
+/*run;*/
 
 
 

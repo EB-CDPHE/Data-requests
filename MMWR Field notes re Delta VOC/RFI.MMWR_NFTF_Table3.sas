@@ -4,8 +4,8 @@ AUTHOR:   Eric Bush
 CREATED:  July 5, 2021
 MODIFIED: 072221: redo table by age groups per CDC request	
 PURPOSE:	 Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		COVID.CEDRS_view   COVID.B6172_fix   COVID.County_Population
-OUTPUT:		[name of output - SAS data tables, printed output, etc]
+INPUT:	 COVID.CEDRS_view   COVID.B6172_fix   COVID.County_Population
+OUTPUT:	 MMWR_cases
 ***********************************************************************************************/
 
 ** Access the CEDRS.view using ODBC **;
@@ -16,29 +16,77 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 /*________________________________________________________________________________________*
  | Programs to run prior to this code:
  | 1. Pull data from CEDRS using Access.CEDRS_view.  Creates CEDRS_view_read
- | 2. Run FIX.CEDRS_view to make data edits to CEDRS_view.  Creates COVID.CEDRS_view_fix
- | 2. Pull data on variants using READ.B6172.sas.  Creates work.B6172_edit
- | 3. Make edits to B6172_read using Fix.B6172.sas. Creates B6172_fix.
- | 4. MMWR.formats.sas creates formats for this program.
+ | 2. Make data edits to CEDRS_view using FIX.CEDRS_view.  Creates COVID.CEDRS_view_fix
+ | 3. Pull data on variants using Access.B6172.  Creates B6172_read
+ | 4. Make data edits to B6172_read using Fix.B6172. Creates B6172_fix.
+ | 5. MMWR.formats.sas creates formats for this program.
+ | 6. Pull data from COPHS using Access.COPHS.   Creates COPHS_read
+ | 7. Make data edits to COPHS using FIX.COPHS.  Creates COVID.COPHS_fix
+ | 8. Merge COPHS data on ICU admission to CEDRS data using Key_Merge.COPHS.CEDRS
  *________________________________________________________________________________________*/
 
-%inc 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\MMWR.formats.sas';
+
+***  Can run the files directly by submitting these statements:  ***;
+***--------------------------------------------------------------***;
+
+*  1. Submit Access.CEDRS_view  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\Access.CEDRS_view.sas';
+
+*  2. Submit Fix.CEDRS_view  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\Fix.CEDRS_view.sas';
+
+*  3. Submit Access.CEDRS_view  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\Access.B6172.sas';
+
+*  4. Submit Fix.B6172  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\Fix.B6172.sas';
+
+*  5. Submit MMWR.formats.sas  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\MMWR.formats.sas';
+
+*  6. Submit Access.CEDRS_view  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\Access.COPHS.sas';
+
+*  7. Submit Fix.CEDRS_view  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\Fix.COPHS.sas';
+
+*  8. Submit MMWR.formats.sas  *;
+%include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\Key_Merge.COPHS.CEDRS.sas';
+
 
 /*______________________________________________________________________________________________________________*
  | Table of contents for RFI code:
- | 1. PROC contents for 
- |    a. COVID.CEDRS_view dataset from dphe144
- |    b. work.B6172_fix dataset from dphe66
+ | 1. PROC contents for input datasets: 
+ |    a. CEDRS_view_fix dataset from dphe144
+ |    b. B6172_fix dataset from dphe66
  |
- | 2. Demographics for confirmed and probable cases
- | --> filtered dataset = MESA county AND ReportedDate between April 20 - June 19, 2021 (work.Not_Mesa144)
+ | 2. Create dataset for data request = MMWR_cases
+ |    a. Modify dataset - imput missing collection dates
+ |    b. Filter dataset - Colorado counties AND CollectionDate between April 20 - June 19, 2021
+ | 3. PROC contents for output dataset for responding to data request:
+ |    a. MMWR_cases
+ | --> filtered dataset = Colorado counties AND CollectionDate between April 20 - June 19, 2021 (work.Not_Mesa144)
+ | 4. Add county population data - total and by age groups
+ |    a. PROC means to get total population by region (Mesa vs ROC)
+ |    b. Input data from Rachel S. for population by age groups for each region
+ |    c. PROC contents of CountyPop dataset
+ | 5. Case count, Population total and calculation of case rates per 100K - by region and Age group
+ |    a.  0-19 year olds
+ |    b. 20-39 year olds
+ |    c. 40-59 year olds
+ |    d. 60-79 year olds
+ |    e. 80+   year olds
+ | 6. Hospitalizations by Age group and Region
+ | 7. Admission to ICU among cases per COPHS by Age group and Region
+ | 8. Case fatality ratio by Age group and Region
+ | 9. Case fatality ratio among those hospitalized by Age group and Region
  *______________________________________________________________________________________________________________*/
 
 
 options pageno=1;
 
-** 1. Contents of datasets to query for RFI **;
-   PROC contents data=COVID.CEDRS_view varnum;
+** 1. Contents of input datasets to access **;
+   PROC contents data=COVID.CEDRS_view_fix varnum;
       title1 'dphe144 - CEDRS_view (a copy of CEDRS_dashboard_constrained)';
 run;
 
@@ -61,7 +109,8 @@ DATA MMWR_cases; set FixCollDate ;
    if Age_Years > 109 then Age_Years = .;
 run;
 
- PROC contents data= MMWR_cases  ;
+ ** 3. Contents of dataset to query for RFI **;
+PROC contents data= MMWR_cases  ;
       title1 'COVID.CEDRS_view obs between April 20 - June 6';
 run;
 
@@ -72,7 +121,7 @@ run;
 ***  All COVID cases     ***;
 ***----------------------***;
 
-** 3. County Population data **;
+** 4. County Population data **;
    PROC contents data=COVID.County_Population; run;
 /*   PROC print data= COVID.County_Population; id county; run;*/
 
@@ -118,11 +167,8 @@ RUN;
    PROC print data= CountyPop; id County; run;
 
 
-
-** 4. Count of Cases and sum of Population by County and Age  **;
-
-** Case rate for 0-19 yo by region **;
-**_________________________________**;
+***  5. Case count, Population total and calculation of case rates per 100K - by region and Age group  ***;
+***____________________________________________________________________________________________________***;
 
 ** Cases in 0-19 yo by region **;
 **----------------------------**;
@@ -290,9 +336,8 @@ run;
 /*   PROC print data= All_CaseRate;  id county;   format CasesPer100K 4.0;  run;*/
 
 
-** Put Case rate stats for all population groups together **;
-**______________________________________________________________**;
-
+** Put Case counts, pop totals, and Case rates for all age groups together **;
+**-------------------------------------------------------------------------**;
 Data CaseRate100K_temp; 
    set   YrGrp1_CaseRate   YrGrp2_CaseRate   YrGrp3_CaseRate   YrGrp4_CaseRate   YrGrp5_CaseRate   All_CaseRate   ;
    format CaseCounts Population comma11.0   CasesPer100K 5.0 ;
@@ -305,7 +350,8 @@ run;
 
 
 
-** 5. Hospitalizations by Age group and Region **;
+***  6. Hospitalizations by Age group and Region  ***;
+***_______________________________________________***;
 
    PROC freq data= MMWR_cases ;
 /*      tables  County  Age_Years hospitalized;*/
@@ -318,7 +364,8 @@ run;
 
 
 
-**   6. Admission to ICU among cases per COPHS   **;
+***   7. Admission to ICU among cases per COPHS   ***;
+***_______________________________________________***;
 
    PROC contents data= COVID.COPHS      varnum;  run;
    PROC contents data= COVID.COPHS_fix  varnum;  run;
@@ -346,7 +393,7 @@ run;
 
 
 
-**   7. Case fatality ratio   **;
+**   8. Case fatality ratio   **;
 
    PROC freq data= MMWR_cases ;
 /*      tables  County  Age_Years outcome;*/
@@ -359,7 +406,7 @@ run;
 
 
 
-**   8. Case fatality ratio among those hospitalized   **;
+**   9. Case fatality ratio among those hospitalized   **;
 
    PROC freq data= MMWR_cases ;
       where hospitalized=1;
@@ -372,56 +419,4 @@ run;
 run;
 
 
-
-***-----------------------***;
-***  SECTION 2 OF TABLE   ***;
-***  Delta variant cases  ***;
-***-----------------------***;
-
-
-
-
-
-***----------------------------------------***;
-***  Estimates for text in draft document  ***;
-***----------------------------------------***;
-
-**   13. Number of cases as of June 6th for ALL of Colorado and for Mesa (%) **;
-   PROC means data= COVID.B6172_fix n nmiss ;
-      where ReportedDate  < '07JUN21'd ;* AND  County='Mesa';
-      var  ReportedDate Age_years ;
-      title1 'from COVID.B6172_fix';
-/*      title2 'Delta variant cases from MESA county';*/
-      title2 'Delta variant cases from ALL Colorado counties';
-run;
-
-
-
-*** Datasets for Rachel S. ***;
-***------------------------***;
-Data DeltaEvents; set B6172_n_MMWR; 
-   keep ProfileID EventID LastName FirstName ResultText Age BirthDate ReportedDate ResultDate;
-run;
-
-
-Data COVID_Events; set MMWR_cases; 
-   keep ProfileID EventID County CollectionDate ReportedDate Age;
-run;
-
-
-
-*** export data to google drive ***;
-***-----------------------------***;
-
-libname mydata 'C:\Users\eabush\Documents\CDPHE\Requests\data';
-
-DATA mydata.MMWR_ICU ; set MMWR_ICU;  run;
-
-DATA mydata.B6172_n_MMWR ; set B6172_n_MMWR;  run;
-
-
-
-DATA COVID.MMWR_cases ; set MMWR_cases;  run;
-DATA COVID.B6172_n_MMWR ; set B6172_n_MMWR;  run;
-DATA COVID.MMWR_ICU ; set MMWR_ICU;  run;
 

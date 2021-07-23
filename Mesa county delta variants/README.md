@@ -8,7 +8,7 @@ An earlier version of the table asked for outcomes by age (<70 yo and 70+ yo).  
 ## Steps taken to get data for revised table:
 | <p align="left">Run order</p> | <p align="left">SAS programs used for data request</p> |
 | ----- | ------------------------------------------------------------------------------ |
-|1| Run Access.CEDRS_view to pull data from dphe144 CEDRS_view. Creates CEDRS_view |
+|1| Run [Access.CEDRS_view](\Users\eabush\Documents\GitHub\Data-requests\Access.CEDRS_view.sas) to pull data from dphe144 CEDRS_view. Creates CEDRS_view |
 |2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|
 |3| Run Access.zDSI_Events to access Events table and get Age. Creates zDSI_Events.read|
 |4| Run FIX.zDSI_Events to create Age_in_Years variable|

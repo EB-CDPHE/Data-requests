@@ -60,6 +60,9 @@ DATA COVID.COPHS_fix;  set COPHS_read;
    if Zip_Code in ('962', '794') then Zip_Code = cat('00', Zip_Code);
    if Zip_Code in ('99999', 'UNKNO') then Zip_Code = '';
 
+** 5) Fix bad merges  **;
+ if Last_Name = 'Dutchie-Cooley' then Last_Name = 'Dutchie Cooley';
+
 run;
 
 

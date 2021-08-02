@@ -27,6 +27,11 @@
          60-79 = ' 60-79 years'
          80-105 = '80-105 years' ;
 
+      value Age3cat
+         0-17 = '0-17 years'
+         18-64 = '18-64 years'
+         65-109 = '65-109 years' ;
+
       value $MesaFmt
       'MESA'='MESA'
        other='ROC' ;

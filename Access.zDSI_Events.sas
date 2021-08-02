@@ -1,11 +1,11 @@
 /**********************************************************************************************
-PROGRAM: Access.zDSI_Events
-AUTHOR:  Eric Bush
-CREATED: July 14, 2021
-MODIFIED:	
-PURPOSE:	Access SQL table on Events
-INPUT:		dbo66.zDSI_Events
-OUTPUT:		      zDSI_Events_read
+PROGRAM:   Access.zDSI_Events
+AUTHOR:    Eric Bush
+CREATED:   July 14, 2021
+MODIFIED:  	
+PURPOSE:   Access SQL table on Events
+INPUT:	  dbo66.zDSI_Events
+OUTPUT:		     zDSI_Events_read
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------*
@@ -54,7 +54,8 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA zDSI_Events_read ; set zDSI_Events_temp_ ;
+DATA zDSI_Events_read ;  length ProfileID $ 9;  set zDSI_Events_temp_ ;
+   format ProfileID $9.;
 run;
 
 

@@ -21,12 +21,13 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 1. Create Age in years variable from other Age Type records **;
-DATA zDSI_Events_fix ;  set zDSI_Events_read ;
+DATA zDSI_Events_fix ; length ProfileID $ 9;  set zDSI_Events_read ;
    if upcase(AgeType) = 'DAYS' then Age_Years = Age/365;
    if upcase(AgeType) = 'WEEKS'  then Age_Years = Age/52;
    if upcase(AgeType) = 'MONTHS' then Age_Years = Age/12;
    if upcase(AgeType) = 'YEARS'  then Age_Years = Age;
    Label Age_Years = 'Age in years';
+   format ProfileID $9.;
 run;
 
 

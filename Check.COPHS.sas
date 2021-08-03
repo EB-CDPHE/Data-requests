@@ -30,17 +30,67 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
    PROC contents data= COPHS_read varnum; run;
 
-
 ***  1. Duplicate records  ***;
 ***------------------------***;
 
-* Identify duplicate records;
+**  How many COPHS records are there?  **;
+   PROC means data= COPHS_read n nmiss ;
+      var Hosp_Admission  ICU_Admission  DOB  Positive_Test;
+run;
+
+**  How many unique patients in COPHS?  **;
+   PROC SQL;
+      select count(distinct MR_Number) as NumPeople
+      from COPHS_read ;
+run;
+
+**  Create dataset of patients with multiple records / observations  **;
    PROC FREQ data= COPHS_read  noprint;  
       tables MR_Number / out=Hosp_DupChk(where=(COUNT>1));
+run;
 
-* Print list of duplicate records;
-   PROC print data=Hosp_DupChk; 
+**  Frequency distribution of duplicate records  **;
+   PROC freq data= Hosp_DupChk; 
+      tables count;
+run;
+ 
+ **  List of records with 4 or more admissions  **;
+  PROC freq data= Hosp_DupChk; 
+      where Count>3; 
+      tables count*MR_Number/list nopercent nofreq nocum; 
+run;
+
+   proc sort data=COPHS_read out=Dup_Sort ; by MR_Number Hosp_Admission ;
+** Print data for records with 4 or more admissions  **;
+   PROC print data=Dup_Sort; 
+      where MR_Number in (
+'1097954', 
+'1345065', 
+'1387869', 
+'CEUE01638818', 
+'CEUL2557164', 
+'H0452890', 
+'M000538741', 
+'P0043691', 
+'S0134047', 
+'S0526208', 
+'S0540750', 
+'W00455941', 
+'W00519430', 
+'W00645967', 
+'396653', 
+'CEUE01337847', 
+'2417438', 
+'W00703839', 
+'20196926', 
+'W00120195', 
+'P0168646', 
+);
       id MR_Number;
+      by MR_Number;
+        var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        
+          Discharge_Transfer_Death_Disposi   Date_Left_Facility  ;
+      format Last_Name $20.   Discharge_Transfer_Death_Disposi $20.  Facility_Name $40. ;   
 run;
 
 * Print record for specific MR_Number ID ;
@@ -50,7 +100,7 @@ run;
       var Facility_Name  Last_Name  First_Name  Hosp_Admission ;
 run;
 
-* Use dup record list to filter COPHS data for just dups (based on MR_Number)  *;
+* Use list of dup records to filter COPHS data for just dups (based on MR_Number)  *;
    proc sort data= COPHS_read(drop=filename)  out=COPHSdups  ; by MR_Number; run;
    proc sort data=Hosp_DupChk  ; by MR_Number; run;
 DATA ChkCOPHSdups; merge COPHSdups Hosp_DupChk(in=dup) ; 
@@ -88,6 +138,8 @@ run;
  |    if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
  *_____________________________________________________________________________________________________________________*/
 
+
+* 1.2) Frequency of dup records   *;
 
 
 ***  2. Missing positive test dates - are they mostly recent admissions?  ***;
@@ -218,6 +270,29 @@ run;
 
 ***  5. Invalid Hospital Admission dates  ***;
 ***---------------------------------------***;
+
+*** 5.1) Print obs with missing Hospital admission date ***;
+   PROC print data= COPHS_read ;
+      where Hosp_Admission = . ;
+      id MR_Number ;
+      var Hosp_Admission Facility_Name First_Name Last_Name Gender DOB Positive_Test Date_Left_Facility City County_of_Residence  ;
+      format Facility_Name $45. First_Name Last_Name  $12.  City $15. ;
+      title1 'DATA =  COPHS_read';
+      title2 'missing Hospital admission date';
+run;
+
+*** 5.1.1) Print out records for patient with missing Hospital admission date ***;
+   PROC print data= COPHS_read ;
+      where MR_Number = 'M1660961' ;
+      id MR_Number ;
+      var Hosp_Admission Facility_Name First_Name Last_Name Gender DOB Positive_Test Date_Left_Facility City County_of_Residence  DateAdded;
+      format Facility_Name $45. First_Name Last_Name  $12.  City $15. ;
+      title1 'DATA =  COPHS_read';
+      title2 'Patient with missing Hospital admission date';
+run;
+
+
+
 
 **  Check range of hospital admission dates  **;
    PROC freq data= COPHS_read ;

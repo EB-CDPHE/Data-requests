@@ -101,6 +101,7 @@ DATA MMWR_cases; set FixCollDate ;
    where '27APR21'd le CollectionDate le '06JUN21'd;                                             *<-- Input Time reference period ;
    if CountyAssigned = 'INTERNATIONAL' then delete;
    if Age_Years > 109 then Age_Years = .;
+   drop ICU;
 run;
 
 
@@ -306,38 +307,6 @@ run;
 
 
 
-***   7. Admission to ICU among cases per COPHS   ***;
-***_______________________________________________***;
-
-   PROC contents data= COVID.COPHS      varnum;  run;
-   PROC contents data= COVID.COPHS_fix  varnum;  run;
-
-/*_____________________________________________________________________________________________*
- | FINDINGS:    
- | First, ID variable is MR_number. There is no ProfileID or EventID
- | If can't merge to CEDRS then how do you calculate "admission to ICU among cases"?
- *_____________________________________________________________________________________________*/
-
-
-** RUN the Key_merge.COPHS.CEDRS.sas program to link COPHS ICU admission to MMWRcases dataset. **;
-
-%include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\Key_Merge.COPHS.CEDRS.sas';
-
-
-   proc freq data=MMWR_ICU ; tables ICU ICU_Admission; run;
-   PROC means data= MMWR_ICU  n nmiss ;  var ICU_Admission hospitalized ICU; run;
-
-   PROC freq data= MMWR_ICU ;
-/*      tables  County  Age_Years hospitalized ICU;*/
-      tables             County * ICU / nocol chisq ;
-      tables Age_Years * County * ICU / nocol chisq ;
-      format   County $MesaFmt.   Age_Years Age3cat. ;* hospitalized HospFmt. ;
-      title1 'Admission to ICU among cases';
-      title2 'data= MMWR_ICU';
-run;
-
-
-
 ***   8. Admission to ICU among hospitalized cases per COPHS   ***;
 ***____________________________________________________________***;
 
@@ -349,11 +318,11 @@ run;
 %include 'C:\Users\eabush\Documents\GitHub\Data-requests\MMWR Field notes re Delta VOC\Key_Merge.COPHS.CEDRS.sas';
 
 
-   PROC freq data= MMWR_ICU ;
-      where hospitalized =1 ;
-      tables  County  Age_Years hospitalized ICU /missing missprint;
-      tables             County * ICU / nocol chisq ;
-      tables Age_Years * County * ICU / nocol chisq ;
+   PROC freq data= MMWR_cases ;
+      where hospitalized =1  AND  ICU=1;
+/*      tables  County  Age_Years hospitalized ICU /missing missprint;*/
+      tables             County * ICU / nocol nopercent  ;
+      tables Age_Years * County * ICU / nocol nopercent  ;
       format   County $MesaFmt.   Age_Years Age3cat.  hospitalized HospFmt. ;
       title1 'Admission to ICU among hospitalized cases';
       title2 'data= MMWR_ICU';

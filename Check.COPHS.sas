@@ -63,29 +63,9 @@ run;
    proc sort data=COPHS_read out=Dup_Sort ; by MR_Number Hosp_Admission ;
 ** Print data for records with 4 or more admissions  **;
    PROC print data=Dup_Sort; 
-      where MR_Number in (
-'1097954', 
-'1345065', 
-'1387869', 
-'CEUE01638818', 
-'CEUL2557164', 
-'H0452890', 
-'M000538741', 
-'P0043691', 
-'S0134047', 
-'S0526208', 
-'S0540750', 
-'W00455941', 
-'W00519430', 
-'W00645967', 
-'396653', 
-'CEUE01337847', 
-'2417438', 
-'W00703839', 
-'20196926', 
-'W00120195', 
-'P0168646', 
-);
+      where MR_Number in ('1097954',  '1345065',   '1387869',  'CEUE01638818',  'CEUL2557164',  'H0452890',  'M000538741', 
+                          'P0043691', 'S0134047',  'S0526208', 'S0540750', 'W00455941', 'W00519430', 'W00645967', '396653', 
+                          'CEUE01337847', '2417438', 'W00703839', '20196926', 'W00120195', 'P0168646' );
       id MR_Number;
       by MR_Number;
         var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        

@@ -63,6 +63,8 @@ DATA COVID.COPHS_fix;  set COPHS_read;
 ** 5) Fix bad merges  **;
  if Last_Name = 'Dutchie-Cooley' then Last_Name = 'Dutchie Cooley';
 
+** 6) Fix values of that are lower case  **;
+   Discharge_Transfer_Death_Disposi = propcase(Discharge_Transfer_Death_Disposi);
 run;
 
 

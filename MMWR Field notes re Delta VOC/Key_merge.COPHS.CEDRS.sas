@@ -75,7 +75,7 @@ DATA MMWR_key;
    format  ProfileID $15.;
    keep ProfileID County Age_Years hospitalized ; 
 run;
-/*   PROC contents data=MMWR_key  varnum ; run;*/
+   PROC contents data=MMWR_key  varnum ; run;
  
 
    proc sort data=ICU_Key  out=I_key; by ProfileID;

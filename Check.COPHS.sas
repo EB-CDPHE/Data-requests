@@ -44,7 +44,7 @@ run;
       from COPHS_read ;
 run;
 
-**  Create dataset of patients with multiple records / observations  **;
+**  Create dataset of patient IDs with multiple records / observations  **;
    PROC FREQ data= COPHS_read  noprint;  
       tables MR_Number / out=Hosp_DupChk(where=(COUNT>1));
 run;
@@ -60,25 +60,34 @@ run;
       tables count*MR_Number/list nopercent nofreq nocum; 
 run;
 
-   proc sort data=COPHS_read out=Dup_Sort ; by MR_Number Hosp_Admission ;
-** Print data for records with 4 or more admissions  **;
-   PROC print data=Dup_Sort; 
+**  Create dataset of patients with 4 or more admissions  **;
+DATA COPHS_HiDup; set COPHS_read(drop=Address_Line_1  Address_Line_2  filename  DateAdded);
       where MR_Number in ('1097954',  '1345065',   '1387869',  'CEUE01638818',  'CEUL2557164',  'H0452890',  'M000538741', 
                           'P0043691', 'S0134047',  'S0526208', 'S0540750', 'W00455941', 'W00519430', 'W00645967', '396653', 
                           'CEUE01337847', '2417438', 'W00703839', '20196926', 'W00120195', 'P0168646' );
-      id MR_Number;
-      by MR_Number;
-        var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        
-          Discharge_Transfer_Death_Disposi   Date_Left_Facility  ;
-      format Last_Name $20.   Discharge_Transfer_Death_Disposi $20.  Facility_Name $40. ;   
 run;
 
-* Print record for specific MR_Number ID ;
-   PROC print data= COPHS_read;
-      where MR_Number='1006415';
-      id MR_Number; 
-      var Facility_Name  Last_Name  First_Name  Hosp_Admission ;
+** 1.1) Print data for records with 4 or more admissions  **;
+   proc sort data=COPHS_HiDup ; by MR_Number Hosp_Admission ;  run;
+   PROC print data=COPHS_HiDup; 
+      id MR_Number;
+      by MR_Number;
+      var DOB Gender Hosp_Admission Facility_Name Current_Level_of_care        
+          ICU_Admission   Date_Left_Facility   Discharge_Transfer_Death_Disposi   ;
+      format Discharge_Transfer_Death_Disposi $20.  Facility_Name $40. ;   
 run;
+
+/*______________________________________________________________________________________________________________________*
+ |FINDINGS (as of 8/4/21):
+ | N=35,179 observations pulled from COPHS. N=33,678 distinct patients (MR_Number). (Therefore 1501 extra obs)
+ | n=1 with missing hospital admission date.
+ | n=9,396 with ICU admission date.
+ |
+ | n=1327 patients with multiple hosp admits, i.e. dup records.
+ | n=21 patients with 4 or more visits to hospital.
+ *______________________________________________________________________________________________________________________*/
+
+
 
 * Use list of dup records to filter COPHS data for just dups (based on MR_Number)  *;
    proc sort data= COPHS_read(drop=filename)  out=COPHSdups  ; by MR_Number; run;
@@ -99,15 +108,31 @@ title2 'List of dup records';
 run;
 
 
-* 1.1): Print out dup records with same Hospital admission date (i.e. bad dup)  *;
-   proc sort data= COPHS_read(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;
-   PROC print data=DupHospAdmit ; 
-      id MR_Number ;
-      var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        
-          Discharge_Transfer_Death_Disposi   Date_Left_Facility  ;
-      format Last_Name $10.   Discharge_Transfer_Death_Disposi $20. Facility_Name $32. ;
-title2 'List of dup records with same Hospital admission date';
+** 1.2) Print dup records with same Hospital admission date (i.e. bad dup)  *;
+proc sort data= COPHS_read  out=Hosp_sort(drop= filename);
+   by MR_Number Hosp_Admission;
+DATA DUP_Hosp_Admit;  set Hosp_sort; 
+   by MR_Number Hosp_Admission;
+   if first.Hosp_Admission ne last.Hosp_Admission;
 run;
+   PROC print data= DUP_Hosp_Admit; 
+      id MR_Number;
+      by MR_Number;
+      var DOB Gender Hosp_Admission Facility_Name Current_Level_of_care        
+          Discharge_Transfer_Death_Disposi   Date_Left_Facility  DateAdded;
+      format Last_Name $10.   Discharge_Transfer_Death_Disposi $20. Facility_Name $32.  ;*DateAdded  mmddyy. ;
+   title2 'List of dup records with same Hospital admission date';
+run;
+
+** 1.2) Print dup records with same Hospital admission date (i.e. bad dup)  *;
+/*   proc sort data= COPHS_read(where= (MR_Number in ('M1373870', 'M1535914')) ) out=DupHospAdmit; by MR_Number; run;*/
+/*   PROC print data=DupHospAdmit ; */
+/*      id MR_Number ;*/
+/*      var Last_Name Gender Hosp_Admission Facility_Name Current_Level_of_care        */
+/*          Discharge_Transfer_Death_Disposi   Date_Left_Facility  ;*/
+/*      format Last_Name $10.   Discharge_Transfer_Death_Disposi $20. Facility_Name $32. ;*/
+/*title2 'List of dup records with same Hospital admission date';*/
+/*run;*/
 
 /*_____________________________________________________________________________________________________________________*
  | FINDINGS:
@@ -119,13 +144,21 @@ run;
  *_____________________________________________________________________________________________________________________*/
 
 
-* 1.2) Frequency of dup records   *;
 
 
 ***  2. Missing positive test dates - are they mostly recent admissions?  ***;
 ***-----------------------------------------------------------------------***;
 
+/*
+|FINDINGS:  This should be re-run by removing readmits      <---*
+*/
+
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
+* count *;
+   proc means data=COPHS_read n nmiss;
+      var Positive_Test;
+run;
+
 * details *;
 proc print data= COPHS_read;
    where Positive_Test = .;
@@ -230,7 +263,7 @@ run;
    'WASHINGTON'   = 'WASHINGTON'
    'WELD'         = 'WELD'
    'YUMA'         = 'YUMA'
-   other = 'BAD COUNTY NAME';
+   other = 'NON-COLO COUNTY NAME';
 run;
 
 * Count of records by formatted County name;
@@ -244,7 +277,7 @@ DATA ChkHospCounty; set COPHS_read;
    keep MR_Number Facility_Name County_of_Residence Last_Name  First_Name  Hosp_Admission ChkCounty;
    ChkCounty = put(County_of_Residence, $CntyChk.);
    PROC print data= ChkHospCounty; 
-      where ChkCounty='BAD COUNTY NAME';
+      where ChkCounty='NON-COLO COUNTY NAME';
 run;
 
 
@@ -387,3 +420,48 @@ run;
       var Last_Name  Hosp_Admission Facility_Name Address_Line_1  City  Zip_Code  County_of_Residence     ;
       format Facility_Name $40.  Address_Line_1 $25.   First_Name Last_Name   $12.  Discharge_Transfer_Death_Disposi  City $15. ;
 run;
+
+
+***  7. Invalid values of Discharge_Transfer_Death_Disposi variable  ***;
+***------------------------------------------------------------------***;
+
+   PROC freq data= COPHS_read ;
+      tables Discharge_Transfer_Death_Disposi / missing missprint ;
+run;
+
+/*_____________________________________________________________________________*
+ |FINDINGS:
+ | n=2 "died" and n=1 "other" (all lower case).  FIX: change to propcase.
+ |
+ *______________________________________________________________________________*/
+
+
+***  7. Hospital admissin after Discharge_Transfer_Death_Disposi = 'DIED'  ***;
+***------------------------------------------------------------------------***;
+
+**  Create dataset of records where reason left was "DIED" but have later hospital admission date  **;
+DATA Hosp_Admit_after_Died;  set Hosp_sort; 
+   by MR_Number Hosp_Admission;
+
+   if PropCase(Discharge_Transfer_Death_Disposi) = "Died"  AND  last.MR_Number = 0 ;* AND lag(DOB) = DOB;
+run;
+
+**  Print out MR_Number and use to print all hospital admissions from COPHS_read  **;
+   PROC print data= Hosp_Admit_after_Died;
+      id MR_Number;
+      var DOB Gender  County_of_Residence   Facility_Name   Positive_Test   Hosp_Admission   ICU_Admission  Died_in_ICU__Y_N_   Discharge_Transfer_Death_Disposi  ;
+run;
+
+**  Print out all hospital admissions for patient who died and had subesquent hospital admission  **;
+   PROC print data= Hosp_sort;
+      where MR_Number in ('1387869', 'CEUL0139998', 'CEUL1984469' );
+      id MR_Number;
+      by MR_Number;
+      var DOB Gender  Facility_Name   Positive_Test   Hosp_Admission   ICU_Admission  Died_in_ICU__Y_N_   Discharge_Transfer_Death_Disposi  ;
+      title2 'Patients that died AND have subesquent hospital admission';
+      format Facility_Name $30.  ;*Discharge_Transfer_Death_Disposi  City $15. ;
+run;
+
+proc contents data= Hosp_sort varnum ; run;
+
+

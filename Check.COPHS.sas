@@ -13,7 +13,8 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
 /*-----------------------------------------------------------------------------------------*
  | Check COPHS data for:
  | 1. Duplicate records (per MR_Number)
- | 1.1 Duplicate records with same Hospital admission date
+ | 1.1) Records with 4 or more admissions
+ | 1.2) Duplicate records with same Hospital admission date
  | 2. Missing positive test dates
  | 3. Check that Grand county records are in Colorado and NOT Utah
  | 4. Invalid values for County_of_Residence variable
@@ -54,6 +55,7 @@ run;
       tables count;
 run;
  
+** 1.1) Records with 4 or more admissions  **;
  **  List of records with 4 or more admissions  **;
   PROC freq data= Hosp_DupChk; 
       where Count>3; 
@@ -67,7 +69,7 @@ DATA COPHS_HiDup; set COPHS_read(drop=Address_Line_1  Address_Line_2  filename  
                           'CEUE01337847', '2417438', 'W00703839', '20196926', 'W00120195', 'P0168646' );
 run;
 
-** 1.1) Print data for records with 4 or more admissions  **;
+** Print data for records with 4 or more admissions  **;
    proc sort data=COPHS_HiDup ; by MR_Number Hosp_Admission ;  run;
    PROC print data=COPHS_HiDup; 
       id MR_Number;

@@ -17,8 +17,9 @@ OUTPUT:		        COPHS_read
  | 2. Create temporary SAS dataset from COPHS data table in the Hospital schema and report findings
  | 3. Use Proc Freq (first time accessing data table) to learn format of date variables
  | 4. Modify SAS dataset per Findings
- |      a) No ID vars that I can recognize. Perhaps MR_Number but it is character variable.
- |      b) Convert temporary character var for each date field to a date var
+ |      a) MR_Number, a character variable, is primary key.
+ |      b) EventID is numeric and should be converted to char var
+ |      c) Convert temporary character var for each date field to a date var
  | 5. Shrink character variables in data set to shortest possible length (based on longest value)
  | 6. Define library to store permanent SAS dataset
  | 7. Rename "shrunken" SAS dataset (by removing underscore added by macro)
@@ -36,22 +37,25 @@ DATA COPHS; set Hosp144.COPHS_tidy; run;    * <-- for building code add (obs=50)
 PROC contents data=COPHS  varnum ;  run;    
 
 /*________________________________________________________________________________________________*
- | FINDINGS:                                                                 
- |    No ID vars that I can recognize. Perhaps MR_Number but it is character variable.    
- |    Several date vars that are a character variables are dumped into PROC freq to determine format |    
+ | FINDINGS:                
+ |  EventID is numeric instead of character variables.    
+ |    --> Create temp version and convert to character variable prior to running SHRINK macro.     
+ |  The primary ID var is MR_Number, which is already a character variable.    
+ |  Several date vars that are a character variables are dumped into PROC freq to determine format 
+ |    --> Convert these to actual date variables.
  *________________________________________________________________________________________________*/
 
 
 ** 3. determine format of dates in the char vars **;
-   PROC freq data=COPHS ;
+/*   PROC freq data=COPHS ;*/
 /*      tables Hospital_Admission_Date___MM_DD_*/
 /*             ICU_Admission_Date___MM_DD_YYYY_*/
 /*             DOB__MM_DD_YYYY_*/
 /*             Positive_COVID_19_Test_Date*/
 /*             Discharge_Transfer__Death_Date__*/
 /*             Last_Day_in_ICU_During_Admission  ;  * date fields;*/
-      tables UTD Partial Breakthrough PartialOnly Vaccine_received CO ;
-run;
+/*      tables UTD Partial Breakthrough PartialOnly Vaccine_received CO ;*/
+/*run;*/
 
 ** 3.a) explore obs with bad date value **;
 /*   proc print data= COPHS;*/
@@ -100,8 +104,8 @@ DATA COPHS_temp;
       Last_Day_in_ICU  = 'Last day in ICU during Admission' 
       UTD              = 'Date of last vaccination'
       Date_first_Vx    = 'Date of first vaccination'  
-      Breakthrough     = 'Hospitalized breakthrough case'
-      PartialOnly      = 'Partially vaccinated at Pos Test date'
+      COPHS_Breakthrough = 'Hospitalized breakthrough case'
+      COPHS_PartialOnly      = 'Partially vaccinated at Pos Test date'
       Vaccine_Received = 'Type of COVID vaccine received'
       CO               = 'Colorado resident'  ;
 

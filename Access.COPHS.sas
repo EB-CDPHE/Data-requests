@@ -80,7 +80,7 @@ DATA COPHS_temp;
              DOB=tmp_dob
              EventID=tmp_EventID
              )); 
-   if MR_Number='4172848' AND Hospital_Admission_Date = '2021-07-01' then Positive_COVID_19_Test_Date = '2021-07-02' ;
+/*   if MR_Number='4172848' AND Hospital_Admission_Date = '2021-07-01' then Positive_COVID_19_Test_Date = '2021-07-02' ;*/
 
 * Convert temporary numeric ID variable character ID var using the CATS function *;
    EventID = cats(tmp_EventID);

@@ -194,6 +194,11 @@ run;
  |    if upcase(County_of_Residence) = 'GRAND' and Zip_Code in (84515, 84532, 84540) then delete;
  *______________________________________________________________________________________________________________*/
 
+proc sort data=sashelp.zipcode (keep=state county countynm  zip zip_class city city2 ) out=new (drop=zip_class);
+by state county;
+where missing(zip_class);
+run;
+   proc print data=new; run;
 
 **  Check zip codes that do not begin with 80 or 81  **;
    PROC print data= COPHS_read ;
@@ -434,6 +439,9 @@ run;
       var Last_Name  Hosp_Admission Facility_Name Address_Line_1  City  Zip_Code  County_of_Residence     ;
       format Facility_Name $40.  Address_Line_1 $25.   First_Name Last_Name   $12.  Discharge_Transfer_Death_Disposi  City $15. ;
 run;
+
+
+
 
 
 ***  7. Invalid values of Discharge_Transfer_Death_Disposi variable  ***;

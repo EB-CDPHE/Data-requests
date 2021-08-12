@@ -13,8 +13,8 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
 /*-----------------------------------------------------------------------------------------*
  | Check COPHS data for:
  | 1. Duplicate records (per MR_Number)
- | 1.1) Records with 4 or more admissions
- | 1.2) Duplicate records with same Hospital admission date
+ |    1.1) Records with 4 or more admissions
+ |    1.2) Duplicate records with same Hospital admission date
  | 2. Missing positive test dates
  | 3. Check that Grand county records are in Colorado and NOT Utah
  | 4. Invalid values for County_of_Residence variable
@@ -152,7 +152,7 @@ run;
 ***-----------------------------------------------------------------------***;
 
 /*
-|FINDINGS:  This should be re-run by removing readmits      <---*
+|FINDINGS:  This should be re-run after removing readmits      <---*
 */
 
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
@@ -195,6 +195,18 @@ run;
  *______________________________________________________________________________________________________________*/
 
 
+**  Check zip codes that do not begin with 80 or 81  **;
+   PROC print data= COPHS_read ;
+      where substr(Zip_Code, 1, 2) ^in ('80', '81');
+      var MR_Number EventID city Zip_Code county_of_residence ;
+run;
+
+/*
+ | FINDINGS:
+ | Another approach besides singling out GRAND county in Utah would be zipcode.
+ | All valid Colorado county names will have zip codes that begin with 80 or 81.
+ | The problem with this is that many zip code values are bad.
+ */
 
 ***  4. Check county variable  ***;
 ***----------------------------***;

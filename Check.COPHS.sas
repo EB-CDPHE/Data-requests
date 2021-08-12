@@ -2,7 +2,8 @@
 PROGRAM:  Check.COPHS
 AUTHOR:   Eric Bush
 CREATED:  June 22, 2021
-MODIFIED: 071921: Update per other RFI patterns for SAS programs.	
+MODIFIED: 081221:
+          071921: Update per other RFI patterns for SAS programs.	
 PURPOSE:	 After a SQL data table has been read using Read.CEDRS_SQL_table, this program can be used to explore the SAS dataset
 INPUT:	 COPHS_read
 OUTPUT:	 printed output
@@ -24,12 +25,21 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
 
 /*%LET ChkHospDSN = 'COPHS_read';       * <-- ENTER name of CEDRS dataset to run data checks against;*/
 
+/*
+| Proposed data checks:
+| A. Admin. / key variables
+|  1. MR_Number - number records; number distinct patients; dups
+|  2. Data Structure - freq of hosp admits; list patients >3 admits
+| B. Patient level variables
+*/
+
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
 
    PROC contents data= COPHS_read varnum; run;
+title1 'COPHS_read';
 
 ***  1. Duplicate records  ***;
 ***------------------------***;
@@ -144,6 +154,108 @@ run;
  |    if MR_Number = 'M1373870' and Facility_Name = 'West Pines Hospital' then delete;
  |    if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
  *_____________________________________________________________________________________________________________________*/
+
+
+** First name **;
+   PROC freq data= COPHS_read;
+      tables First_Name / missing missprint;
+run;
+
+** List of records with missing First name **;
+   PROC print data= COPHS_read;
+      where First_Name='';
+      id MR_Number;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'Records with missing First Name';
+run;
+
+   PROC print data= COPHS_read;
+      where length(First_Name) =1   AND  First_Name ^='' ;
+      id MR_Number;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'First Name with only 1 letter';
+run;
+
+   PROC print data= COPHS_read;
+      where countw(First_Name) >1   ;
+      id MR_Number;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'First Name with > 1 word';
+run;
+
+   PROC print data= COPHS_read;
+      where countw(First_Name) >1  AND  length(scan(First_Name,2,' ')) in (1,2) ;
+      id MR_Number;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'First Name with > 1 word';
+run;
+/*________________________________________________________________________________________*
+ |FINDINGS:
+ | n=1069 records with missing First name (and most are missing Last name too).
+ | n=28 records with single letter for first name
+ | n=713 records with two part first name
+ | n=498 records with middle initial
+ *________________________________________________________________________________________*/
+
+
+** Last name **;
+   PROC freq data= COPHS_read;
+      tables Last_Name / missing missprint;
+run;
+
+
+** List of records with missing Last name **;
+   PROC print data= COPHS_read;
+      where Last_Name='';
+      id MR_Number;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'Records with missing First Name';
+run;
+
+
+   PROC print data= COPHS_read;
+      where length(Last_Name) =1   AND  Last_Name ^='' ;
+      id MR_Number;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'First Name with only 1 letter';
+run;
+
+
+   PROC print data= COPHS_read;
+      where countw(Last_Name) >1   ;
+      id MR_Number;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'Last Name with > 1 word';
+run;
+
+/*____________________________________________________________________________________*
+ |FINDINGS:
+ | n=1065 records with missing Last name (and most are missing First name too).
+ | n=0 records with single letter for Last name
+ | n=3241 records with two part Last name
+ *____________________________________________________________________________________*/
+
+
+** Gender **;
+   PROC freq data= COPHS_read;
+      tables Gender / missing missprint;
+run;
+
+/*____________________________________________________________________________________*
+ |FINDINGS:
+ | n=10 records where Gender = "F" (and not "Female").
+ | n=21 records where Gender = "M" (and not "Male").
+ | n=4 records where Gender = "Unknown"
+ *____________________________________________________________________________________*/
+
+   PROC print data= COPHS_read;
+      where Gender in ('Unknown')  ;
+      id MR_Number;
+      by gender;
+      var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'bad values for Gender';
+run;
+
 
 
 

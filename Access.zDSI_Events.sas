@@ -2,7 +2,7 @@
 PROGRAM:   Access.zDSI_Events
 AUTHOR:    Eric Bush
 CREATED:   July 14, 2021
-MODIFIED:  	
+MODIFIED:  081321:  Add filter for DELETED=0	
 PURPOSE:   Access SQL table on Events
 INPUT:	  dbo66.zDSI_Events
 OUTPUT:		     zDSI_Events_read
@@ -25,8 +25,8 @@ LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK
 
 
 **  2. Create temp SAS dataset from SQL table  **;
-DATA zDSI_Events; set CEDRS66.zDSI_Events(keep=ProfileID EventID Disease EventStatus AgeTypeID AgeType Age   MedicalRecordNumber); 
-   if disease ='COVID-19'  AND   EventStatus in ('Probable','Confirmed') ;
+DATA zDSI_Events; set CEDRS66.zDSI_Events(keep=ProfileID EventID Disease EventStatus AgeTypeID AgeType Age Deleted); 
+   if disease ='COVID-19'  AND   EventStatus in ('Probable','Confirmed')   AND  Deleted=0 ;
 run; 
 
 ** Review contents of SAS dataset **;

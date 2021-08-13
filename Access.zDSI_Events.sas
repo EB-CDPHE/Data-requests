@@ -28,11 +28,16 @@ LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK
  | ** DiseaseID=159 for Disease='COVID-19'
  | ** EventStatusID=1 for EventStatus='Confirmed'
  | ** EventStatusID=2 for EventStatus='Probable'
+ | ** AgeTypeID=1 for AgeType='years'
+ | ** AgeTypeID=2 for AgeType='months'
+ | ** AgeTypeID=3 for AgeType='weeks'
+ | ** AgeTypeID=4 for AgeType='days'
+ | ** AgeTypeID=9 for AgeType='unknown'
  *_______________________________________________________*/
 
 
 **  2. Create temp SAS dataset from SQL table  **;
-DATA zDSI_Events; set CEDRS66.zDSI_Events(keep=ProfileID EventID  DiseaseID  EventStatusID  AgeTypeID AgeType Age Deleted); 
+DATA zDSI_Events; set CEDRS66.zDSI_Events(keep=ProfileID EventID  DiseaseID  EventStatusID  AgeTypeID  Age Deleted); 
 /*   if disease ='COVID-19'  AND   EventStatus in ('Probable','Confirmed')   AND  Deleted=0 ;*/
    if DiseaseID =159  AND   EventStatusID in (1, 2)   AND  Deleted=0 ;
 run; 

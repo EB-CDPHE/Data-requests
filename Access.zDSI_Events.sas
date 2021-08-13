@@ -23,10 +23,18 @@ OUTPUT:		     zDSI_Events_read
 ** 1. Libname to access COVID19 database on dbo144 server using ODBC **;
 LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK's libname ; 
 
+/*_______________________________________________________*
+ |NOTE:  
+ | ** DiseaseID=159 for Disease='COVID-19'
+ | ** EventStatusID=1 for EventStatus='Confirmed'
+ | ** EventStatusID=2 for EventStatus='Probable'
+ *_______________________________________________________*/
+
 
 **  2. Create temp SAS dataset from SQL table  **;
-DATA zDSI_Events; set CEDRS66.zDSI_Events(keep=ProfileID EventID Disease EventStatus AgeTypeID AgeType Age Deleted); 
-   if disease ='COVID-19'  AND   EventStatus in ('Probable','Confirmed')   AND  Deleted=0 ;
+DATA zDSI_Events; set CEDRS66.zDSI_Events(keep=ProfileID EventID  DiseaseID  EventStatusID  AgeTypeID AgeType Age Deleted); 
+/*   if disease ='COVID-19'  AND   EventStatus in ('Probable','Confirmed')   AND  Deleted=0 ;*/
+   if DiseaseID =159  AND   EventStatusID in (1, 2)   AND  Deleted=0 ;
 run; 
 
 ** Review contents of SAS dataset **;

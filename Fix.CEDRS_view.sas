@@ -41,18 +41,21 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 ***  Make edits to CEDRS_view_read and create COVID.CEDRS_view_fix  ***;
 ***-----------------------------------------------------------------***;
 
-   proc sort data=zDSI_Events_fix  out=AgeVar(keep=ProfileID EventID Age_Years Age)  ; by ProfileID EventID ;
+   proc sort data=zDSI_Events_fix  out=AgeVar(keep=ProfileID EventID Age_Years )  ; by ProfileID EventID ;
    proc sort data=CEDRS_view_read  out=CEDRS_NoAge   ; by ProfileID EventID ;
 DATA COVID.CEDRS_view_fix; 
-   merge CEDRS_NoAge AgeVar ; 
+   merge CEDRS_NoAge(in=c) AgeVar ; 
    by ProfileID EventID ;
+   if c;
 
 ** 1) new county variable  **;
    County = upcase(scan(CountyAssigned,1,',')); 
  
 ** 2) impute missing values of Age_at_Reported  **;
-   if Age=. AND Age_Years=. then Age_Years = Age_at_Reported;
-   if Age_Years > 109 then Age_Years = . ;
+/*   if Age=. AND Age_Years=. then Age_Years = Age_at_Reported;*/
+   if Age_at_Reported = . then Age_at_Reported = Age_Years;
+/*   if Age_Years > 115 then Age_Years = . ;*/
+/*   if Age_at_Reported > 115 then Age_at_Reported = . ;*/
 
 run;
 
@@ -66,6 +69,10 @@ run;
 
 *** 4.  Post-edit checks ***;
 ***----------------------***;
+   PROC means data= COVID.CEDRS_view_fix n nmiss;
+      var ReportedDate    Age_at_Reported   Age_Years;
+run;
+   PROC freq data= COVID.CEDRS_view_fix;  tables Age_at_Reported /missing missprint; run;
 /**/
 /*proc univariate data= COVID.CEDRS_view_fix; var Age_years; run;*/
 /*proc means data= COVID.CEDRS_view_fix  n nmiss min p1 p10 p25 median mean p75 p90 p99 max   maxdec=2; var Age_years; run;*/

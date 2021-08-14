@@ -31,7 +31,7 @@ DATA zDSI_Events_fix ;   set zDSI_Events_read ;
 /*   if upcase(AgeType) = 'MONTHS' then Age_Years = Age/12;*/
 /*   if upcase(AgeType) = 'YEARS'  then Age_Years = Age;*/
    Label Age_Years = 'Age in years';
-   drop AgeTypeID  AgeType  Age ;
+   drop AgeTypeID  Age ;
 run;
 
 

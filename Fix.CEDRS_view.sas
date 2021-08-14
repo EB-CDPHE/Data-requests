@@ -54,8 +54,8 @@ DATA COVID.CEDRS_view_fix;
 ** 2) impute missing values of Age_at_Reported  **;
 /*   if Age=. AND Age_Years=. then Age_Years = Age_at_Reported;*/
    if Age_at_Reported = . then Age_at_Reported = Age_Years;
-/*   if Age_Years > 115 then Age_Years = . ;*/
-/*   if Age_at_Reported > 115 then Age_at_Reported = . ;*/
+   if Age_Years > 115 then Age_Years = . ;
+   if Age_at_Reported > 115 then Age_at_Reported = . ;
 
 run;
 

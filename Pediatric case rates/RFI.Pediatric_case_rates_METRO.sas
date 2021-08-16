@@ -22,7 +22,7 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
       var Yrs0_5 ;   
 run;
 
-   %Let agepopulation = 177730 ;      * <-- pull number from county population;
+   %Let agepopulation = 220763 ;      * <-- pull number from county population;
 
 
 **  Create age specific dataset and sort by date  **;
@@ -86,7 +86,7 @@ run;
       var Yrs6_11 ;   
 run;
 
-   %Let agepopulation = 178075 ;      * <-- pull number from county population;
+   %Let agepopulation = 229192 ;      * <-- pull number from county population;
 
 
 **  Create age specific dataset and sort by date  **;
@@ -145,9 +145,10 @@ run;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
       where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
                        'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
-      var Yrs12_17 ;   run;
+      var Yrs12_17 ;   
+run;
 
-   %Let agepopulation = 183728 ;      * <-- pull number from county population;
+   %Let agepopulation = 248406 ;      * <-- pull number from county population;
 
 
 **  Create age specific dataset and sort by date  **;
@@ -206,9 +207,10 @@ run;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
       where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
                        'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
-      var Yrs18_121 ;   run;
+      var Yrs18_121 ;   
+run;
 
-   %Let agepopulation = 1947490 ;      * <-- pull number from county population;
+   %Let agepopulation = 2538115 ;      * <-- pull number from county population;
 
 
 **  Create age specific dataset and sort by date  **;
@@ -267,9 +269,10 @@ run;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
       where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
                        'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
-      var County_Population_Est ;   run;
+      var County_Population_Est ;   
+run;
 
-   %Let agepopulation = 2487023 ;      * <-- pull number from county population;
+   %Let agepopulation = 3236476 ;      * <-- pull number from county population;
 
 
 **  Create age specific dataset and sort by date  **;

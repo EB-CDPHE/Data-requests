@@ -269,7 +269,7 @@ run;
 
 **  Create age specific dataset and sort by date  **;
  Data SouthEast0_115; set COVID.CEDRS_view_fix ;
-   if CountyAssigned in ('CROWLEY' ,'BENT' ,'PROWERS' ,'BACA' ,'KIOWA' ,'OTERO' )  
+   if CountyAssigned in ('CROWLEY' ,'BENT' ,'PROWERS' ,'BACA' ,'KIOWA' ,'OTERO' )  ;
    * AND  (0 le  Age_at_Reported < 116);
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;

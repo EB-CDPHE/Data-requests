@@ -17,7 +17,8 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
 
 ** Set population for age group **;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
-      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' ) ;   
+      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
+                       'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
       var Yrs0_5 ;   
 run;
 
@@ -26,7 +27,7 @@ run;
 
 **  Create age specific dataset and sort by date  **;
  Data Metro0_5; set COVID.CEDRS_view_fix ;
-   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' )  
+   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE', 'BOULDER', 'BROOMFIELD', 'DOUGLAS' )  
       AND  (0 le  Age_at_Reported  < 6);
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
@@ -80,7 +81,8 @@ run;
 
 ** Set population for age group **;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
-      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' ) ;   
+      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
+                       'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
       var Yrs6_11 ;   
 run;
 
@@ -89,7 +91,7 @@ run;
 
 **  Create age specific dataset and sort by date  **;
  Data Metro6_11; set COVID.CEDRS_view_fix ;
-   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' )  
+   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE', 'BOULDER', 'BROOMFIELD', 'DOUGLAS' )  
       AND  (6 le  Age_at_Reported  < 12);
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
@@ -141,7 +143,8 @@ run;
 
 ** Set population for age group **;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
-      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' ) ;   
+      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
+                       'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
       var Yrs12_17 ;   run;
 
    %Let agepopulation = 183728 ;      * <-- pull number from county population;
@@ -149,7 +152,7 @@ run;
 
 **  Create age specific dataset and sort by date  **;
  Data Metro12_17; set COVID.CEDRS_view_fix ;
-   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' )  
+   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE', 'BOULDER', 'BROOMFIELD', 'DOUGLAS' )  
       AND  (12 le  Age_at_Reported < 18);
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
@@ -201,7 +204,8 @@ run;
 
 ** Set population for age group **;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
-      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' ) ;   
+      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
+                       'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
       var Yrs18_121 ;   run;
 
    %Let agepopulation = 1947490 ;      * <-- pull number from county population;
@@ -209,7 +213,7 @@ run;
 
 **  Create age specific dataset and sort by date  **;
  Data Metro18_115; set COVID.CEDRS_view_fix ;
-   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' )  
+   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE', 'BOULDER', 'BROOMFIELD', 'DOUGLAS' )  
       AND  (18 le  Age_at_Reported < 116);
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
@@ -261,7 +265,8 @@ run;
 
 ** Set population for age group **;
    PROC means data= CountyPop_est n sum  maxdec=0 ;   
-      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' ) ;   
+      where County in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' 
+                       'BOULDER', 'BROOMFIELD', 'DOUGLAS') ;   
       var County_Population_Est ;   run;
 
    %Let agepopulation = 2487023 ;      * <-- pull number from county population;
@@ -269,7 +274,7 @@ run;
 
 **  Create age specific dataset and sort by date  **;
  Data Metro0_115; set COVID.CEDRS_view_fix ;
-   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE' )  ;
+   if CountyAssigned in ('DENVER' ,'JEFFERSON' ,'ADAMS' ,'ARAPAHOE', 'BOULDER', 'BROOMFIELD', 'DOUGLAS' )  ;
    * AND  (0 le  Age_at_Reported < 116);
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;

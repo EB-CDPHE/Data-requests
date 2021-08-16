@@ -17,17 +17,12 @@ TITLE;
 OPTIONS pageno=1;
 /*________________________________________________________________________________________*
  | Programs to run prior to this code:
- | 1. Pull data from CEDRS using Access.CEDRS_view.  Creates CEDRS_view_read 
- | 2. Pull age data from Events using Access.zDSI_Events.  Creates zDSI_Events_read 
- | 3. Get Age_Years from Events using Fix.zDSI_Events.  Creates zDSI_Events_fix 
- | 4. Edit data from CEDRS using Fix.CEDRS_view.  Creates COVID.CEDRS_view_fix
- | 3. Make edits to B6172_read using Fix.B6172.sas. Creates B6172_fix.
- | 4. MMWR.formats.sas creates formats for this program.
  *________________________________________________________________________________________*/
 
 /*________________________________________________________________________________*
  | TABLE OF CONTENTS:
  | 1. Obtain county population data for specified age groups
+ | 2. Create timeline of all dates for COVID epidemic (March 1, 2020 - present)
  *________________________________________________________________________________*/
 
 
@@ -85,8 +80,23 @@ run;
 
 
 
-   proc print data= CountyPop_est; run;
+*** Create timeline of all dates ***;
+***------------------------------***;
+
+DATA timeline;
+   ReportedDate='01MAR20'd;
+   output;
+   do t = 1 to 530;
+      ReportedDate+1;
+      output;
+   end;
+   format ReportedDate mmddyy10.;
+   drop t ;
+run;
+/*proc print data= timeline;  run;*/
+
    
+
 ***------------------***;
 ***  COUNTIES = ALL  ***;
 ***  AGE GRPS = ALL  ***;
@@ -165,23 +175,6 @@ proc print data= ALL0_121_MoveAv; run;
 
 
 
-*** Create timeline of all dates ***;
-***------------------------------***;
-
-DATA timeline;
-   ReportedDate='01MAR20'd;
-   output;
-   do t = 1 to 530;
-      ReportedDate+1;
-      output;
-   end;
-   format ReportedDate mmddyy10.;
-   drop t ;
-run;
-/*proc print data= timeline;  run;*/
-
-
-
 ***----------------------***;
 ***  COUNTIES = Boulder  ***;
 ***----------------------***;
@@ -217,8 +210,6 @@ Data Boulder0_5_rate; set Boulder0_5_sort;
       CaseRate= NumCases / (&agepopulation/100000);
       output;
    end;
-* define population *;
-
 * drop patient level variables  *;
    drop ProfileID  EventID  Age_at_Reported  County;
 run;

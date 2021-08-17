@@ -75,8 +75,35 @@ DATA CountyPop_est ;
      Yrs18_121  = 'Population for 18-121 year olds' ;
    drop _NAME_  tmp_county  _0_to_5   _6_to_11   _12_to_17   _18_to_121   ;
 run;
-   proc print data= CountyPop_est; 
+/*   PROC print data= CountyPop_est; run;*/
+
+
+ **  Print Denominators for selected county regions  **;
+   proc format;
+      value $COregion
+         'CHEYENNE', 'ELBERT', 'YUMA', 'MORGAN', 'LINCOLN',
+         'SEDGWICK', 'PHILLIPS', 'KIT CARSON', 'LOGAN', 'WASHINGTON' = 'North East counties'
+        'CROWLEY', 'BENT', 'PROWERS','BACA','KIOWA','OTERO' = 'South East counties'
+        'DENVER','JEFFERSON','ADAMS','ARAPAHOE' = 'Metro counties' 
+        'BOULDER' = 'Boulder'
+        'BROOMFIELD' = 'Broomfield'
+        'DOUGLAS' = 'Douglas'
+        other = 'other counties' ;
 run;
+
+   PROC means data= CountyPop_est  n sum  maxdec=0 ;
+      where County in
+         ('BOULDER', 'BROOMFIELD', 'DOUGLAS',
+          'CHEYENNE', 'ELBERT', 'YUMA', 'MORGAN', 'LINCOLN',
+          'SEDGWICK', 'PHILLIPS', 'KIT CARSON', 'LOGAN', 'WASHINGTON'
+          'CROWLEY', 'BENT', 'PROWERS','BACA','KIOWA','OTERO'
+          'DENVER','JEFFERSON','ADAMS','ARAPAHOE'
+         );      
+      var Yrs0_5  Yrs6_11  Yrs12_17  Yrs18_121  County_Population_Est  ;
+      class County;
+      format County  $COregion. ;
+run;
+
 
 
 
@@ -196,7 +223,6 @@ run;
   PROC sort data=Boulder0_5  out= Boulder0_5_sort; by ReportedDate;
 /*   proc print data= Boulder0_5_sort ;  ID ReportedDate ;  run;*/
 
-
 **  Reduce dataset from patient level to date level **;
 **  Result is one obs per date reported  **;
 Data Boulder0_5_rate; set Boulder0_5_sort;
@@ -214,7 +240,6 @@ Data Boulder0_5_rate; set Boulder0_5_sort;
    drop ProfileID  EventID  Age_at_Reported  County;
 run;
 /*   proc print data= Boulder0_5_rate ;  ID ReportedDate ;  run;*/
-
 
 ** add ALL reported dates for populations with sparse data **;
 Data Boulder0_5_dates; merge Timeline  Boulder0_5_rate;

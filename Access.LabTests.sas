@@ -40,11 +40,15 @@ PROC contents data=LabTests  varnum ; title1 'CEDRS66.zDSI_LabTests';  run;
  |    (Convert to character prior to running SHRINK macro.)    
  |    CreatedDate is a date-time variable. Extract date part and create date variable.
  |    Character vars have length and format of $255. Keep just the two new variables plus ICU.
+
+ |NOTE:  
+ | ** TestTypeID=437 for TestType='COVID-19 Variant Type'
+
  *________________________________________________________________________________________________*/
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA LabTests_temp; set LabTests(rename=
+DATA COVID_LabTests; set LabTests(rename=
                                     (EventID=tmp_EventID
                                      ResultDate=tmp_ResultDate
                                      CreateDate=tmp_CreateDate
@@ -69,20 +73,20 @@ DATA LabTests_temp; set LabTests(rename=
 /*   Keep EventID  CreatedDate;*/
 run;
 
-   PROC contents data=LabTests_temp varnum ; title1 'LabTests_temp'; run;
+   PROC contents data=COVID_LabTests varnum ; title1 'COVID_LabTests'; run;
 
 
 ** 4. Shrink character variables in data set to shortest possible lenght (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
- %shrink(LabTests_temp)
+ %shrink(COVID_LabTests)
 
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA LabTests_read ; set LabTests_temp_;
+DATA LabTests_read ; set COVID_LabTests_;
 run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=LabTests_read  ; run;
+   PROC contents data=LabTests_read ;   run;

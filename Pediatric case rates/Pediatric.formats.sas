@@ -23,10 +23,11 @@
       value $PedRegion
          'CHEYENNE', 'ELBERT', 'YUMA', 'MORGAN', 'LINCOLN',
          'SEDGWICK', 'PHILLIPS', 'KIT CARSON', 'LOGAN', 'WASHINGTON' = 'North East counties'
-         'DENVER','JEFFERSON','ADAMS','ARAPAHOE' = 'Metro counties' 
-         'BOULDER' = 'Boulder'
-         'BROOMFIELD' = 'Broomfield'
-         'DOUGLAS' = 'Douglas'
+         'CROWLEY', 'BENT', 'PROWERS','BACA','KIOWA','OTERO' = 'South East counties'
+         'BOULDER','BROOMFIELD','DOUGLAS','DENVER','ADAMS','ARAPAHOE','JEFFERSON' = 'Metro counties' 
+         'COSTILLA' ,'MINERAL' ,'ALAMOSA' ,'SAGUACHE', 'RIO GRANDE', 'CONEJOS' = 'San Luis Valley'
+         'LAKE' ,'TELLER' ,'CHAFFEE' ,'PARK' = 'South Central region'
+         'LAS ANIMAS' ,'FREMONT' ,'HUERFANO' ,'CUSTER' = 'South region'
          other = 'other counties' ;
 run;
 

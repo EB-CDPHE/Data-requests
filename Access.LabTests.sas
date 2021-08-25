@@ -33,6 +33,9 @@ DATA LabTests; set CEDRS66.zDSI_LabTests; run;    * <-- for building code add (o
 ** Review contents of SAS dataset **;
 PROC contents data=LabTests  varnum ; title1 'CEDRS66.zDSI_LabTests';  run;  
 
+   PROC freq data = LabTests;
+      tables TestTypeID * TestType /list; 
+run;
 
 /*________________________________________________________________________________________________*
  | FINDINGS:                                                                 
@@ -40,20 +43,28 @@ PROC contents data=LabTests  varnum ; title1 'CEDRS66.zDSI_LabTests';  run;
  |    (Convert to character prior to running SHRINK macro.)    
  |    CreatedDate is a date-time variable. Extract date part and create date variable.
  |    Character vars have length and format of $255. Keep just the two new variables plus ICU.
-
+ |
  |NOTE:  
- | ** TestTypeID=437 for TestType='COVID-19 Variant Type'
-
+ | ** TestTypeID=435 for TestType = 'Antigen for COVID-19'
+ | ** TestTypeID=436 for TestType = 'Variant of public health concern'
+ | ** TestTypeID=437 for TestType = 'COVID-19 Variant Type'
  *________________________________________________________________________________________________*/
+
+   PROC freq data = LabTests;
+      where TestType = 'COVID-19 Variant Type' ;
+      tables TestTypeID * TestType /list; 
+run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA COVID_LabTests; set LabTests(rename=
-                                    (EventID=tmp_EventID
-                                     ResultDate=tmp_ResultDate
-                                     CreateDate=tmp_CreateDate
-                                     UpdateDate=tmp_UpdateDate)
-                                     );     * <-- rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
+DATA COVID_LabTests; 
+* rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
+   set LabTests(rename=
+                (EventID    = tmp_EventID
+                 ResultDate = tmp_ResultDate
+                 CreateDate = tmp_CreateDate
+                 UpdateDate = tmp_UpdateDate)
+                 );     
 
 * restrict to just COVID sequencing results *;
    where TestType = 'COVID-19 Variant Type' ;
@@ -89,4 +100,4 @@ run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=LabTests_read ;   run;
+   PROC contents data=LabTests_read  varnum ;  title1 'LabTests_read';  run;

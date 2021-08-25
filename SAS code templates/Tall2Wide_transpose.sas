@@ -31,7 +31,7 @@ PROC transpose data=HV_sort  out=HospVar1(drop= _NAME_)  prefix=Hosp_Name;
    by MR_Number Name;                                                            * will create one row for each value ;
    var Hosp_Name;                                                                * hospital level variables to be transposed;
 run;
-proc print data= HospPatients2; run;
+proc print data= HospVar1; run;
 
 
 ** Macro definition **;

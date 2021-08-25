@@ -140,6 +140,51 @@ run;
  *___________________________________________________________________________________________________*/
 
 
+**  Evaluate "ELRID" variable  **;
+   PROC freq data = LabTests_read  ;
+      tables ELRID / missing missprint;
+run;
+
+/*_______________________________________________________________________________________*
+ |FINDINGS:
+ | Almost a third of records are missing ELRID value
+ | Otherwise, ELRID is a 6 digit ID unique for each record.
+ *_______________________________________________________________________________________*/
+
+
+ **  Evaluate data variables  **;
+  PROC means data = LabTests_read  n nmiss ;
+      var CreateDate  ResultDate  UpdateDate   ; 
+run;
+
+/*_______________________________________________________________________________________*
+ |FINDINGS:
+ | CreateDate has no missing values. 
+ | ResultDate is missing almost 10% of results. These dates shouldn't be missing. 
+ | UpdateDate exists for less than 10% of results, which is fine.
+ *_______________________________________________________________________________________*/
+
+
+ **  Explore relationship between CreateDate and ResultDate  **;
+   PROC freq data = LabTests_read  ;
+      tables CreateDate  ResultDate ;
+      format CreateDate  ResultDate  WeekW5. ;
+run;
+   PROC print data = LabTests_read  ;
+      where ResultDate > CreateDate ;
+run;
+
+
+/*_______________________________________________________________________________________*
+ |FINDINGS:
+ | CreateDate values begin week 3 of 2021 to the present. 
+ | ResultDate values begin week 6 of 2020 to the present. 
+ | No records have a ResultDate after CreateDate.
+ *_______________________________________________________________________________________*/
+
+
+
+
 
 
 

@@ -1,13 +1,14 @@
-/*
+/*----------------------------------------------------------------------------*
  PROGRAM:  Tall2Wide_transpose.sas
  Purpose: Transpose long dataset with multiple variables to wide dataset 
-*/
-/*
+ *----------------------------------------------------------------------------*/
+
+/*____________________________________________________________________________*
  | Patient level variables:  MR_Number;  Name
  | Hospital level variables: Hosp_Name; Visit; ICU; RsnLeft
  | Some patients have multiple hospital admissions.
  | To get patient level dataset, have to transpose hospital level variables.
-*/
+ *____________________________________________________________________________*/
 
 DATA HospVisits;
    input MR_Number $ Name $ Hosp_Name $ Visit ICU RsnLeft ;
@@ -25,10 +26,10 @@ proc print data= HospVisits; run;
 
 
 ** Macro template **;
-   proc sort data= HospVisits out=HV_sort; by MR_Number Name ;  * sort by patient level key variables;
+   proc sort data= HospVisits out=HV_sort; by MR_Number Name ;                  * sort by patient level key variables;
 PROC transpose data=HV_sort  out=HospVar1(drop= _NAME_)  prefix=Hosp_Name; 
-   by MR_Number Name;  * will create one row for each value (in this case - Week of the year);
-   var Hosp_Name;          * hospital level variables to be transposed;
+   by MR_Number Name;                                                            * will create one row for each value ;
+   var Hosp_Name;                                                                * hospital level variables to be transposed;
 run;
 proc print data= HospPatients2; run;
 

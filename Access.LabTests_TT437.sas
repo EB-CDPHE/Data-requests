@@ -27,7 +27,7 @@ OUTPUT:		      LabTests_read
 LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK's libname ; 
 
 
-** 2. Read in the first 50 records to create sample SAS dataset **;
+** 2. Read in the SQL table to create initial SAS dataset **;
 DATA LabTests; set CEDRS66.zDSI_LabTests; run;    * <-- for building code add (obs=50) ;
 
 ** Review contents of SAS dataset **;
@@ -36,7 +36,11 @@ PROC contents data=LabTests  varnum ; title1 'CEDRS66.zDSI_LabTests';  run;
    PROC freq data = LabTests;
       tables TestTypeID * TestType /list; 
 run;
-proc print data= LabTests; where TestType = 'RT-PCR'; var TestTypeID TestType ResultID ResultText QuantitativeResult; run;
+
+   PROC print data= LabTests; 
+      where TestType = 'RT-PCR'; 
+      var TestTypeID TestType ResultID ResultText QuantitativeResult; 
+run;
 
 /*________________________________________________________________________________________________*
  | FINDINGS:                                                                 
@@ -52,14 +56,16 @@ proc print data= LabTests; where TestType = 'RT-PCR'; var TestTypeID TestType Re
  | ** TestTypeID=437 for TestType = 'COVID-19 Variant Type'
  *________________________________________________________________________________________________*/
 
+** Calculate frequency of various test types related to COVID **;
    PROC freq data = LabTests;
-      where TestType = 'COVID-19 Variant Type' ;
+      where TestTypeID in (229, 435, 436, 437) ;
       tables TestTypeID * TestType /list; 
+      format TestType $35.;
 run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA COVID_LabTests; 
+DATA TT437_temp; 
 * rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
    set LabTests(rename=
                 (EventID    = tmp_EventID
@@ -83,23 +89,20 @@ DATA COVID_LabTests;
    UpdateDate = datepart(tmp_UpdateDate);   format UpdateDate yymmdd10.;
 
    DROP tmp_: ;
-/*   Keep EventID  CreatedDate;*/
 run;
-
-   PROC contents data=COVID_LabTests varnum ; title1 'COVID_LabTests'; run;
 
 
 ** 4. Shrink character variables in data set to shortest possible lenght (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
- %shrink(COVID_LabTests)
+ %shrink(TT437_temp)
 
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA LabTests_read ; set COVID_LabTests_;
+DATA Lab_TT437_read ; set TT437_temp_;
 run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=LabTests_read  varnum ;  title1 'LabTests_read';  run;
+   PROC contents data=Lab_TT437_read  varnum ;  title1 'Lab_TT437_read';  run;

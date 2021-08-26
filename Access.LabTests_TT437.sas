@@ -5,7 +5,7 @@ CREATED:	   August 20, 2021
 MODIFIED:   
 PURPOSE:	   Connect to CEDRS backend (dphe66) to access LabTests
 INPUT:		dbo66.zDSI_LabTests  WHERE TestTypeID= 437 (TestType = 'COVID-19 Variant Type')
-OUTPUT:		      LabTests_read
+OUTPUT:		      Lab_TT437_read
 ***********************************************************************************************/
 
 /*________________________________________________________________________________________________________*

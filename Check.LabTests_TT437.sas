@@ -9,15 +9,16 @@ INPUT:	 Lab_TT437_read
 OUTPUT:	 printed output
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
-options ps=50 ls=150 ;     * Landscape pagesize settings *;
+/*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
+%Let TT437dsn = Lab_TT437_read ;
 
 options pageno=1;
-   PROC contents data=LabTests_TT437  varnum ;  title1 'LabTests_TT437';  run;
+/*   PROC contents data=LabTests_TT437  varnum ;  title1 'LabTests_TT437';  run;*/
 
 
 **  Compare "CreateBY" and "CreatedBY" variables  **;
-   PROC means data = LabTests_TT437  n nmiss ;
+   PROC means data = &TT437dsn  n nmiss ;
       var CreateBYID   CreatedBYID   ; 
 run;
 /*_______________________________________________________________________________*
@@ -29,7 +30,7 @@ run;
 
 
 **  Evaluate "CreateByID" and "CreateBy" variables  **;
-   PROC freq data = LabTests_TT437  order=freq;
+   PROC freq data = &TT437dsn  order=freq;
       tables CreateByID * CreateBy /list; ** Name of person that created the test result record;
 run;
 
@@ -48,7 +49,7 @@ run;
 
 
 **  Evaluate "UpdatedBy" variables  **;
-   PROC freq data = LabTests_TT437  ;
+   PROC freq data = &TT437dsn  ;
 /*      tables  UpdatedBy;*/
       tables CreateByID *  UpdatedBy /list; ** Name of person that created the test result record;
 run;
@@ -61,12 +62,12 @@ run;
 
 
 **  Evaluate "TestBrandID" and "TestBrand" variables  **;
-   PROC freq data = LabTests_TT437  order=freq;
+   PROC freq data = &TT437dsn  order=freq;
       tables TestBrandID * TestBrand /list  missing missprint; 
 run;
 
  **  Evaluate "LegacyTestID" variable  **;
-  PROC means data = LabTests_TT437  n nmiss ;
+  PROC means data = &TT437dsn  n nmiss ;
       var LegacyTestID   ; 
 run;
 
@@ -78,38 +79,39 @@ run;
 
 
  **  Explore relationship between LabID and LabSpecimenID  **;
-  PROC means data = LabTests_TT437  n nmiss ;
+  PROC means data = &TT437dsn  n nmiss ;
       var LabID  LabSpecimenID   ; 
 run;
 
-   PROC freq data = LabTests_TT437;
+   PROC freq data = &TT437dsn;
       tables LabID  LabSpecimenID  ;
+run;
+
+**  Get frequency of records with duplicate LabSpecimenID's  **;
+   PROC freq data = &TT437dsn;
+      tables  LabSpecimenID / out=Lab_TT437_Count ;
+   PROC freq data = Lab_TT437_Count;
+      tables  count;
 run;
 
 /*_______________________________________________________________________________________*
  |FINDINGS:
  | LabID:  No values are missing. This is a 7 digit ID unique for each record
  | LabSpecimenID:  No values are missing. This is a 6 or 7 digit ID. Most are unique.
- |    n=212 duplicate LabSpecimenID 
+ |    n=213 duplicate LabSpecimenID 
  |    n=1 with 3 and 4 counts respectively
  *_______________________________________________________________________________________*/
 
-**  Get frequency of records with duplicate LabSpecimenID's  **;
-   PROC freq data = LabTests_TT437;
-      tables  LabSpecimenID / out=LabSpecCount ;
-run;
-   PROC freq data = LabSpecCount;
-      tables  count;
-run;
+
 
 **  Print records with duplicate LabSpecimenID's  **;
-   proc sort data= LabTests_TT437  out= LabTests_Spec(keep= EventID  LabID  LabSpecimenID) ;  
+   proc sort data= &TT437dsn  out= Lab_TT437_Sort(keep= EventID  LabID  LabSpecimenID) ;  
       by LabSpecimenID  LabID  ;
-DATA MultiLabSpec;   set LabTests_Spec;
+DATA Multi_TT437_Spec;   set Lab_TT437_Sort;
    by LabSpecimenID  LabID  ;
    if first.LabSpecimenID ne last.LabSpecimenID;
 run;
-   PROC print data= MultiLabSpec;
+   PROC print data= Multi_TT437_Spec;
 run;
 
 /*_______________________________________________________________________________________*
@@ -120,8 +122,9 @@ run;
 
 
 
+
 **  Evaluate "ResultID" and "ResultText" variables  **;
-   PROC freq data = LabTests_TT437  ;
+   PROC freq data = &TT437dsn  ;
       tables ResultID / missing missprint;
       tables ResultID * ResultText /list; 
 run;
@@ -142,7 +145,7 @@ run;
 
 
 **  Evaluate "ELRID" variable  **;
-   PROC freq data = LabTests_TT437  ;
+   PROC freq data = &TT437dsn  ;
       tables ELRID / missing missprint;
 run;
 
@@ -154,7 +157,7 @@ run;
 
 
  **  Evaluate data variables  **;
-  PROC means data = LabTests_TT437  n nmiss ;
+  PROC means data = &TT437dsn  n nmiss ;
       var CreateDate  ResultDate  UpdateDate   ; 
 run;
 
@@ -167,11 +170,11 @@ run;
 
 
  **  Explore relationship between CreateDate and ResultDate  **;
-   PROC freq data = LabTests_TT437  ;
+   PROC freq data = &TT437dsn  ;
       tables CreateDate  ResultDate ;
       format CreateDate  ResultDate  WeekW5. ;
 run;
-   PROC print data = LabTests_TT437  ;
+   PROC print data = &TT437dsn  ;
       where ResultDate > CreateDate ;
 run;
 

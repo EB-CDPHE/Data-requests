@@ -78,6 +78,8 @@ DATA TT437_temp;
    UpdateDate = datepart(tmp_UpdateDate);   format UpdateDate yymmdd10.;
 
    DROP tmp_: ;
+
+   Label LabID = "Lab's Test ID";
 run;
 
 

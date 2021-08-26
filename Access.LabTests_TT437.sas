@@ -7,21 +7,9 @@ PURPOSE:	   Connect to CEDRS backend (dphe66) to access LabTests
 INPUT:		dbo66.zDSI_LabTests  WHERE TestTypeID= 437 (TestType = 'COVID-19 Variant Type')
 OUTPUT:		      Lab_TT437_read
 ***********************************************************************************************/
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
+/*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
-/*________________________________________________________________________________________________________*
- | Required user input for this code to work:
- |    1. Complete libname stm with Libref, dsn, and schema.  See CEDRS.Libnames.sas
- |    2. Insert libref into Data step. Explore work folder to get name of data table and add to set statement.
- |       *This data step will be run twice.
- |       a. The first time, use obs=50 option. Review proc contents output.
- |       b. Record findings. See expected findings below.
- |    3. Modify second Data step per findings. Creates a temporary data set.
- |    4. Shrink character variables in data set to shortest possible lenght (based on longest value).
- |       ** Get Macro.Shrink.sas program from GitHub repository "SAS-code-library".
- |       ** NOTE: macro saves to new dataset by adding "_" to end of dataset name provided by user.
- |    5. Create libname for folder to store permanent SAS dataset (if desired). e.g on J: drive.
- |    6. Rename "shrunken" SAS dataset by removing underscore added by macro.
- *________________________________________________________________________________________________________*/
 
 ** 1. Libname to access [SQL database name] using ODBC **;
 LIBNAME CEDRS66  ODBC  dsn='CEDRS' schema=cedrs;  run;         * <--  Changed BK's libname ; 
@@ -33,14 +21,15 @@ DATA LabTests; set CEDRS66.zDSI_LabTests; run;    * <-- for building code add (o
 ** Review contents of SAS dataset **;
 PROC contents data=LabTests  varnum ; title1 'CEDRS66.zDSI_LabTests';  run;  
 
-   PROC freq data = LabTests;
-      tables TestTypeID * TestType /list; 
-run;
+**  Review different test types related to COVID testing  **;
+/*   PROC freq data = LabTests;*/
+/*      tables TestTypeID * TestType /list; */
+/*run;*/
 
-   PROC print data= LabTests; 
-      where TestType = 'RT-PCR'; 
-      var TestTypeID TestType ResultID ResultText QuantitativeResult; 
-run;
+/*   PROC print data= LabTests; */
+/*      where TestType = 'RT-PCR'; */
+/*      var TestTypeID TestType ResultID ResultText QuantitativeResult; */
+/*run;*/
 
 /*________________________________________________________________________________________________*
  | FINDINGS:                                                                 
@@ -57,11 +46,11 @@ run;
  *________________________________________________________________________________________________*/
 
 ** Calculate frequency of various test types related to COVID **;
-   PROC freq data = LabTests;
-      where TestTypeID in (229, 435, 436, 437) ;
-      tables TestTypeID * TestType /list; 
-      format TestType $35.;
-run;
+/*   PROC freq data = LabTests;*/
+/*      where TestTypeID in (229, 435, 436, 437) ;*/
+/*      tables TestTypeID * TestType /list; */
+/*      format TestType $35.;*/
+/*run;*/
 
 
 ** 3. Modify SAS dataset per Findings **;

@@ -77,15 +77,15 @@ run;
       tables ResultID * ResultText /list; 
 run;
 
-/*_________________________________________________________________________________________________*
+/*_________________________________________________________________________________________________________*
  |FINDINGS:
  | ResultID is the numeric code assigned to ResultText. In all but one case it is a 4 digit code.
  | ResultText holds the description of the sequencing result.
  |    ResultID=9 for ResultText = 'Unknown'
  |    ResultID=1071 is for ResultText = 'Yes'
  |    ResultID=1072 is for ResultText = 'No'
- | n=1 record has a missing Result
- *___________________________________________________________________________________________________*/
+ | n=1 record has a missing Result. LabSpecimenID=2162300 and EventID=1232059 with CreateDate=2021-08-06
+ *_________________________________________________________________________________________________________*/
 
 * Print data for this record *;
    PROC print data=  &TT436dsn ; 
@@ -155,8 +155,8 @@ run;
  |    The other record has ResultID(=9), ResultText(=Unknown), ResultDate(=2021-04-23), 
  |    CreateDate(=2021-04-27), and CreateByID(=13410).
  |FIX:
- | Delete record with ResultID=9.
- | DeDUP other two records based on LabSpecimenID, EventID, ResultID, ResultDate, CreateDate all being identical.
+ | First delete record with ResultID=9. This will leave two records with identical values on FOUR variables.
+ | DeDUP other two records based on LabSpecimenID, EventID, ResultID, ResultDate, CreateDate all being same.
  *______________________________________________________________________________________________________________*/
 
 
@@ -166,12 +166,13 @@ run;
    proc sort data= &TT436dsn  
               out= TT436_Spec ;  
       by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
+   data TT436_Spec; set TT436_Spec;
+      if LabSpecimenID in (1772736) AND ResultID=9 then delete ;  * if delete this 1 record the other two will have NumDupKeys=4;
 run;
 
 ** Calculate number of variables with identical values for Dups. Creates NumDupKey **;
 DATA Two_TT436_Spec;  set TT436_Spec;
    by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
-   where LabSpecimenID ^in (1772736) ;
 
    * duplicate on all 4 variables;
         if (first.LabSpecimenID ne last.LabSpecimenID)  AND (first.ResultID ne last.ResultID)  AND  
@@ -197,10 +198,6 @@ run;
       tables NumDupKeys; 
 run;
 
-
-
-
-
 /*______________________________________________________________________________________________________________*
  |FINDINGS:
  | n=8 records (4 pairs) with duplicate LabSpecimenID's have identical values in FOUR vars
@@ -211,10 +208,10 @@ run;
  | FIX: Delete record with missing ResultDate.
  |
  | n=272 records (136 pairs) with duplicate LabSpecimenID's have identical values in ONE var (LabSpecimenID)
- | All but two of these pairs had ResultID= 1069 or 1070 for one record in duplicate pair.
- | The two exceptions had one record with result text that contained "LIKE".
- | FIX: delete record with ResultID= 1069 or 1070 and keep matching record with other ResultID.
- | FIX: delete record with result text that contains "LIKE".
+ | All but four of these pairs had ResultID= 9 (ResultText='Unknown') for one record in duplicate pair.
+ | The four exceptions had one record with result text = 'Yes' and the other result = 'No'.
+ | FIX: since all four mixed result dups have been sequenced, keep record where result = 'Yes'.
+ | FIX: delete record with ResultID= 9 and keep matching record with other ResultID.
  *_______________________________________________________________________________________________________________*/
 
 
@@ -257,31 +254,29 @@ run;
 run;
 
 
-
-
-***  X. Evaluate date variables  ***;
+***  6. Evaluate date variables  ***;
 ***------------------------------***;
 
-   PROC means data = &TT437dsn  n nmiss ;
+   PROC means data = &TT436dsn  n nmiss ;
       var CreateDate  ResultDate  UpdateDate   ; 
 run;
 
 /*_______________________________________________________________________________________*
  |FINDINGS:
  | CreateDate has no missing values. 
- | ResultDate is missing almost 10% of results. These dates shouldn't be missing. 
- | UpdateDate exists for less than 10% of results, which is fine.
+ | ResultDate is missing almost 40% of results. These dates shouldn't be missing. 
+ | UpdateDate exists for less than 2% of results, which is fine.
  *_______________________________________________________________________________________*/
 
 
-***  X. Explore relationship between CreateDate and ResultDate  ***;
+***  7. Explore relationship between CreateDate and ResultDate  ***;
 ***--------------------------------------------------------------***;
 
-   PROC freq data = &TT437dsn  ;
+   PROC freq data = &TT436dsn  ;
       tables CreateDate  ResultDate ;
       format CreateDate  ResultDate  WeekW5. ;
 run;
-   PROC print data = &TT437dsn  ;
+   PROC print data = &TT436dsn  ;
       where ResultDate > CreateDate ;
 run;
 

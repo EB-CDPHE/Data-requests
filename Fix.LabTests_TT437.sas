@@ -41,7 +41,7 @@ run;
 run;
 
 ** STEP 3:  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
-DATA Lab_TT437_fix ;   
+DATA Lab_TT437_temp ;   
    set TT437_DeDup3 (DROP=  TestBrandID  TestBrand  LegacyTestID  CreatedByID) ;
    by LabSpecimenID ; 
 
@@ -62,7 +62,14 @@ DATA Lab_TT437_fix ;
 run;
 
 
-** 2. Contents of new dataset with edits **;
+**  STEP 4:  SORT fixed data for merging  **;
+   PROC sort data= Lab_TT437_temp
+               out= Lab_TT437_fix;
+      by LabSpecimenID EventID;
+run;
+
+
+**  STEP 5:  Contents of new dataset with edits  **;
    PROC contents data=Lab_TT437_fix  varnum ;  title1 'Lab_TT437_fix';  run;
 
 

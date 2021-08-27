@@ -1,0 +1,80 @@
+/**********************************************************************************************
+PROGRAM: Fix.LabTests_TT436
+AUTHOR:  Eric Bush
+CREATED:	August 26, 2021
+MODIFIED: 
+PURPOSE:	Make data edits to Lab_TT436_read per edit checks in CHECK.LabTests_TT436.sas
+INPUT:	      Lab_TT436_read 
+OUTPUT:	      Lab_TT436_fix
+***********************************************************************************************/
+
+/*---------------------------------------------------------------------------------------------*
+ | Fixes made in this code:
+ | 1. DROP extraneous variables (TestBrandID  TestBrand  LegacyTestID  CreatedByID)
+ | 2. Delete duplicate records that are irrelevant, i.e. NO sequence results 
+ | 3. RENAME variables to keep when merging with Lab_TT437_fix
+ | 4. DROP variables not needed for merging with Lab_TT437_fix
+ | 5. SORT fixed data for merging
+ *---------------------------------------------------------------------------------------------*/
+
+** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
+
+Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
+
+   PROC contents data=Lab_TT436_read varnum;  title1 'Lab_TT436_read';  run;
+
+** STEP 1:  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
+DATA Lab_TT436_temp ;   
+   set Lab_TT436_read (DROP=  TestBrandID  TestBrand  LegacyTestID  CreatedByID) ;
+
+* Delete one obs of triplicate record where ResultID = 9 *;
+   if LabSpecimenID in (1772736) AND ResultID=9 then delete ;
+
+* Delete duplicate records with different values for all variables (except LabSpecimenID) *;
+   if LabSpecimenID in (1527798, 1527799, 1545962, 1553079)  AND  ResultID= 1072 then delete ;
+
+run;
+
+
+** STEP 2:  De-duplicate records with two LabTest results per Specimen that have identical values in FOUR variables **;
+   proc sort data= Lab_TT436_temp  
+               out= TT436_DeDup4  NODUPKEY ;  
+      by LabSpecimenID  ResultID  descending ResultDate  descending CreateDate  ; 
+run;
+
+
+** STEP 3:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables **;
+   proc sort data= TT436_DeDup4  
+               out= TT436_DeDup2  NODUPKEY ;  
+      by LabSpecimenID  ResultID    ; 
+run;
+
+
+** STEP 4:  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
+DATA Lab_TT436_fix;  set TT436_DeDup2;
+   by LabSpecimenID ; 
+
+* Delete duplicate records with different values for all variables (except LabSpecimenID) *;
+* AND have a ResultID = 9 *;
+   if (first.LabSpecimenID ne last.LabSpecimenID)  AND  ResultID= 9 then delete;
+
+* RENAME variables to keep when merging with Lab_TT437_fix  *;
+   RENAME   ResultText         = ResultText_TT436
+            QuantitativeResult = QuantitativeResult_TT436
+            ReferenceRange     = ReferenceRange_TT436
+            ResultID           = ResultID_TT436
+            ResultDate         = ResultDate_TT436
+            CreateDate         = CreateDate_TT436
+            UpdateDate         = UpdateDate_TT436  ;
+
+* DROP variables not needed for merging with Lab_TT437_fix  *;
+   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  TestTypeID TestType  ;
+
+run;
+
+
+** STEP 5:  Contents of new dataset with edits **;
+   PROC contents data=Lab_TT436_fix  varnum ;  title1 'Lab_TT436_fix';  run;
+
+
+

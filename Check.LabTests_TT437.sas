@@ -14,7 +14,7 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 %Let TT437dsn = Lab_TT437_read ;
 
 options pageno=1;
-   PROC contents data=LabTests_TT437  varnum ;  title1 'LabTests_TT437';  run;
+   PROC contents data=Lab_TT437_read  varnum ;  title1 'Lab_TT437_read';  run;
 
 /*--------------------------------------------------------------------*
  | Check Lab_TT437_read data for:

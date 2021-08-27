@@ -33,13 +33,13 @@ DATA Lab_TT229_temp ;
                             1735642, 1798732, 1925013, 2005303, 2362747, 2376934 ) ;
 
 * RENAME variables to keep when merging with Lab_TT437_fix  *;
-   RENAME   ResultText         = ResultText_TT29
-            QuantitativeResult = QuantitativeResult_TT29
-            ReferenceRange     = ReferenceRange_TT29
-            ResultID           = ResultID_TT29
-            ResultDate         = ResultDate_TT29
-            CreateDate         = CreateDate_TT29
-            UpdateDate         = UpdateDate_TT29
+   RENAME   ResultText         = ResultText_TT229
+            QuantitativeResult = QuantitativeResult_TT229
+            ReferenceRange     = ReferenceRange_TT229
+            ResultID           = ResultID_TT229
+            ResultDate         = ResultDate_TT229
+            CreateDate         = CreateDate_TT229
+            UpdateDate         = UpdateDate_TT229
        ;
 
 * DROP variables not needed for merging with Lab_TT437_fix  *;
@@ -53,7 +53,7 @@ run;
       by LabSpecimenID EventID;
 run;
 
-** STEP 2:  Contents of new dataset with edits **;
+** STEP 3:  Contents of new dataset with edits **;
    PROC contents data=Lab_TT229_fix  varnum ;  title1 'Lab_TT229_fix';  run;
 
 

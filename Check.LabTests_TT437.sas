@@ -83,42 +83,143 @@ run;
       var LabID  LabSpecimenID   ; 
 run;
 
-   PROC freq data = &TT437dsn;
-      tables LabID  LabSpecimenID  ;
-run;
-
-**  Get frequency of records with duplicate LabSpecimenID's  **;
-   PROC freq data = &TT437dsn;
-      tables  LabSpecimenID / out=Lab_TT437_Count ;
-   PROC freq data = Lab_TT437_Count;
-      tables  count;
-run;
-
-/*_______________________________________________________________________________________*
- |FINDINGS:
- | LabID:  No values are missing. This is a 7 digit ID unique for each record
- | LabSpecimenID:  No values are missing. This is a 6 or 7 digit ID. Most are unique.
- |    n=213 duplicate LabSpecimenID 
- |    n=1 with 3 and 4 counts respectively
- *_______________________________________________________________________________________*/
-
-
-
-**  Print records with duplicate LabSpecimenID's  **;
-   proc sort data= &TT437dsn  out= Lab_TT437_Sort(keep= EventID  LabID  LabSpecimenID) ;  
-      by LabSpecimenID  LabID  ;
-DATA Multi_TT437_Spec;   set Lab_TT437_Sort;
-   by LabSpecimenID  LabID  ;
-   if first.LabSpecimenID ne last.LabSpecimenID;
-run;
-   PROC print data= Multi_TT437_Spec;
-run;
+/*   PROC freq data = &TT437dsn;  tables LabID  LabSpecimenID  ;  run;*/
 
 /*_______________________________________________________________________________________*
  |FINDINGS:
  | Records with duplicate LabSpecimenID have same EventID but different, unique LabID's
  | In other words, a LabSpecimenID can have multiple LabID's.
  *_______________________________________________________________________________________*/
+
+
+**  Get frequency of records with duplicate LabSpecimenID's  **;
+   PROC freq data = &TT437dsn;
+      tables  LabSpecimenID / out=Lab_TT437_Count ;
+   PROC freq data = Lab_TT437_Count;
+      tables COUNT;
+run;
+
+/*_______________________________________________________________________________________*
+ |FINDINGS:
+ | LabID:  No values are missing. This is a 7 digit ID unique for each record
+ | LabSpecimenID:  No values are missing. This is a 6 or 7 digit ID. Most are unique.
+ | N = 35,339 records with LabSpecimenID. Most records have only 1 LabSpecimenID.  
+ | N = 35121 unique LabSpecimenID 's for this TestType
+ | n=213 LabSpecimenID with two LabTest results
+ | n=1 LabSpecimenID with three LabTest results
+ | n=1 LabSpecimenID with four LabTest results
+ *_______________________________________________________________________________________*/
+
+
+** More on records that have a LabSpecimenID with 3 or 4 LabTest results  **;
+* Get LabSpecimenID for these records *;
+   PROC print data=  Lab_TT437_Count; 
+      where COUNT > 2 ;
+      id LabSpecimenID; var COUNT;
+run;
+
+* Print data from  Lab_TT437_read  for these records *;
+   PROC print data=  Lab_TT437_read; 
+      where LabSpecimenID in (1595014, 2055207) ;
+      id LabSpecimenID; by LabSpecimenID; 
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID ;
+      format  ResultText $10. ;
+run;
+
+/*_______________________________________________________________________________________________________________*
+ |FINDINGS:
+ | LabSpecimenID = 1595014. This specimen is for EventID= 1081964 which is a deleted event.
+ |    All 4 records have identical values for ResultID(=1061), ResultText(=B.1.1.7), ResultDate(=.), 
+ |    CreateDate(=2021-06-10), and CreateByID(=13737).
+ | LabSpecimenID = 2055207. This specimen is for EventID= 1209272 and entered via ELR.
+ |    All 3 records have identical values for ResultID(=1061), ResultText(=B.1.1.7), ResultDate(=2021-06-24),
+ |    CreateDate(=2021-06-25), and CreateByID(=13081).
+ |FIX:
+ | DeDUP based on LabSpecimenID, EventID, ResultID, ResultDate, CreateDate all being identical.
+ *______________________________________________________________________________________________________________*/
+
+
+**  Evaluate records with two LabTest results for a particular LabSpecimenID  **;
+   proc sort data= &TT437dsn  
+              out= TT437_Spec ;  
+      by LabSpecimenID  ResultID  ResultDate  CreateDate  ; 
+run;
+
+DATA Two_TT437_Spec;  set TT437_Spec;
+   by LabSpecimenID  ResultID  ResultDate  CreateDate  ; 
+   where LabSpecimenID ^in (1595014, 2055207) ;
+
+   * duplicate on all 4 variables;
+        if (first.LabSpecimenID ne last.LabSpecimenID)  AND (first.ResultID ne last.ResultID)  AND  
+           (first.ResultDate ne last.ResultDate) AND (first.CreateDate ne last.CreateDate)  then NumDupKeys=4;  
+   * duplicate on 3 variables;
+   else if (first.LabSpecimenID ne last.LabSpecimenID)  AND (first.ResultID ne last.ResultID)  AND  
+           (first.ResultDate ne last.ResultDate) then NumDupKeys=3;
+   * duplicate on 2 variables;
+   else if (first.LabSpecimenID ne last.LabSpecimenID)  AND (first.ResultID ne last.ResultID)  then NumDupKeys=2;
+   * duplicate on 1 variable only;
+   else if (first.LabSpecimenID ne last.LabSpecimenID)  then NumDupKeys=1;
+
+run;
+
+
+**  Calculate the number of variables that are identical for the two results  **;
+   PROC freq data= Two_TT437_Spec; 
+      tables NumDupKeys; 
+run;
+
+
+**  Print records with duplicate LabTest results per Specimen  **;
+**  that have FOUR variables that are identical between the two records **;
+   PROC print data= Two_TT437_Spec; 
+      where NumDupKeys=4;
+      id LabSpecimenID;
+      by LabSpecimenID;
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID  NumDupKeys ;
+      format  ResultText $10. ;
+   title1 "Source data = &TT437dsn";
+   title2 'NumDupKeys=4';
+run;
+
+
+**  Print records with duplicate LabTest results per Specimen  **;
+**  that have THREE variables that are identical between the two records **;
+   PROC print data= Two_TT437_Spec; 
+      where NumDupKeys=3;
+      id LabSpecimenID;
+      by LabSpecimenID;
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID  NumDupKeys ;
+      format  ResultText $10. ;
+   title1 "Source data = &TT437dsn";
+   title2 'NumDupKeys=3';
+run;
+
+
+**  Print records with duplicate LabTest results per Specimen  **;
+**  that have TWO variables that are identical between the two records **;
+   PROC print data= Two_TT437_Spec; 
+      where NumDupKeys=2;
+      id LabSpecimenID;
+      by LabSpecimenID;
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID  NumDupKeys ;
+      format  ResultText $10. ;
+   title1 "Source data = &TT437dsn";
+   title2 'NumDupKeys=2';
+run;
+
+
+**  Print records with duplicate LabTest results per Specimen  **;
+**  that have only ONE variable that is identical between the two records **;
+   PROC print data= Two_TT437_Spec; 
+      where NumDupKeys=1;
+      id LabSpecimenID;
+      by LabSpecimenID;
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID  NumDupKeys ;
+      format  ResultText $10. ;
+   title1 "Source data = &TT437dsn";
+   title2 'NumDupKeys=1';
+run;
+
 
 
 

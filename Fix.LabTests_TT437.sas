@@ -1,9 +1,9 @@
 /**********************************************************************************************
 PROGRAM: Fix.LabTests_TT437
 AUTHOR:  Eric Bush
-CREATED:	July 15, 2021
-MODIFIED: 081321: Switch from char var AgeType to numeric var AgeTypeID	
-PURPOSE:	Make data edits to zDSI_Events_read per edit checks in CHECK.zDSI_Events_read.sas
+CREATED:	August 26, 2021
+MODIFIED: 
+PURPOSE:	Make data edits to Lab_TT437_read per edit checks in CHECK.LabTests_TT437.sas
 INPUT:	      Lab_TT437_read 
 OUTPUT:	      Lab_TT437_fix
 ***********************************************************************************************/
@@ -21,11 +21,16 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 **  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
-DATA Lab_TT437_fix ;   set Lab_TT437_read ;
+DATA Lab_TT437_fix ;   
+   set Lab_TT437_read (DROP=  TestBrandID  TestBrand  LegacyTestID  CreatedByID) ;
 
-   DROP  TestBrandID  TestBrand  LegacyTestID  CreatedByID   ;
+* Re-format ResultText field: i.e. extract lineage name and ignore descriptive text *;
+   Variant_Type =  scan(ResultText,1,'-');     ;
+
+
 run;
 
 
 ** 2. Contents of new dataset with edits **;
-   PROC contents data=Lab_TT437_fix  varnum ;  title1 'Lab_TT437_fix';  run;
+/*   PROC contents data=Lab_TT437_fix  varnum ;  title1 'Lab_TT437_fix';  run;*/
+

@@ -16,6 +16,13 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 options pageno=1;
    PROC contents data=Lab_TT229_read  varnum ;  title1 'Lab_TT229_read';  run;
 
+/*------------------------------------------------------------------------------*
+ | Check Lab_TT229_read data for:
+ | 1. Compare "CreateBY" and "CreatedBY" variables
+ | 2. Evaluate "ResultID" and "ResultText" variables
+ | 3. Examine records with duplicate LabSpecimenID's
+ |    a) Records with duplicate LabSpecimenID that have > 2 LabTest results 
+ *------------------------------------------------------------------------------*/
 
 
 ***  1. Compare "CreateBY" and "CreatedBY" variables  ***;
@@ -33,18 +40,18 @@ run;
  *_______________________________________________________________________________*/
 
 
-***  X. Evaluate "ResultID" and "ResultText" variables  ***;
+***  2. Evaluate "ResultID" and "ResultText" variables  ***;
 ***-----------------------------------------------------***;
 
    PROC freq data = &TT229dsn  ;
-/*      tables ResultID / missing missprint;*/
-/*      tables ResultID * ResultText /list; */
+      tables ResultID / missing missprint;
+      tables ResultID * ResultText /list missing missprint; 
       tables QuantitativeResult ; 
 run;
 
 /*_________________________________________________________________________________________________*
  |FINDINGS:
- | ResultID is the numeric code assigned to ResultText. In all but one case it is a 4 digit code.
+ | ResultID is the numeric code assigned to ResultText. 
  | ResultText holds the description of the RT_PCR result.
  |    ResultID=1 for ResultText = 'Positive'
  |    ResultID=2 for ResultText = 'Negative'
@@ -54,7 +61,7 @@ run;
  *___________________________________________________________________________________________________*/
 
 
-***  X. Examine records with duplicate LabSpecimenID's  ***;
+***  3. Examine records with duplicate LabSpecimenID's  ***;
 ***-----------------------------------------------------***;
 
    PROC freq data = &TT229dsn  noprint;
@@ -64,8 +71,8 @@ run;
 run;
 
 
-*** X.a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results  ***;
-***-----------------------------------------------------------------------------***;
+*** 3.a) Records with duplicate LabSpecimenID that have > 2 LabTest results  ***;
+***--------------------------------------------------------------------------***;
 
 * Get LabSpecimenID for these records *;
    PROC print data=  Lab_TT229_Count; 
@@ -106,3 +113,5 @@ run;
  | NONE of these LabSpecimens have been sequenced, i.e. NONE have corresponding TestType=437.
  |FIX:  Delete these records prior to merge with Lab_TT437_fix.
  *_______________________________________________________________________________________________________________*/
+
+

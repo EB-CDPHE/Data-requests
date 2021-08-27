@@ -8,10 +8,14 @@ INPUT:	      Lab_TT437_read
 OUTPUT:	      Lab_TT437_fix
 ***********************************************************************************************/
 
-/*---------------------------------------------------------------------------------------------*
+/*------------------------------------------------------------------------------------------------*
  | Fixes made in this code:
- |  1. Convert Age for all Age_Types to age in years. Creates new variable: Age_in_Years  
- *---------------------------------------------------------------------------------------------*/
+ | 1. De-dup records with two Test results per Specimen with identical values in FOUR variables
+ | 2. De-dup records with two Test results per Specimen with identical values in THREE variables 
+ | 3. Delete duplicate record where ResultDate = missing (dups with identical values in TWO vars)
+ | 4. Delete duplicate records with different values for all variables (except LabSpecimenID)
+ | 5. Re-format ResultText field: i.e. extract lineage name and ignore descriptive text
+ *------------------------------------------------------------------------------------------------*/
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
 
@@ -23,13 +27,13 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 ** De-DUP needs to occur in series (not in parallel) **;
 **---------------------------------------------------**;
 
-** STEP 1:  De-duplicate records with two LabTest results per Specimen that have identical results in FOUR variables **;
+** STEP 1:  De-duplicate records with two LabTest results per Specimen that have identical values in FOUR variables **;
    proc sort data= Lab_TT437_read  
               out= TT437_DeDup4  NODUPKEY ;  
       by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
 run;
 
-** STEP 2:  De-duplicate records with two LabTest results per Specimen that have identical results in THREE variables **;
+** STEP 2:  De-duplicate records with two LabTest results per Specimen that have identical values in THREE variables **;
 ** Keep record with most recent CreateDate **;
    proc sort data= TT437_DeDup4  
               out= TT437_DeDup3  NODUPKEY ;  

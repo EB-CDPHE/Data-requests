@@ -17,7 +17,7 @@ options pageno=1;
    PROC contents data=LabTests_TT437  varnum ;  title1 'LabTests_TT437';  run;
 
 /*--------------------------------------------------------------------*
- | Check CEDRS_read data for:
+ | Check Lab_TT437_read data for:
  |  1. Compare "CreateBY" and "CreatedBY" variables
  |  2. Evaluate "CreateByID" and "CreateBy" variables
  |  3. Evaluate "UpdatedBy" variables

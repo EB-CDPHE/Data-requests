@@ -43,7 +43,7 @@ run;
 ** STEP 3:  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
 DATA Lab_TT437_fix ;   
    set TT437_DeDup3 (DROP=  TestBrandID  TestBrand  LegacyTestID  CreatedByID) ;
-      by LabSpecimenID ; 
+   by LabSpecimenID ; 
 
 * Delete duplicate record where ResultDate = missing *;
    if LabSpecimenID in (1471200, 1605796) AND ResultDate= . then delete ;
@@ -64,4 +64,5 @@ run;
 
 ** 2. Contents of new dataset with edits **;
    PROC contents data=Lab_TT437_fix  varnum ;  title1 'Lab_TT437_fix';  run;
+
 

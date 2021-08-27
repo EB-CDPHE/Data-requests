@@ -43,7 +43,7 @@ DATA Lab_TT229_temp ;
        ;
 
 * DROP variables not needed for merging with Lab_TT437_fix  *;
-   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  ;
+   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  TestTypeID TestType  ;
 
 run;
 

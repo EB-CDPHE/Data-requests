@@ -14,13 +14,32 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 %Let TT437dsn = Lab_TT437_read ;
 
 options pageno=1;
-/*   PROC contents data=LabTests_TT437  varnum ;  title1 'LabTests_TT437';  run;*/
+   PROC contents data=LabTests_TT437  varnum ;  title1 'LabTests_TT437';  run;
+
+/*--------------------------------------------------------------------*
+ | Check CEDRS_read data for:
+ |  1. Compare "CreateBY" and "CreatedBY" variables
+ |  2. Evaluate "CreateByID" and "CreateBy" variables
+ |  3. Evaluate "UpdatedBy" variables
+ |  4. Evaluate "TestBrandID" and "TestBrand" variables
+ |  5. Explore relationship between LabID and LabSpecimenID
+ |  6. Examine records with duplicate LabSpecimenID's
+ |     a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results  ***;
+ |     b) Records with duplicate LabSpecimenID that have 2 LabTest results
+ |  7. Evaluate "ResultID" and "ResultText" variables
+ |  8. Evaluate "ELRID" variable
+ |  9. Evaluate date variables
+ | 10. Explore relationship between CreateDate and ResultDate
+ *--------------------------------------------------------------------*/
 
 
-**  Compare "CreateBY" and "CreatedBY" variables  **;
+***  1. Compare "CreateBY" and "CreatedBY" variables  ***;
+***---------------------------------------------------***;
+
    PROC means data = &TT437dsn  n nmiss ;
       var CreateBYID   CreatedBYID   ; 
 run;
+
 /*_______________________________________________________________________________*
  |FINDINGS:
  | CreateBYID has no missing responses
@@ -29,7 +48,9 @@ run;
  *_______________________________________________________________________________*/
 
 
-**  Evaluate "CreateByID" and "CreateBy" variables  **;
+***  2. Evaluate "CreateByID" and "CreateBy" variables  ***;
+***-----------------------------------------------------***;
+
    PROC freq data = &TT437dsn  order=freq;
       tables CreateByID * CreateBy /list; ** Name of person that created the test result record;
 run;
@@ -48,7 +69,9 @@ run;
  *_______________________________________________________________________________*/
 
 
-**  Evaluate "UpdatedBy" variables  **;
+***  3. Evaluate "UpdatedBy" variables  ***;
+***-------------------------------------***;
+
    PROC freq data = &TT437dsn  ;
 /*      tables  UpdatedBy;*/
       tables CreateByID *  UpdatedBy /list; ** Name of person that created the test result record;
@@ -61,13 +84,15 @@ run;
  *_______________________________________________________________________________*/
 
 
-**  Evaluate "TestBrandID" and "TestBrand" variables  **;
+***  4. Evaluate "TestBrandID" and "TestBrand" variables  ***;
+***-------------------------------------------------------***;
+
    PROC freq data = &TT437dsn  order=freq;
       tables TestBrandID * TestBrand /list  missing missprint; 
 run;
 
  **  Evaluate "LegacyTestID" variable  **;
-  PROC means data = &TT437dsn  n nmiss ;
+   PROC means data = &TT437dsn  n nmiss ;
       var LegacyTestID   ; 
 run;
 
@@ -78,7 +103,9 @@ run;
  *__________________________________________________*/
 
 
- **  Explore relationship between LabID and LabSpecimenID  **;
+***  5. Explore relationship between LabID and LabSpecimenID  ***;
+***-----------------------------------------------------------***;
+
   PROC means data = &TT437dsn  n nmiss ;
       var LabID  LabSpecimenID   ; 
 run;
@@ -92,7 +119,9 @@ run;
  *_______________________________________________________________________________________*/
 
 
-**  Get frequency of records with duplicate LabSpecimenID's  **;
+***  6. Examine records with duplicate LabSpecimenID's  ***;
+***-----------------------------------------------------***;
+
    PROC freq data = &TT437dsn;
       tables  LabSpecimenID / out=Lab_TT437_Count ;
    PROC freq data = Lab_TT437_Count;
@@ -111,7 +140,9 @@ run;
  *_______________________________________________________________________________________*/
 
 
-** More on records that have a LabSpecimenID with 3 or 4 LabTest results  **;
+*** 6.a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results  ***;
+***-----------------------------------------------------------------------------***;
+
 * Get LabSpecimenID for these records *;
    PROC print data=  Lab_TT437_Count; 
       where COUNT > 2 ;
@@ -139,14 +170,17 @@ run;
  *______________________________________________________________________________________________________________*/
 
 
-**  Evaluate records with two LabTest results for a particular LabSpecimenID  **;
+*** 6.b) Records with duplicate LabSpecimenID that have 2 LabTest results  ***;
+***-----------------------------------------------------------------------------***;
+
    proc sort data= &TT437dsn  
               out= TT437_Spec ;  
-      by LabSpecimenID  ResultID  ResultDate  CreateDate  ; 
+      by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
 run;
 
+** Calculate number of variables with identical values for Dups. Creates NumDupKey **;
 DATA Two_TT437_Spec;  set TT437_Spec;
-   by LabSpecimenID  ResultID  ResultDate  CreateDate  ; 
+   by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
    where LabSpecimenID ^in (1595014, 2055207) ;
 
    * duplicate on all 4 variables;
@@ -162,11 +196,37 @@ DATA Two_TT437_Spec;  set TT437_Spec;
 
 run;
 
+** See results - data with NumDupKeys **;
+/*   PROC print data= Two_TT437_Spec; */
+/*      where NumDupKeys > . ;*/
+/*      var  LabSpecimenID EventID ResultID  ResultDate  CreateDate NumDupKeys  ; */
+/*run;*/
 
-**  Calculate the number of variables that are identical for the two results  **;
+**  Frequency of duplicates by the number of variables that are identical for the two results  **;
    PROC freq data= Two_TT437_Spec; 
       tables NumDupKeys; 
 run;
+
+/*______________________________________________________________________________________________________________*
+ |FINDINGS:
+ | n=36 records (18 pairs) with duplicate LabSpecimenID's have identical values in FOUR vars
+ | FIX: DeDup on FOUR keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
+ |
+ | n=62 records (31 pairs) with duplicate LabSpecimenID's have identical values in THREE vars
+ | All but two of these pairs have ResultID in (1067, 1070). Were they re-sequenced?
+ | FIX: DeDup on THREE keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
+ | Previous sort should be for descending CreateDate so this de-dup will keep most recent record.
+ |
+ | n=4 records (2 pairs) with duplicate LabSpecimenID's have identical values in TWO vars
+ | These records have same ResultID and ResultText. The ResultDate differs because one value is missing.
+ | FIX: Delete record with missing ResultDate.
+ |
+ | n=324 records (162 pairs) with duplicate LabSpecimenID's have identical values in ONE var (LabSpecimenID)
+ | All but two of these pairs had ResultID= 1069 or 1070 for one record in duplicate pair.
+ | The two exceptions had one record with result text that contained "LIKE".
+ | FIX: delete record with ResultID= 1069 or 1070 and keep matching record with other ResultID.
+ | FIX: delete record with result text that contains "LIKE".
+ *_______________________________________________________________________________________________________________*/
 
 
 **  Print records with duplicate LabTest results per Specimen  **;
@@ -222,9 +282,9 @@ run;
 
 
 
+***  7. Evaluate "ResultID" and "ResultText" variables  ***;
+***-----------------------------------------------------***;
 
-
-**  Evaluate "ResultID" and "ResultText" variables  **;
    PROC freq data = &TT437dsn  ;
       tables ResultID / missing missprint;
       tables ResultID * ResultText /list; 
@@ -245,7 +305,9 @@ run;
  *___________________________________________________________________________________________________*/
 
 
-**  Evaluate "ELRID" variable  **;
+***  8. Evaluate "ELRID" variable  ***;
+***--------------------------------***;
+
    PROC freq data = &TT437dsn  ;
       tables ELRID / missing missprint;
 run;
@@ -257,8 +319,10 @@ run;
  *_______________________________________________________________________________________*/
 
 
- **  Evaluate data variables  **;
-  PROC means data = &TT437dsn  n nmiss ;
+***  9. Evaluate date variables  ***;
+***------------------------------***;
+
+   PROC means data = &TT437dsn  n nmiss ;
       var CreateDate  ResultDate  UpdateDate   ; 
 run;
 
@@ -270,7 +334,9 @@ run;
  *_______________________________________________________________________________________*/
 
 
- **  Explore relationship between CreateDate and ResultDate  **;
+***  10. Explore relationship between CreateDate and ResultDate  ***;
+***--------------------------------------------------------------***;
+
    PROC freq data = &TT437dsn  ;
       tables CreateDate  ResultDate ;
       format CreateDate  ResultDate  WeekW5. ;
@@ -278,7 +344,6 @@ run;
    PROC print data = &TT437dsn  ;
       where ResultDate > CreateDate ;
 run;
-
 
 /*_______________________________________________________________________________________*
  |FINDINGS:

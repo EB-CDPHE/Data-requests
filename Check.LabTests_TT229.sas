@@ -22,6 +22,7 @@ options pageno=1;
  | 2. Evaluate "ResultID" and "ResultText" variables
  | 3. Examine records with duplicate LabSpecimenID's
  |    a) Records with duplicate LabSpecimenID that have > 2 LabTest results 
+ | 
  *------------------------------------------------------------------------------*/
 
 
@@ -44,7 +45,6 @@ run;
 ***-----------------------------------------------------***;
 
    PROC freq data = &TT229dsn  ;
-      tables ResultID / missing missprint;
       tables ResultID * ResultText /list missing missprint; 
       tables QuantitativeResult ; 
 run;
@@ -58,6 +58,7 @@ run;
  |    ResultID=4 for ResultText = 'Indeterminate'
  |    ResultID=9 for ResultText = 'Unknown'
  |    ResultID=99 for ResultText = 'Result is Text'
+ | QuantitativeResult variable is nearly useless given wide range of responses.
  *___________________________________________________________________________________________________*/
 
 
@@ -114,4 +115,37 @@ run;
  |FIX:  Delete these records prior to merge with Lab_TT437_fix.
  *_______________________________________________________________________________________________________________*/
 
+
+
+***  5. Evaluate date variables  ***;
+***------------------------------***;
+
+** Missing values for date variables **;
+   PROC means data = &TT229dsn  n nmiss ;
+      var ResultDate  CreateDate  UpdateDate ; 
+run;
+
+/*____________________________________________________________*
+ |FINDINGS:
+ | CreateDate has no missing values. 
+ | UpdateDate exists for approx 0.3% of PCR results.
+ | Result date is missing for approx 2.0% of PCR results.  
+ *____________________________________________________________*/
+
+
+** Invalid values (i.e. date ranges) for date variables **;
+   PROC freq data = &TT229dsn  ;
+      tables ResultDate  CreateDate  UpdateDate  ;
+      format ResultDate  CreateDate  UpdateDate   WeekW11. ;
+run;
+
+/*_________________________________________________________________*
+ |FINDINGS:
+ | All date values are from much earlier time period than COVID, i.e. 1920.
+ | ResultDate has values several months into the future, i.e. Dec 2021
+ | CreateDate goes from 2013 to present. 
+ | UpdateDate goes from 2017 to present. 
+ |FIX:
+ | Re-do data check after merging with COVID LabTests.
+ *_________________________________________________________________*/
 

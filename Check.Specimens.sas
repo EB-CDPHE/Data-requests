@@ -109,14 +109,17 @@ run;
 ** Invalid values (i.e. date ranges) for date variables **;
    PROC freq data = &SpecDSN  ;
       tables CollectionDate  CreatedDate  UpdatedDate ;
-      format CollectionDate  CreatedDate  UpdatedDate  WeekW5. ;
+      format CollectionDate  CreatedDate  UpdatedDate  WeekW11. ;
 run;
 
-/*_________________________________________________________________*
+/*____________________________________________________________________________*
  |FINDINGS:
  | All date values are from much earlier time period than COVID. 
+ | CollectionDate goes from 1900 to 2106, i.e. there are some wrong values.
+ | CreatedDate goes from 1999 to present.
+ | UpdatedDate goes from 2017 to present.
  |FIX:
  | Re-do data check after merging with COVID LabTests.
- *_________________________________________________________________*/
+ *____________________________________________________________________________*/
 
 

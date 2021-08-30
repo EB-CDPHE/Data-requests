@@ -65,7 +65,7 @@ DATA Specimens_temp;
 
    DROP tmp_: ;
 
-   KEEP LabSpecimenID  EventID  SpecimenTypeID Specimen  CollectionDate AccessionID  SampleName  
+   KEEP LabSpecimenID  EventID  SpecimenTypeID  Specimen  CollectionDate AccessionID  SampleName  
         CreatedDate  CreatedID  Created  UpdatedDate UpdatedID  Updated ;
 
    Label CreatedDate = "Specimen Create Date "

@@ -26,23 +26,15 @@ PROC contents data=Specimens  varnum ; title1 'CEDRS66.zDSI_Specimens';  run;
 /*      tables CreatedID * Created / list; */
 /*run;*/
 
-/*   PROC print data= LabTests; */
-/*      where TestType = 'RT-PCR'; */
-/*      var TestTypeID TestType ResultID ResultText QuantitativeResult; */
-/*run;*/
-
 /*________________________________________________________________________________________________*
  | FINDINGS:                                                                 
  |    EventID is a numeric instead of character variable.    
  |    (Convert to character prior to running SHRINK macro.)    
  |    CreatedDate is a date-time variable. Extract date part and create date variable.
+ |    UpdatedDate is a date-time variable. Extract date part and create date variable.
+ |    CollectionDate is a date-time variable. Extract date part and create date variable.
  |    Character vars have length and format of $255. Keep just the two new variables plus ICU.
  |
- |NOTE:  
- | ** TestTypeID=229 for TestType = 'RT-PCR'
- | ** TestTypeID=435 for TestType = 'Antigen for COVID-19'
- | ** TestTypeID=436 for TestType = 'Variant of public health concern'
- | ** TestTypeID=437 for TestType = 'COVID-19 Variant Type'
  *________________________________________________________________________________________________*/
 
 ** Calculate frequency of various test types related to COVID **;

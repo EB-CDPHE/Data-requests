@@ -33,12 +33,12 @@ options pageno=1;
       tables CreatedID * Created /list; ** Name of person that created the test result record;
 run;
 
-/*_______________________________________________________________________________*
+/*_______________________________________________________________________________________*
  |FINDINGS:
  | CreatedID is the numeric code assigned to names
  | Created holds the names.
  | Over 60% of Specimens were created by "System Admin" (38%) or ELRAutoImport (23%).
- *_______________________________________________________________________________*/
+ *_______________________________________________________________________________________*/
 
 
 ***  2. Evaluate "UpdatedID" and "Updated" variables  ***;
@@ -51,13 +51,13 @@ UpdatedAbbrev = scan(Updated,1,' ');
       tables UpdatedID * UpdatedAbbrev /list; ** Name of person that created the test result record;
 run;
 
-/*_______________________________________________________________________________*
+/*____________________________________________________________________________________________________*
  |FINDINGS:
  | UpdatedID is the numeric code assigned to names. There are multiple names assigned to each code.
  | However, all names assigned to a code have the same first name but different last name.
  | Updated holds the names.
  | 
- *_______________________________________________________________________________*/
+ *____________________________________________________________________________________________________*/
 
 
 ***  3. Evaluate "SpecimenTypeID" and "Specimen" variables  ***;

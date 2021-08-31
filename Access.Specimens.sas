@@ -88,5 +88,5 @@ run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=Specimens_read  varnum ;  title1 'Lab_TT437_read';  run;
+   PROC contents data=Specimens_read  varnum ;  title1 'Specimens_read';  run;
 

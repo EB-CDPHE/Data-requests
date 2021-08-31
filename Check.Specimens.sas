@@ -123,3 +123,33 @@ run;
  *____________________________________________________________________________*/
 
 
+***  6. Pre-merge analysis  ***;
+***------------------------------***;
+
+   proc sort data= Specimens_read
+               out= Specimens_sort;
+      by LabSpecimenID EventID;
+run;
+
+DATA Spec_PCR; 
+   merge Lab_TT229_fix(in=pcr)  Specimens_read(in=s) ;
+   by LabSpecimenID EventID;
+   
+   if pcr=1 then TT229_in=1; else TT229_in=0;
+   if s=1 then Spec_in=1; else Spec_in=0;
+run;
+
+   PROC freq data= Spec_PCR ;
+      tables Spec_in * TT229_in ;
+run;
+
+** Print record that has PCR test but is NOT in Specimen dataset **;
+   proc print data= Spec_PCR;  where Spec_in=0 and TT229_in=1; run;
+
+/*______________________________________________________________________________________________*
+ |FINDINGS:
+ | n=2,298,171 records in Specimens
+ | n=1,372,307 records with PCR test - all but 1 are in Specimens dataset
+ | EventID= 722098 and LabSpecimenID= 840399 is missing from Specimens though has PCR test
+ *______________________________________________________________________________________________*/
+

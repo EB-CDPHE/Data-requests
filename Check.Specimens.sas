@@ -145,6 +145,7 @@ run;
 
 ** Print record that has PCR test but is NOT in Specimen dataset **;
    proc print data= Spec_PCR;  where Spec_in=0 and TT229_in=1; run;
+   proc print data= Specimens_read;  where EventID='722098'; run;
 
 /*______________________________________________________________________________________________*
  |FINDINGS:

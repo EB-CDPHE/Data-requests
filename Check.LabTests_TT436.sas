@@ -2,7 +2,7 @@
 PROGRAM:  Check.LabTests_TT436
 AUTHOR:   Eric Bush
 CREATED:  August 27, 2021
-MODIFIED: 
+MODIFIED: 090121
 PURPOSE:	 After a SQL data table has been read using Access.LabTests_TT437, 
             this program can be used to explore the SAS dataset.
 INPUT:	 Lab_TT436_read
@@ -123,8 +123,8 @@ run;
  |FINDINGS:
  | LabID:  No values are missing. This is a 7 digit ID unique for each record
  | LabSpecimenID:  No values are missing. This is a 6 or 7 digit ID. Most are unique.
- | N = 25,925 records with LabSpecimenID. Most records have only 1 LabSpecimenID.  
- | N = 25,772 unique LabSpecimenID 's for this TestType
+ | N = 27,745 records with LabSpecimenID. Most records have only 1 LabSpecimenID.  
+ | N = 25,592 unique LabSpecimenID 's for this TestType
  | n=151 LabSpecimenID with two LabTest results
  | n=1 LabSpecimenID with three LabTest results
  *_______________________________________________________________________________________*/
@@ -200,7 +200,7 @@ run;
 
 /*______________________________________________________________________________________________________________*
  |FINDINGS:
- | n=8 records (4 pairs) with duplicate LabSpecimenID's have identical values in FOUR vars
+ | n=10 records with duplicate LabSpecimenID's have identical values in FOUR vars
  | FIX: DeDup on FOUR keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  |
  | n=22 records (11 pairs) with duplicate LabSpecimenID's have identical values in TWO vars

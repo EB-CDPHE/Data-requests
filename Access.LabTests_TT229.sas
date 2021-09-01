@@ -2,7 +2,7 @@
 PROGRAM:    Access.LabTests_TT229      
 AUTHOR:		Eric Bush
 CREATED:	   August 27, 2021
-MODIFIED:   
+MODIFIED:   090121:  Add additional Test Types to documentation
 PURPOSE:	   Connect to CEDRS backend (dphe66) to access LabTests
 INPUT:		dbo66.zDSI_LabTests  WHERE TestTypeID= 229 (TestType = 'RT-PCR')
 OUTPUT:		      Lab_TT229_read
@@ -40,9 +40,11 @@ PROC contents data=LabTests  varnum ; title1 'CEDRS66.zDSI_LabTests';  run;
  |
  |NOTE:  
  | ** TestTypeID=229 for TestType = 'RT-PCR'
+ | ** TestTypeID=434 for TestType = 'Other Molecular Assay'
  | ** TestTypeID=435 for TestType = 'Antigen for COVID-19'
  | ** TestTypeID=436 for TestType = 'Variant of public health concern'
  | ** TestTypeID=437 for TestType = 'COVID-19 Variant Type'
+ | ** TestTypeID=439 for TestType = ' At-home Antigen'
  *________________________________________________________________________________________________*/
 
 ** Calculate frequency of various test types related to COVID **;

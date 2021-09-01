@@ -99,7 +99,9 @@ DATA Lab_TT229_temp ;   set TT229_DeDup1 (DROP=  TestBrandID  TestBrand  LegacyT
                             1735642, 1798732, 1925013, 2005303, 2362747, 2376934 ) ;
 
 * RENAME variables to keep when merging with Lab_TT437_fix  *;
-   RENAME   ResultText         = ResultText_TT229
+   RENAME   TestTypeID         = TestTypeID_TT229
+            TestType           = TestType_TT229
+            ResultText         = ResultText_TT229
             QuantitativeResult = QuantitativeResult_TT229
             ReferenceRange     = ReferenceRange_TT229
             ResultID           = ResultID_TT229
@@ -109,7 +111,7 @@ DATA Lab_TT229_temp ;   set TT229_DeDup1 (DROP=  TestBrandID  TestBrand  LegacyT
        ;
 
 * DROP variables not needed for merging  *;
-   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  TestTypeID TestType  ;
+   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  ;
 
 run;
 

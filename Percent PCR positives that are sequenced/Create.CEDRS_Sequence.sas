@@ -1,14 +1,14 @@
-/**********************************************************************************************
+/********************************************************************************************************
 PROGRAM:  Create.CEDRS_Sequence
 AUTHOR:   Eric Bush
 CREATED:	 August 31, 2021
 MODIFIED: 090121
 PURPOSE:	 Make data edits to Lab_TT437_read per edit checks in CHECK.LabTests_TT437.sas
-INPUT:	      Specimens_read  &  Lab_TT229_fix  ||  Lab_TT436_fix  &  Lab_TT436_fix  ||
-OUTPUT:	      Specimens_w_PCR                   ||   
-***********************************************************************************************/
+INPUT:	 Specimens_read  &  Lab_TT229_fix  |_|  Lab_TT436_fix  &  Lab_TT436_fix  ||
+OUTPUT:	 Specimens_w_PCR                   |+|  COVID_Sequence                   ==  COVID.CEDRS_Sequence
+**********************************************************************************************************/
 
-/*
+/*-----------------------------------------------------------------------------------------------------*
  | Steps to create final dataset:
  | 1. Merge Lab_TT229_fix (PCR LabTest data)  AND  Specimens_read (Specimen data)
  |    --> Specimens_w_PCR
@@ -22,8 +22,10 @@ OUTPUT:	      Specimens_w_PCR                   ||
  |    --> CEDRS_PCR1
  | 5. Merge CEDRS_PCR1  AND SwP2
  |    --> CEDRS_PCR2
-
-*/
+ | 6. SKIP THIS STEP FOR NOW  (Merge CEDRS_PCR2  AND SwP3)
+ | 7. Merge COVID sequence data with CEDRS_PCR data
+ |    --> CEDRS_Sequence
+ *------------------------------------------------------------------------------------------------------*/
 
 
 *** STEP 1:  Merge Lab_TT229_fix (PCR LabTest data)  AND  Specimens_read (Specimen data) ***;
@@ -145,7 +147,7 @@ run;
 
 
 *** STEP 6:  Part 2 of joining PCR test data with CEDRS
-***   CEDRS_PCR2  AND  SwP3 (Specimens with PCR tests-Part 3)  ***;
+***   Merge CEDRS_PCR2  AND  SwP3 (Specimens with PCR tests-Part 3)  ***;
 *** CREATES:  CEDRS_PCR
 ***-----------------------------------------------------------------***;
 
@@ -176,6 +178,9 @@ run;
       by EventID LabSpecimenID ;
 run;
 
+
+Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
+
 **  Merge COVID_Sequence and  CEDRS_PCR2 to create CEDRS_Sequence  **;
 DATA COVID.CEDRS_Sequence;
    merge COVID_Sequence_sort  CEDRS_PCR2_sort(in=pcr) ;
@@ -183,4 +188,4 @@ DATA COVID.CEDRS_Sequence;
 
    if pcr;
 run;
-   PROC contents data= COVID.CEDRS_Sequence  varnum  ; title1 'CEDRS_Sequence'; run;
+   PROC contents data= COVID.CEDRS_Sequence  varnum  ; title1 'COVID.CEDRS_Sequence'; run;

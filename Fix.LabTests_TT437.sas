@@ -14,10 +14,11 @@ OUTPUT:	      Lab_TT437_fix
  | 2. De-dup records with two Test results per Specimen with identical values in THREE variables 
  | 3. Delete duplicate record where ResultDate = missing (dups with identical values in TWO vars)
  | 4. Delete duplicate records with different values for all variables (except LabSpecimenID)
- | 5. Re-format ResultText field: i.e. extract lineage name and ignore descriptive text
- | 6. RENAME variables to keep when merging with Lab_TT437_fix
- | 7. DROP variables not needed for merging with Lab_TT437_fix
- | 8. SORT fixed data for merging
+ | 5. Delete results = "Specimen unsatisfactory for evaluation"
+ | 6. Re-format ResultText field: i.e. extract lineage name and ignore descriptive text
+ | 7. RENAME variables to keep when merging with Lab_TT437_fix
+ | 8. DROP variables not needed for merging with Lab_TT437_fix
+ | 9. SORT fixed data for merging
  *------------------------------------------------------------------------------------------------*/
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
@@ -58,6 +59,9 @@ DATA Lab_TT437_temp ;
 * Delete duplicate records with different values for all variables (except LabSpecimenID) *;
 * AND have a ResultID = (1069 or 1070) *;
    if (first.LabSpecimenID ne last.LabSpecimenID)  AND  ResultID in (1067, 1068, 1069, 1070) then delete;
+
+* Delete results = "Specimen unsatisfactory for evaluation"*;
+   if ResultText = 'Specimen unsatisfactory for evaluation' then delete;
 
 * Re-format ResultText field: i.e. extract lineage name and ignore descriptive text *;
    Variant_Type =  scan(ResultText,1,'-');     ;

@@ -28,7 +28,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
    PROC contents data=Lab_TT436_read varnum;  title1 'Lab_TT436_read';  run;
 
 
-** STEP 1:  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
+** STEP 1:  Fix data errors per findings in Check.LabTests_TT436.sas program  **;
 DATA Lab_TT436_temp ;   
    set Lab_TT436_read (DROP=  TestBrandID  TestBrand  LegacyTestID  CreatedByID) ;
 

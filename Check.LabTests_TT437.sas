@@ -30,6 +30,7 @@ options pageno=1;
  |  8. Evaluate "ELRID" variable
  |  9. Evaluate date variables
  | 10. Explore relationship between CreateDate and ResultDate
+ | 11. Check for results = "Specimen unsatisfactory for evaluation"
  *--------------------------------------------------------------------*/
 
 
@@ -353,8 +354,8 @@ run;
  *_______________________________________________________________________________________*/
 
 
-***  11. Explore Result Text  ***;
-***--------------------------------------------------------------***;
+***  11. Check for results = "Specimen unsatisfactory for evaluation"  ***;
+***--------------------------------------------------------------------***;
 
    PROC freq data = &TT437dsn  ;
       tables ResultText ;

@@ -159,10 +159,10 @@ run;
 run;
 
 **  Merge COVID_Sequence and  CEDRS_PCR2 to create CEDRS_Sequence  **;
-DATA CEDRS_Sequence;
+DATA COVID.CEDRS_Sequence;
    merge COVID_Sequence_sort  CEDRS_PCR2_sort(in=pcr) ;
    by EventID LabSpecimenID;
 
    if pcr;
 run;
-   PROC contents data= CEDRS_Sequence  varnum  ; title1 'CEDRS_Sequence'; run;
+   PROC contents data= COVID.CEDRS_Sequence  varnum  ; title1 'CEDRS_Sequence'; run;

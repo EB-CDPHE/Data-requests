@@ -16,9 +16,9 @@ OUTPUT:	      Lab_TT436_fix
  | 4. De-dup records with two Test results per Specimen with identical values in FOUR variables
  | 5. De-dup records with two Test results per Specimen with identical values in TWO variables
  | 6. For duplicate records with identical values in ONE variable, delete record where result='No'
- | 3. RENAME variables to keep when merging with Lab_TT437_fix
- | 4. DROP variables not needed for merging with Lab_TT437_fix
- | 5. SORT fixed data for merging
+ | 7. RENAME variables to keep when merging with Lab_TT437_fix
+ | 8. DROP variables not needed for merging with Lab_TT437_fix
+ | 9. SORT fixed data for merging
  *---------------------------------------------------------------------------------------------*/
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;

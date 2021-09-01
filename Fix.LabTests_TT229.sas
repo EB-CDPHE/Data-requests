@@ -1,9 +1,9 @@
 /**********************************************************************************************
-PROGRAM: Fix.LabTests_TT229
-AUTHOR:  Eric Bush
-CREATED:	August 26, 2021
-MODIFIED: 
-PURPOSE:	Make data edits to Lab_TT229_read per edit checks in CHECK.LabTests_TT229.sas
+PROGRAM:  Fix.LabTests_TT229
+AUTHOR:   Eric Bush
+CREATED:	 August 26, 2021
+MODIFIED: 090121 
+PURPOSE:	 Make data edits to Lab_TT229_read per edit checks in CHECK.LabTests_TT229.sas
 INPUT:	      Lab_TT229_read 
 OUTPUT:	      Lab_TT229_fix
 ***********************************************************************************************/
@@ -32,6 +32,7 @@ OUTPUT:	      Lab_TT229_fix
 
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
+title;
    PROC contents data=Lab_TT229_read varnum;  title1 'Lab_TT229_read';  run;
 
 

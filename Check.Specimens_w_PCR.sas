@@ -17,8 +17,272 @@ options pageno=1;
    PROC contents data=Specimens_read  varnum ;  title1 'Specimens_read';  run;
 
 /*-----------------------------------------------------------------*
- | Check Lab_TT437_read data for:
+ | Check Specimens_w_PCR data for:
  *-----------------------------------------------------------------*/
+
+** Any missing CollectionDate? **;
+   PROC means data= Specimens_w_PCR  n nmiss;
+      var CollectionDate  LabSpecimenID ;
+run;
+
+
+** How many Specimens per EventID?  **;
+   PROC freq data = Specimens_w_PCR  NOPRINT ;
+      where CollectionDate ne .;
+      tables  EventID*CollectionDate / out=Event_Coll_Count ;
+run;
+
+/*      proc print data= Event_Coll_Count; where count=1;     run;*/
+/*      proc print data= Specimens_w_PCR; where EventID='1000140'; */
+/*         var EventID  LabSpecimenID CollectionDate   ;*/
+/*run;*/
+
+   PROC freq data = Event_Coll_Count;
+      tables COUNT;
+      title1 'Specimens_w_PCR';
+      title2 'Frequency of Collection Dates per EventID';
+run;
+
+
+proc print data= Event_Count;
+where count>50;
+run;
+
+   proc sort data= Specimens_w_PCR
+               out= Specimens_w_PCR_Sort ;
+      by EventID  CollectionDate   LabSpecimenID  ;
+run;
+
+   PROC print data= Specimens_w_PCR_Sort ;
+      where EventID in 
+         ('1007196', '1210721', '552404', '647800', '664619', '741091', '792031', '998246'
+         );
+      ID EventID; 
+      by EventID;
+      var LabSpecimenID  Specimen  CollectionDate   ResultDate_TT229  ResultText_TT229  ;
+      format Specimen  $10.;
+run;
+
+
+
+/*-----------------------------------------------------------------*
+ | Check CEDRS_fix data for:
+ *-----------------------------------------------------------------*/
+
+
+** Any missing CollectionDate? **;
+   PROC means data= COVID.CEDRS_view_fix   n nmiss;
+      var   ReportedDate   CollectionDate    ;
+run;
+
+
+
+    proc sort data= COVID.CEDRS_view_fix
+               out= CEDRS_sort ;
+      by EventID  CollectionDate     ;
+run;
+
+
+
+** How many Specimens per EventID?  **;
+   PROC freq data = CEDRS_sort  NOPRINT ;
+      where CollectionDate ne .;
+      tables  EventID*CollectionDate / out=CEDRS_Coll_Count ;
+run;
+
+   PROC freq data = CEDRS_Coll_Count;
+      tables COUNT;
+      title1 'COVID.CEDRS_view_fix';
+      title2 'Frequency of Collection Dates per EventID';
+run;
+
+
+
+
+
+
+
+   PROC print data= CEDRS_sort ;
+      where EventID in 
+         ('1007196', '1210721', '552404', '647800', '664619', '741091', '792031', '998246'
+         );
+      ID EventID; 
+      by EventID;
+      var   CollectionDate   ReportedDate  Earliest_CollectionDate ;
+      format Specimen  $10.;
+      title1 'CEDRS_sort';
+run;
+
+
+
+
+/*-----------------------------------------------------------------*
+ | Check SwP2 data for:
+ *-----------------------------------------------------------------*/
+** Any missing CollectionDate? **;
+   PROC means data= SwP2   n nmiss;
+      var   LabSpecimenID   CollectionDate    ;
+run;
+
+** How many Specimens per EventID?  **;
+   PROC freq data = SwP2  NOPRINT ;
+      where CollectionDate ne .;
+      tables  EventID*CollectionDate / out=SwP2_Coll_Count ;
+   PROC freq data = SwP2_Coll_Count;
+      tables COUNT;
+      title1 'SwP2';
+      title2 'Frequency of Collection Dates per EventID';
+run;
+
+
+
+
+
+/*-----------------------------------------------------------------*
+ | Check CEDRS_PCR1 data for:
+ *-----------------------------------------------------------------*/
+
+   PROC print data= CEDRS_PCR1 ;
+      ID EventID; 
+      by EventID;
+      var LabSpecimenID   CollectionDate   ReportedDate  Earliest_CollectionDate   Specimen  CollectionDate   ResultDate_TT229  ResultText_TT229  ;
+      format Specimen  $10.;
+      title1 'CEDRS_sort';
+run;
+
+
+
+/*-----------------------------------------------------------------*
+ | Check CEDRS_PCR2 data for:
+ *-----------------------------------------------------------------*/
+
+** Any missing CollectionDate? **;
+   PROC means data= CEDRS_PCR2   n nmiss;
+      var   ReportedDate   CollectionDate  LabSpecimenID  ;
+run;
+
+
+** How many Collection Dates per EventID?  **;
+   PROC freq data = CEDRS_PCR2  NOPRINT ;
+      where CollectionDate ne .;
+      tables  EventID*CollectionDate / out=PCR2_Coll_Count ;
+run;
+
+   PROC freq data = PCR2_Coll_Count;
+      tables COUNT;
+      title1 'CEDRS_PCR2';
+      title2 'Frequency of Collection Dates per EventID';
+run;
+
+
+** Which PCR tests were added?  **;
+/*DATA extrarec;  set CEDRS_PCR2;*/
+/*   by EventID CollectionDate;*/
+/**/
+/*   if first.EventID ne last.EventID;*/
+/*run;*/
+/*   PROC print data= extrarec;*/
+/*      where collectiondate='31JUL21'd;*/
+/*      id EventID;*/
+/*      by EventID;*/
+/*      var LabSpecimenID   CollectionDate   ReportedDate  Earliest_CollectionDate   Specimen  CollectionDate   ResultDate_TT229  ResultText_TT229  ;*/
+/*      format Specimen  $10.;*/
+/*      title1 'CEDRS_PCR2 extra records';*/
+/*      title2 'Extra records added to CEDRS_PCR1 when creating CEDRS_PCR2';*/
+/*run;*/
+
+
+proc sort data=
+            out= ;
+   by EventID CollectionDate ReportedDate ;
+
+
+
+/*-----------------------------------------------------------------*
+ | Check SwP2 data for:
+ *-----------------------------------------------------------------*/
+** Any missing CollectionDate? **;
+
+   PROC means data= SwP3   n nmiss;
+      var   LabSpecimenID   CollectionDate    ;
+run;
+
+** How many Specimens per EventID?  **;
+   PROC freq data = SwP3  NOPRINT ;
+/*      where CollectionDate ne .;*/
+      tables  EventID*CollectionDate / out=SwP3_Coll_Count ;
+   PROC freq data = SwP3_Coll_Count;
+      tables COUNT  / missing missprint;
+      title1 'SwP3';
+      title2 'Frequency of Collection Dates per EventID';
+run;
+
+
+
+/*-----------------------------------------------------------------*
+ | Check COVID_Sequence data for:
+ *-----------------------------------------------------------------*/
+title1 'COVID_Sequence';
+** Any missing CollectionDate? **;
+   PROC means data= COVID_Sequence   n nmiss;
+      var  LabSpecimenID  ResultDate_TT436  ResultDate  ;
+run;
+
+
+** How many Specimens per EventID?  **;
+   PROC freq data = COVID_Sequence  NOPRINT ;
+      tables  EventID*LabSpecimenID / out=COVID_Sequence_Count ;
+   PROC freq data = COVID_Sequence_Count;
+      tables COUNT;
+      title1 'COVID_Sequence';
+      title2 'Frequency of LabSpecimenID per EventID';
+run;
+
+
+/*-----------------------------------------------------------------*
+ | Check again CEDRS_PCR2 data for:
+ *-----------------------------------------------------------------*/
+title1 'CEDRS_PCR2';
+
+** Any missing CollectionDate? **;
+   PROC means data= CEDRS_PCR2   n nmiss;
+      var LabSpecimenID  ReportedDate   CollectionDate   ResultDate_TT229 ;
+run;
+
+** How many Specimens per EventID?  **;
+   PROC freq data = CEDRS_PCR2  NOPRINT ;
+      tables  EventID*LabSpecimenID / out=CEDRS_PCR2_Count2 ;
+   PROC freq data = CEDRS_PCR2_Count2;
+      tables COUNT;
+      title1 'CEDRS_PCR2';
+      title2 'Frequency of LabSpecimenID per EventID';
+run;
+
+
+
+
+
+/*-----------------------------------------------------------------*
+ | Check NOMATCH2 data for:
+ *-----------------------------------------------------------------*/
+
+** Any missing CollectionDate? **;
+   PROC means data= NOMATCH2   n nmiss;
+      var      CollectionDate   LabSpecimenID ;
+run;
+
+** How many Specimens per EventID?  **;
+   PROC freq data = NOMATCH2  NOPRINT ;
+      where CollectionDate ne .;
+      tables  EventID*CollectionDate / out=NOMATCH2_Count ;
+run;
+
+   PROC freq data = NOMATCH2_Count;
+      tables COUNT;
+      title1 'NOMATCH2';
+      title2 'Frequency of Collection Dates per EventID';
+run;
+
 
 
 

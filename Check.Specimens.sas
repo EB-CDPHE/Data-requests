@@ -2,7 +2,7 @@
 PROGRAM:  Check.Specimens
 AUTHOR:   Eric Bush
 CREATED:  August 30, 2021
-MODIFIED: 
+MODIFIED: 090121
 PURPOSE:	 After a SQL data table has been read using Access.Specimens_read, 
             this program can be used to explore the SAS dataset.
 INPUT:	 Specimens_read
@@ -56,7 +56,6 @@ run;
  | UpdatedID is the numeric code assigned to names. There are multiple names assigned to each code.
  | However, all names assigned to a code have the same first name but different last name.
  | Updated holds the names.
- | 
  *____________________________________________________________________________________________________*/
 
 

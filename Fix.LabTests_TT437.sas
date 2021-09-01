@@ -1,9 +1,9 @@
 /**********************************************************************************************
-PROGRAM: Fix.LabTests_TT437
-AUTHOR:  Eric Bush
-CREATED:	August 26, 2021
-MODIFIED: 
-PURPOSE:	Make data edits to Lab_TT437_read per edit checks in CHECK.LabTests_TT437.sas
+PROGRAM:  Fix.LabTests_TT437
+AUTHOR:   Eric Bush
+CREATED:	 August 26, 2021
+MODIFIED: 090121
+PURPOSE:	 Make data edits to Lab_TT437_read per edit checks in CHECK.LabTests_TT437.sas
 INPUT:	      Lab_TT437_read 
 OUTPUT:	      Lab_TT437_fix
 ***********************************************************************************************/
@@ -15,6 +15,9 @@ OUTPUT:	      Lab_TT437_fix
  | 3. Delete duplicate record where ResultDate = missing (dups with identical values in TWO vars)
  | 4. Delete duplicate records with different values for all variables (except LabSpecimenID)
  | 5. Re-format ResultText field: i.e. extract lineage name and ignore descriptive text
+ | 6. RENAME variables to keep when merging with Lab_TT437_fix
+ | 7. DROP variables not needed for merging with Lab_TT437_fix
+ | 8. SORT fixed data for merging
  *------------------------------------------------------------------------------------------------*/
 
 ** Access the final SAS dataset that was created in the Access.* program validated with the Check.* programn **;
@@ -59,6 +62,22 @@ DATA Lab_TT437_temp ;
 * Re-format ResultText field: i.e. extract lineage name and ignore descriptive text *;
    Variant_Type =  scan(ResultText,1,'-');     ;
    Label Variant_Type = "ResultText abbreviated " ;
+
+* RENAME variables to keep when merging  *;
+   RENAME   TestTypeID         = TestTypeID_TT437
+            TestType           = TestType_TT437
+            ResultText         = ResultText_TT437
+            QuantitativeResult = QuantitativeResult_TT437
+            ReferenceRange     = ReferenceRange_TT437
+            ResultID           = ResultID_TT437
+            ResultDate         = ResultDate_TT437
+            CreateDate         = CreateDate_TT437
+            UpdateDate         = UpdateDate_TT437  ;
+
+* DROP variables not needed for merging  *;
+   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID    ;
+
+
 run;
 
 

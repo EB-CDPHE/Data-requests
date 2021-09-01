@@ -70,6 +70,8 @@ run;
       tables  LabSpecimenID / out=Lab_TT229_Count ;
    PROC freq data = Lab_TT229_Count;
       tables COUNT;
+      title1 'Lab_TT229_read';
+      title2 'Frequency count of LabSpecimenID';
 run;
 
 
@@ -250,7 +252,7 @@ run;
       format ResultDate  CreateDate  UpdateDate   WeekW11. ;
 run;
 
-/*_________________________________________________________________*
+/*_____________________________________________________________________________*
  |FINDINGS:
  | All date values are from much earlier time period than COVID, i.e. 1920.
  | ResultDate has values several months into the future, i.e. Dec 2021
@@ -258,5 +260,5 @@ run;
  | UpdateDate goes from 2017 to present. 
  |FIX:
  | Re-do data check after merging with COVID LabTests.
- *_________________________________________________________________*/
+ *______________________________________________________________________________*/
 

@@ -2,7 +2,7 @@
 PROGRAM:  Check.LabTests_TT229
 AUTHOR:   Eric Bush
 CREATED:  August 27, 2021
-MODIFIED: 
+MODIFIED: 090121
 PURPOSE:	 After a SQL data table has been read using Access.LabTests_TT229, 
             this program can be used to explore the SAS dataset.
 INPUT:	 Lab_TT229_read
@@ -157,19 +157,19 @@ run;
 
 /*______________________________________________________________________________________________________________*
  |FINDINGS:
- | n=9504 records (4752 pairs) with duplicate LabSpecimenID's have identical values in FOUR vars
+ | n=9891 records with duplicate LabSpecimenID's have identical values in FOUR vars
  | FIX: DeDup on FOUR keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  |
- | n=22 records (11 pairs) with duplicate LabSpecimenID's have identical values in THREE vars
+ | n=20 records with duplicate LabSpecimenID's have identical values in THREE vars
  | ?All but two of these pairs have ResultID in (1067, 1070). Were they re-sequenced?
  | ?FIX: DeDup on THREE keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  | ?Previous sort should be for descending CreateDate so this de-dup will keep most recent record.
  |
- | n=146 records (73 pairs) with duplicate LabSpecimenID's have identical values in TWO vars
+ | n=147 records with duplicate LabSpecimenID's have identical values in TWO vars
  | ?These records have same ResultID and ResultText. The ResultDate differs because one value is missing.
  | ?FIX: Delete record with missing ResultDate.
  |
- | n=82 records (41 pairs) with duplicate LabSpecimenID's have identical values in ONE var (LabSpecimenID)
+ | n=82 records with duplicate LabSpecimenID's have identical values in ONE var (LabSpecimenID)
  | ?All but two of these pairs had ResultID= 1069 or 1070 for one record in duplicate pair.
  | ?The two exceptions had one record with result text that contained "LIKE".
  | ?FIX: delete record with ResultID= 1069 or 1070 and keep matching record with other ResultID.

@@ -1,9 +1,9 @@
 /**********************************************************************************************
-PROGRAM: Fix.LabTests_TT436
-AUTHOR:  Eric Bush
-CREATED:	August 26, 2021
-MODIFIED: 
-PURPOSE:	Make data edits to Lab_TT436_read per edit checks in CHECK.LabTests_TT436.sas
+PROGRAM:  Fix.LabTests_TT436
+AUTHOR:   Eric Bush
+CREATED:	 August 26, 2021
+MODIFIED: 090121
+PURPOSE:	 Make data edits to Lab_TT436_read per edit checks in CHECK.LabTests_TT436.sas
 INPUT:	      Lab_TT436_read 
 OUTPUT:	      Lab_TT436_fix
 ***********************************************************************************************/

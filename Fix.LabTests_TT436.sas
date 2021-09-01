@@ -64,7 +64,9 @@ DATA TT436_fix;  set TT436_DeDup2;
    if (first.LabSpecimenID ne last.LabSpecimenID)  AND  ResultID= 9 then delete;
 
 * RENAME variables to keep when merging with Lab_TT437_fix  *;
-   RENAME   ResultText         = ResultText_TT436
+   RENAME   TestTypeID         = TestTypeID_TT436
+            TestType           = TestType_TT436
+            ResultText         = ResultText_TT436
             QuantitativeResult = QuantitativeResult_TT436
             ReferenceRange     = ReferenceRange_TT436
             ResultID           = ResultID_TT436
@@ -73,7 +75,7 @@ DATA TT436_fix;  set TT436_DeDup2;
             UpdateDate         = UpdateDate_TT436  ;
 
 * DROP variables not needed for merging with Lab_TT437_fix  *;
-   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  TestTypeID TestType  ;
+   DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  ;
 
 run;
 

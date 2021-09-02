@@ -105,12 +105,12 @@ run;
       format  ResultText $10. ;
 run;
 
-/*______________________________________________________________________________________________________________*
+/*________________________________________________________________________________________________________*
  |FINDINGS:
  | n=1 record that has 3 LabTest results for a given LabSpecimenID
  | NONE of these LabSpecimens have been sequenced, i.e. NONE have corresponding TestType=437.
- |FIX:  Delete this record prior to merge with Lab_TT437_fix.
- *_______________________________________________________________________________________________________________*/
+ |FIX:  De-dup with other duplicate records via NODUPKEY prior to merge with Lab_TT437_fix.
+ *________________________________________________________________________________________________________*/
 
 
 
@@ -125,7 +125,8 @@ run;
 ** Calculate number of variables with identical values for Dups. Creates NumDupKey **;
 DATA Two_TT434_Spec ;  set TT434_Spec ;
    by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
-      where LabSpecimenID in (937046 ) ;
+/*      where LabSpecimenID in (937046 ) ;*/
+/*      where CreateDate in ('10OCT20'd, '01APR21'd, '31JUL21'd) ;* OR  CreateDate ge '31JUL21'd ;*/
 
    * duplicate on all 4 variables;
         if (first.LabSpecimenID ne last.LabSpecimenID)  AND (first.ResultID ne last.ResultID)  AND  
@@ -149,23 +150,16 @@ run;
 
 /*______________________________________________________________________________________________________________*
  |FINDINGS:
- | n=9891 records with duplicate LabSpecimenID's have identical values in FOUR vars
+ | n=28,250 records with duplicate LabSpecimenID's have identical values in FOUR vars
  | FIX: DeDup on FOUR keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
- |
- | n=20 records with duplicate LabSpecimenID's have identical values in THREE vars
- | ?All but two of these pairs have ResultID in (1067, 1070). Were they re-sequenced?
- | ?FIX: DeDup on THREE keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
- | ?Previous sort should be for descending CreateDate so this de-dup will keep most recent record.
- |
- | n=147 records with duplicate LabSpecimenID's have identical values in TWO vars
- | ?These records have same ResultID and ResultText. The ResultDate differs because one value is missing.
- | ?FIX: Delete record with missing ResultDate.
- |
- | n=82 records with duplicate LabSpecimenID's have identical values in ONE var (LabSpecimenID)
- | ?All but two of these pairs had ResultID= 1069 or 1070 for one record in duplicate pair.
- | ?The two exceptions had one record with result text that contained "LIKE".
- | ?FIX: delete record with ResultID= 1069 or 1070 and keep matching record with other ResultID.
- | ?FIX: delete record with result text that contains "LIKE".
+ | n=2 records with duplicate LabSpecimenID's have identical values in THREE vars
+ | FIX: DeDup on THREE keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
+ | n=12 records with duplicate LabSpecimenID's have identical values in TWO vars
+ | FIX: Delete records where ResultDate= missing.
+ |    Then DeDup on TWO keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
+ | n=4 records with duplicate LabSpecimenID's have identical values in ONE var
+ | FIX: Delete records where ResultDate= missing.
+ |    Then DeDup on ONE key using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  *_______________________________________________________________________________________________________________*/
 
 
@@ -179,6 +173,42 @@ run;
       format  ResultText $10. ;
    title1 "Source data = &TT434dsn";
    title2 'NumDupKeys=4';
+run;
+
+**  Print records with duplicate LabTest results per Specimen  **;
+**  that have THREE variables that are identical between the two records **;
+   PROC print data= Two_TT434_Spec; 
+      where NumDupKeys=3;
+      id LabSpecimenID;
+      by LabSpecimenID;
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID  NumDupKeys ;
+      format  ResultText $10. ;
+   title1 "Source data = &TT434dsn";
+   title2 'NumDupKeys=3';
+run;
+
+**  Print records with duplicate LabTest results per Specimen  **;
+**  that have TWO variables that are identical between the two records **;
+   PROC print data= Two_TT434_Spec; 
+      where NumDupKeys=2;
+      id LabSpecimenID;
+      by LabSpecimenID;
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID  NumDupKeys ;
+      format  ResultText $10. ;
+   title1 "Source data = &TT434dsn";
+   title2 'NumDupKeys=2';
+run;
+
+**  Print records with duplicate LabTest results per Specimen  **;
+**  that have ONE variables that are identical between the two records **;
+   PROC print data= Two_TT434_Spec; 
+      where NumDupKeys=1;
+      id LabSpecimenID;
+      by LabSpecimenID;
+      var EventID ResultID ResultText ResultDate CreateDate LabID ELRID CreateByID  NumDupKeys ;
+      format  ResultText $10. ;
+   title1 "Source data = &TT434dsn";
+   title2 'NumDupKeys=1';
 run;
 
 

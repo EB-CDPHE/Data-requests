@@ -56,7 +56,7 @@ run;
 run;
 
 
-
+** Filter data to just CF 2021 **;
 DATA WGS_CY21;  set WGS;  
    where ReportedDate > '31DEC20'd;
 run;

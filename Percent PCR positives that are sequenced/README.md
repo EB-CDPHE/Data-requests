@@ -6,7 +6,8 @@ This request is for the proportion of specimens collected from confirmed and pro
 
 ## Data sources:
 Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
-![Source Data Tables](images\SourceDataTables.png)
+
+![Source_Data_Tables](images\SourceDataTables.png)
 
 > What does this look like?
 
@@ -16,7 +17,7 @@ Diagnostic testing is sequential and begins with specimen collection. The vast m
 |     | <p align="left">Steps taken to get data for revised table</p> |
 | --- | ------------------------------------------------------------------------------------ |
 |1| Access.Specimens.sas program reads and curates data from dphe66 zDSI_LabTests.Specimen. |
-|2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|
+|2| Access.Lab_TT229.sas program reads and curaates data from dphe6 zDSI_LabTests and filters on TestTypeID=229, which is for 'RT-PCR' tests. |
 |3| Run Access.zDSI_Events to get Age. Creates zDSI_Events.read|
 |4| Run FIX.zDSI_Events to create Age_in_Years variable|
 |5| Run FIX.CEDRS_view to edit data in CEDRS_view_read, add Age_in_Years variable.  Creates CEDRS_view_fix

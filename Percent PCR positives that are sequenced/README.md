@@ -9,9 +9,13 @@ Diagnostic testing is sequential and begins with specimen collection. The vast m
 
 ![Source_Data_Tables](images\SourceDataTables.png)
 
+
+
+#
 > What does this look like?
+##
 
-
+![Curated_Datasets](images/Curated%20datasets.jpg)
 #
 
 |     | <p align="left">Steps taken to get data for revised table</p> |

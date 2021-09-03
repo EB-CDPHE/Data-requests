@@ -2,7 +2,7 @@
 ## Background:
 This request is for the proportion of specimens collected from confirmed and probable COVID cases.  **Population**:  Confirmed and probable cases with specimen create date or collection date from January 1, 2021 to present that have a positive PCR or other molecular assay result.  **Outcomes**: percent of positive specimens that have been sequenced.  **Groups**: Week of collection date (or create date) and type of laboratory that provided sequencing results, i.e. CDPHE lab or other lab.  
 
-![SourceDataTables](C:\Users\eabush\Documents\GitHub\Data-requests\Percent PCR positives that are sequenced|SourceDataTables.png)
+![SourceDataTables](C:\Users\eabush\Documents\GitHub\Data-requests\Percent PCR positives that are sequenced\SourceDataTables.png)
 
 
 

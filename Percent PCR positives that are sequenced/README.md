@@ -2,15 +2,20 @@
 ## Background:
 This request is for the proportion of specimens collected from confirmed and probable COVID cases.  **Population**:  Confirmed and probable cases with specimen create date or collection date from January 1, 2021 to present that have a positive PCR or other molecular assay result.  **Outcomes**: percent of positive specimens that have been sequenced.  **Groups**: Week of collection date (or create date) and type of laboratory that provided sequencing results, i.e. CDPHE lab or other lab.  
 
-![Source Data Tables](C:\Users\eabush\Documents\GitHub\Data-requests\Percent PCR positives that are sequenced\SourceDataTables.png)
+#
 
+## Data sources:
+Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
+![Source Data Tables](images\SourceDataTables.png)
+
+> What does this look like?
 
 
 #
 
 |     | <p align="left">Steps taken to get data for revised table</p> |
 | --- | ------------------------------------------------------------------------------------ |
-|1| Run Access.CEDRS_view to acquire data from dphe144 CEDRS_view. Creates CEDRS_view_read  |
+|1| Access.Specimens.sas program reads and curates data from dphe66 zDSI_LabTests.Specimen. |
 |2| Use Check.CEDRS_view for data checks. Output informs edits made in Fix.CEDRS_view|
 |3| Run Access.zDSI_Events to get Age. Creates zDSI_Events.read|
 |4| Run FIX.zDSI_Events to create Age_in_Years variable|

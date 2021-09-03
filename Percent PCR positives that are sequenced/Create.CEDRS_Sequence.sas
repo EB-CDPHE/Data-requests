@@ -48,12 +48,47 @@ OUTPUT:	 Specimens_w_PCR                   |+|  COVID_Sequence                  
 run;
 
 DATA Specimens_w_PCR; 
-   merge Lab_TT229_fix(in=pcr)  Specimens_read ;
+   merge Lab_TT229_fix(in=pcr)  Specimens_sort ;
    by LabSpecimenID EventID;
    if pcr=1;            * <--  KEEP only the specimen records that have had a PCR test;
 run;
 
    PROC contents data=Specimens_w_PCR  varnum ;  title1 'Specimens_w_PCR';  run;
+
+
+*** Repeat above for other molecular assays ***;
+
+DATA Specimens_w_OMA; 
+   merge Lab_TT434_fix(in=OMA)  Specimens_sort ;
+   by LabSpecimenID EventID;
+   if OMA=1;            * <--  KEEP only the specimen records that have had a OMA test;
+run;
+
+   PROC contents data=Specimens_w_OMA  varnum ;  title1 'Specimens_w_OMA';  run;
+
+
+*** Put them together by MERGE (not Concantenate) ***;
+DATA Specimens_w_results ; 
+   merge Specimens_w_OMA(in=OMA)  Specimens_w_PCR(in=PCR) ;
+   by LabSpecimenID EventID;
+run;
+   PROC contents data=Specimens_w_results  varnum ;  title1 'Specimens_w_results';  run;
+
+
+*** List of specimens with BOTH PCR and OMA ***;
+DATA DupAssays(Keep= EventID LabSpecimenID TestTypeID_TT229  TestTypeID_TT434  CollectionDate); 
+   merge Specimens_w_OMA(in=OMA)  Specimens_w_PCR(in=PCR) ;
+   by LabSpecimenID EventID;
+   if OMA=1 AND PCR=1;
+run;
+
+   PROC contents data=DupAssays  varnum ;  title1 'DupAssays';  run;
+   PROC print data= DupAssays;  
+      id EventID; 
+      var LabSpecimenID CollectionDate TestTypeID_TT229 TestTypeID_TT434 ;
+   title1 'data from CEDRS66.zDSI_Specimens'; 
+   title2 'LSI with BOTH PCR and OMA'; 
+run;
 
 
 
@@ -69,6 +104,25 @@ DATA COVID_Sequence ;
 run;
 
    PROC contents data=COVID_Sequence  varnum ;  title1 'COVID_Sequence';  run;
+
+
+
+
+
+*** STEP 2b:  Merge COVID sequencing LabTests data - ADD TestType=434  ***;
+*** CREATES:  COVID_Sequence2 (adds "Other Molecular Assay" specimens  ***;
+***--------------------------------------------------------------------***;
+
+DATA COVID_Sequence2 ; 
+   merge Lab_TT434_fix  COVID_Sequence;
+   by LabSpecimenID EventID;
+
+run;
+
+   PROC contents data=COVID_Sequence2  varnum ;  title1 'COVID_Sequence2';  run;
+
+
+
 
 
 
@@ -167,7 +221,7 @@ run;
 ***---------------------------------------------------------***;
 
 **  Sort COVID_Sequence dataset by EventID and LabSpecimenID  **;
-   proc sort data= COVID_Sequence
+   proc sort data= COVID_Sequence2
                out= COVID_Sequence_sort;
       by EventID LabSpecimenID ;
 run;

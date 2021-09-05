@@ -7,21 +7,35 @@ This request is for the proportion of specimens collected from confirmed and pro
 ## Data sources:
 Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
 
-![Source_Data_Tables](images\SourceDataTables.png)
+##### Source data tables:
+![Source_Data_Tables](images/SourceDataTables.png)
 
+The five source datatables were read and curated using a separate "Access.*.sas" program for each.
+ * [Access.Specimens.sas](../Access.Specimens.sas)            
+ * [Access.Lab_TT229.sas](../Access.LabTests_TT229.sas)
+ * [Access.Lab_TT434.sas](../Access.LabTests_TT434.sas)         
+ * [Access.Lab_TT436.sas](../Access.LabTests_TT436.sas)
+ * [Access.Lab_TT437.sas](../Access.LabTests_TT437.sas)
 
+These programs are nearly identical. They change SQL columns with date values into SAS date variables, convert EventID from numeric to character variable, and keep selected variables. The dataset is passed through a "shrink" macro to reduce the length of the character variables to the minimum size possible.
 
-#
-> What does this look like?
-##
+![Access_SAS_Code](images/AccessCode.png)
 
-![Curated_Datasets](images/Curated%20datasets.jpg)
+###
+The five `Access.*.sas` programs result is the following curated SAS datasets.
+###
+
+##### Curated data tables:
+![Curated_Datasets](images/Curated%20datasets.png)
 #
 
 |     | <p align="left">Steps taken to get data for revised table</p> |
 | --- | ------------------------------------------------------------------------------------ |
 |1| Access.Specimens.sas program reads and curates data from dphe66 zDSI_LabTests.Specimen. |
-|2| Access.Lab_TT229.sas program reads and curaates data from dphe6 zDSI_LabTests and filters on TestTypeID=229, which is for 'RT-PCR' tests. |
+| | This is a specimen-level dataset that includes every type of specimen for any reportable disease |
+
+
+|2| *Access.Lab_TT229* reads and curates data from dphe6 zDSI_LabTests and filters on TestTypeID=229, which is for 'RT-PCR' tests. |
 |3| Run Access.zDSI_Events to get Age. Creates zDSI_Events.read|
 |4| Run FIX.zDSI_Events to create Age_in_Years variable|
 |5| Run FIX.CEDRS_view to edit data in CEDRS_view_read, add Age_in_Years variable.  Creates CEDRS_view_fix
@@ -33,7 +47,12 @@ Diagnostic testing is sequential and begins with specimen collection. The vast m
         1) MMWR.formats to create user-defined formats to recategorize data
         2) Key_merge.COPHS.CEDRS to merge COPHS data with CEDRS data
 
-#             
+```
+ What does this look like?
+```
+
+  *does*
+
 ## SAS Programs in this folder:
 
 | Program name    | Input Dataset  | Output Dataset   | Purpose                                  

@@ -149,13 +149,24 @@ It can be seen that seven of them have a `CreateDate` that differs by a single d
 
 ![TT229 Num Dup Keys 2a](images/TT229numdupkey2agray.png)
 
-These records were de-duplicated as above. The other group of duplicates that differed on `ResultDate` were in cases where the `ResultDate = .` Here are some example records:
+These records were de-duplicated as above, i.e. keep record with latest result date and earliest create date. The other group of duplicates that differed on `ResultDate` were in cases where the `ResultDate = .` Here are some example records:
 
 ![TT229 Num Dup Keys 2b](images/TT229numdupkey2bgray.png)
 
 These records were deduplicated by deleting the record where `ResultDate = .`.
 
+**Number of Dup Keys = 1:** The final group of duplicates were those that only had one key variable with identical results. These records had different results for the same LSI. As with the previous group of duplicates, some of these had one record with a missing result and the other record had a result. In these cases the record with the missing result was deleted. 
 
+The others had two different results, e.g. `ResultText = Positive` for one record and for the duplicate record (on LSI) `ResultText = Negative`. Here are some examples:
+
+![TT229 Num Dup Keys 1](images/TT229numdupkey1gray.png)
+
+For these duplicates, the record with the lowest value of ResultID was kept, e.g. `ResultID=1` was kept and `ResultID=2` was deleted. 
+
+
+
+###
+## Data editing:
 
 
 ###

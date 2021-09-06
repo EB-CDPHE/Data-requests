@@ -122,7 +122,7 @@ For check 4:
 ````
 
 Dealing with records with multiple LabSpecimenID's
-
+![TT229 Dup Count](images/TT229dupcount.png)
 
 ###
 ## Data merging:

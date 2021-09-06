@@ -71,7 +71,7 @@ run;
 run;
 
 
-** STEP 5:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  **;
+** STEP 5:  De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable  **;
 **          AND ResultDate = .  **;
 DATA TT229_DeDup1a ;   
    set TT229_DeDup2;
@@ -81,7 +81,7 @@ DATA TT229_DeDup1a ;
 run;
 
 
-** STEP 6:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  **;
+** STEP 6:  De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable  **;
 **          AND ResultDate is NOT missing.  **;
 ** Keep record with the earlier ResultDate  **;
    proc sort data= TT229_DeDup1a  

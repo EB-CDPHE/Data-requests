@@ -17,7 +17,7 @@ options pageno=1;
    PROC contents data=Specimens_read  varnum ;  title1 'Specimens_read';  run;
 
 /*-----------------------------------------------------------------*
- | Check Lab_TT437_read data for:
+ | Check Specimens_read data for:
  |  1. Evaluate "CreatedID" and "Created" variables
  |  2. Evaluate "UpdatedID" and "Updated" variables
  |  3. Evaluate "SpecimenTypeID" and "Specimen" variables

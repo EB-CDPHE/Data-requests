@@ -7,15 +7,15 @@ This request is for the proportion of specimens collected from confirmed and pro
 ## Data sources:
 Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
 
-##### Source data tables:
+#### Source data tables:
 ![Source_Data_Tables](images/SourceDataTables.png)
 
-The five source datatables were read and curated using a separate "Access.*.sas" program for each.
+The five source data tables were read and curated using a separate "Access.*.sas" program for each.
  * [Access.Specimens.sas](../Access.Specimens.sas)            
- * [Access.Lab_TT229.sas](../Access.LabTests_TT229.sas)
- * [Access.Lab_TT434.sas](../Access.LabTests_TT434.sas)         
- * [Access.Lab_TT436.sas](../Access.LabTests_TT436.sas)
- * [Access.Lab_TT437.sas](../Access.LabTests_TT437.sas)
+ * [Access.Lab_TT229.sas](../Access.LabTests_TT229.sas) - fiters LabTests on TestTypeID=229
+ * [Access.Lab_TT434.sas](../Access.LabTests_TT434.sas) - fiters LabTests on TestTypeID=434        
+ * [Access.Lab_TT436.sas](../Access.LabTests_TT436.sas) - fiters LabTests on TestTypeID=436
+ * [Access.Lab_TT437.sas](../Access.LabTests_TT437.sas) - fiters LabTests on TestTypeID=437
 
 These programs are nearly identical. They change SQL columns with date values into SAS date variables, convert EventID from numeric to character variable, and keep selected variables. The dataset is passed through a "shrink" macro to reduce the length of the character variables to the minimum size possible.
 
@@ -24,10 +24,45 @@ These programs are nearly identical. They change SQL columns with date values in
 ###
 The five `Access.*.sas` programs result is the following curated SAS datasets.
 ###
-
-##### Curated data tables:
+#### Curated data tables:
 ![Curated_Datasets](images/Curated%20datasets.png)
-#
+###
+## Data cleaning:
+
+1. Check.Specimens_read.sas
+        This program conducts data checks on selected variables in Specimens_read. The variables in this dataset are listed [**HERE**](./contents/PROC_Contents.Specimens_read.pdf).
+        
+````diff
++/*-----------------------------------------------------------------*
++| Check Specimens_read data for:
++|  1. Evaluate "CreatedID" and "Created" variables
++|  2. Evaluate "UpdatedID" and "Updated" variables
++|  3. Evaluate "SpecimenTypeID" and "Specimen" variables
++|  4. Examine records with duplicate LabSpecimenID's
++|  5. Evaluate date variables
++*-----------------------------------------------------------------*/
+````
+Some of the findings from this program include:
+
+````diff
+For check 1:
++| "CreatedID" is the numeric code assigned to names
++| "Created" holds the names.
++| Over 60% of Specimens were created by "System Admin" (38%) or ELRAutoImport (23%).
+
+For check 2:
++| "UpdatedID" is the numeric code assigned to names. There are multiple names assigned to each code.
++| However, all names assigned to a code have the same first name but different last name.
++| "Updated" holds the names.
+
+
+````
+
+
+1. Check Lab_TT229_read
+
+
+
 
 |     | <p align="left">Steps taken to get data for revised table</p> |
 | --- | ------------------------------------------------------------------------------------ |

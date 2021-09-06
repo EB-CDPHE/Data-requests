@@ -65,7 +65,7 @@ DATA TT229_temp;
                  UpdateDate = tmp_UpdateDate)
                  );     
 
-* restrict to just COVID sequencing results *;
+* restrict to just RT-PCR results *;
    where TestTypeID = 229 ;
  
 * Convert temporary numeric ID variable character ID var using the CATS function *;

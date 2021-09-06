@@ -30,7 +30,8 @@ The five `Access.*.sas` programs result is the following curated SAS datasets.
 ## Data cleaning:
 
 **1. Check.Specimens_read.sas**
-        This program conducts data checks on selected variables in Specimens_read. The "_Collection_Date_" variable in this dataset stores the date the specimen was collected. The full list of variables and their attributes for the Specimens_read dataset are listed [HERE](./contents/PROC_Contents.Specimens_read.pdf).
+
+This program conducts data checks on selected variables in Specimens_read. The "_Collection_Date_" variable in this dataset stores the date the specimen was collected. The full list of variables and their attributes for the Specimens_read dataset are listed [HERE](./contents/PROC_Contents.Specimens_read.pdf).
 
 ````diff
 +/*-----------------------------------------------------------------*
@@ -76,6 +77,7 @@ For check 5:
 
 ##
 **2. Check Lab_TT229_read**
+
 This program conducts data checks on selected variables in Lab_TT229_read dataset. This datsaset has the results for ALL RT-PCR tests run on specimens collected. The full list of variables and their attributes for the Lab_TT229_read dataset are listed [HERE](./contents/PROC_Contents.Lab_TT229_read.pdf).
 
 ````diff
@@ -122,7 +124,14 @@ For check 4:
 ````
 
 Dealing with records with multiple LabSpecimenID's
+
 ![TT229 Dup Count](images/TT229dupcount.png)
+
+At the time this data check was run there were 1,296,291 unique values of LabSpecimenID (LSI). There were 24 LSI that had 3 or more records, i.e. PCR results. Here is the list:
+
+![TT229 Multi Dup](images/TT229multidup.png)
+
+Since none of the PCR results for these LSI's have sequence results, i.e. they are not found on Lab_TT437, they were deleted in the cleaned dataset.
 
 ###
 ## Data merging:

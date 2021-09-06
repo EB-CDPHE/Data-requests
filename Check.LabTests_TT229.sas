@@ -161,19 +161,19 @@ run;
  | FIX: DeDup on FOUR keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  |
  | n=20 records with duplicate LabSpecimenID's have identical values in THREE vars
- | ?All but two of these pairs have ResultID in (1067, 1070). Were they re-sequenced?
- | ?FIX: DeDup on THREE keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
- | ?Previous sort should be for descending CreateDate so this de-dup will keep most recent record.
+ | Most have CreateDate that differs by a one day. Some differ by 1 or more months.
+ | FIX: DeDup on THREE keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
+ | Previous sort should be for descending CreateDate so this de-dup will keep most recent record.
  |
  | n=147 records with duplicate LabSpecimenID's have identical values in TWO vars
- | ?These records have same ResultID and ResultText. The ResultDate differs because one value is missing.
- | ?FIX: Delete record with missing ResultDate.
+ | These records have same ResultID and ResultText. The ResultDate differs because one value is missing.
+ | FIX: Delete record with missing ResultDate. OTherwise take the record with latest result date.
  |
  | n=82 records with duplicate LabSpecimenID's have identical values in ONE var (LabSpecimenID)
- | ?All but two of these pairs had ResultID= 1069 or 1070 for one record in duplicate pair.
- | ?The two exceptions had one record with result text that contained "LIKE".
- | ?FIX: delete record with ResultID= 1069 or 1070 and keep matching record with other ResultID.
- | ?FIX: delete record with result text that contains "LIKE".
+ | Some of these had missing results.
+ | Other times the results differed, e.g. Positive result on one record and negative result on the other
+ | FIX: delete record with ResultID= missing and keep matching record with other ResultID.
+ | FIX: keep record with lowest value for ResultID, e.g. Positive result over the Negative result 
  *_______________________________________________________________________________________________________________*/
 
 

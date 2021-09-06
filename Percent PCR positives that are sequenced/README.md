@@ -141,11 +141,20 @@ For the 5000+ duplicate records, i.e. LSI with two PCR tests, the observations w
 
 **Number of Dup Keys = 3:** There were 10 duplicate LSI which had identical values for `LabSpecimenID`, `ResultID`, `ResultDate` but had different values for `CreateDate`. Here are the records:
 
-![TT229 Num Dup Keys 2](images/TT229numdupkey2gray20.png)
+![TT229 Num Dup Keys 3](images/TT229numdupkey3gray20.png)
 
 It can be seen that seven of them have a `CreateDate` that differs by a single day. The others differ by months. Since the duplicates have the same result, the record with the earliest `CreateDate` was kept and the other one dropped.
 
-**Number of Dup Keys = 2:** There were many more LSI with duplicate records that only had identical values for  `LabSpecimenID`, `ResultID` but different `ResultDate` and  `CreateDate`. However, in all cases they had the same `CreatedID` value, i.e. the record was created by the same person. These records were de-duplicated via one of two methods. Here are some of the records with two different values for `ResultDate`:
+**Number of Dup Keys = 2:** There were many more LSI with duplicate records that only had identical values for  `LabSpecimenID`, `ResultID` but different `ResultDate` and  `CreateDate`. In many cases they had the same `CreatedID` value, i.e. the record was created by the same person. Here are some of the records with two different values for `ResultDate`:
+
+![TT229 Num Dup Keys 2a](images/TT229numdupkey2agray.png)
+
+These records were de-duplicated as above. The other group of duplicates that differed on `ResultDate` were in cases where the `ResultDate = .` Here are some example records:
+
+![TT229 Num Dup Keys 2b](images/TT229numdupkey2bgray.png)
+
+These records were deduplicated by deleting the record where `ResultDate = .`.
+
 
 
 

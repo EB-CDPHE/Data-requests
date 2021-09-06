@@ -29,9 +29,9 @@ The five `Access.*.sas` programs result is the following curated SAS datasets.
 ###
 ## Data cleaning:
 
-1. Check.Specimens_read.sas
-        This program conducts data checks on selected variables in Specimens_read. The variables in this dataset are listed [**HERE**](./contents/PROC_Contents.Specimens_read.pdf).
-        
+**1. Check.Specimens_read.sas**
+        This program conducts data checks on selected variables in Specimens_read. The "_Collection_Date_" variable in this dataset stores the date the specimen was collected. The full list of variables and their attributes for the Specimens_read dataset are listed [HERE](./contents/PROC_Contents.Specimens_read.pdf).
+
 ````diff
 +/*-----------------------------------------------------------------*
 +| Check Specimens_read data for:
@@ -55,12 +55,77 @@ For check 2:
 +| However, all names assigned to a code have the same first name but different last name.
 +| "Updated" holds the names.
 
+For check 3:
++| SpecimenTypeID is a two digit numeric code assigned to Specimen types. 
++| Specimen describes the Specimen type.
+
+For check 4:
++| LabSpecimenID is a numeric ID that can be 1 to 7 digits long. 
++| There are NO duplicate LabSpecimenID 's in this dataset.
+
+For check 5: 
++| CreatedDate has no missing values. 
++| UpdatedDate exists for approx 1.5% of Specimens.
++| Collection date is missing in < 1% of Specimens.  
++| All date values are from much earlier time period than COVID. 
++| CollectionDate goes from 1900 to 2106, i.e. there are some wrong values.
++| CreatedDate goes from 1999 to present.
++| UpdatedDate goes from 2017 to present.
 
 ````
 
+##
+**2. Check Lab_TT229_read**
+This program conducts data checks on selected variables in Lab_TT229_read dataset. This datsaset has the results for ALL RT-PCR tests run on specimens collected. The full list of variables and their attributes for the Lab_TT229_read dataset are listed [HERE](./contents/PROC_Contents.Lab_TT229_read.pdf).
 
-1. Check Lab_TT229_read
+````diff
++/*------------------------------------------------------------------------------*
++| Check Lab_TT229_read data for:
++| 1. Compare "CreateBY" and "CreatedBY" variables
++| 2. Evaluate "ResultID" and "ResultText" variables
++| 3. Examine records with duplicate LabSpecimenID's
++|    a) Records with duplicate LabSpecimenID that have > 2 LabTest results 
++|    b) Records with duplicate LabSpecimenID that have 2 LabTest results
++| 4. Evaluate date variables
++*------------------------------------------------------------------------------*/
+````
 
+Some of the findings from this program include:
+
+````diff
+For check 1:
++| CreateBYID has no missing responses
++| CreateDbyID only has 3900 responses, most are missing.
++| ** DO NOT USE CreateDbyID. DROP this variable.
+
+For check 2:
++| ResultID is the numeric code assigned to ResultText. 
++| ResultText holds the description of the RT_PCR result.
+     ResultID=1 for ResultText = 'Positive'
+     ResultID=2 for ResultText = 'Negative'
+     ResultID=4 for ResultText = 'Indeterminate'
+     ResultID=9 for ResultText = 'Unknown'
+     ResultID=99 for ResultText = 'Result is Text'
++| QuantitativeResult variable is nearly useless given wide range of responses.
+
+Check 3 - see below
+
+For check 4:
++| CreateDate has no missing values. 
++| UpdateDate exists for approx 0.3% of PCR results.
++| Result date is missing for approx 2.0% of PCR results.  
++| All date values are from much earlier time period than COVID, i.e. 1920.
++| ResultDate has values several months into the future, i.e. Dec 2021
++| CreateDate goes from 2013 to present. 
++| UpdateDate goes from 2017 to present. 
+
+````
+
+Dealing with records with multiple LabSpecimenID's
+
+
+###
+## Data merging:
 
 
 

@@ -133,6 +133,22 @@ At the time this data check was run there were 1,296,291 unique values of LabSpe
 
 Since none of the PCR results for these LSI's have sequence results, i.e. they are not found on Lab_TT437, they were deleted in the cleaned dataset.
 
+For the 5000+ duplicate records, i.e. LSI with two PCR tests, the observations were grouped by the number of key variables containing identical values. The key variables evaluated were `LabSpecimenID`, `ResultID`, `ResultDate`, and `CreateDate`. Here is that distribution:
+
+![TT229 Num Dup Keys](images/TT229numdupkeys.png)
+
+**Number of Dup Keys = 4:** Over 95% of these duplicates were identical on all four key variables. The record with the latest `ResultDate` and earliest `CreateDate` was kept and the others deleted.
+
+**Number of Dup Keys = 3:** There were 10 duplicate LSI which had identical values for `LabSpecimenID`, `ResultID`, `ResultDate` but had different values for `CreateDate`. Here are the records:
+
+![TT229 Num Dup Keys 2](images/TT229numdupkey2gray20.png)
+
+It can be seen that seven of them have a `CreateDate` that differs by a single day. The others differ by months. Since the duplicates have the same result, the record with the earliest `CreateDate` was kept and the other one dropped.
+
+**Number of Dup Keys = 2:** There were many more LSI with duplicate records that only had identical values for  `LabSpecimenID`, `ResultID` but different `ResultDate` and  `CreateDate`. However, in all cases they had the same `CreatedID` value, i.e. the record was created by the same person. These records were de-duplicated via one of two methods. Here are some of the records with two different values for `ResultDate`:
+
+
+
 ###
 ## Data merging:
 

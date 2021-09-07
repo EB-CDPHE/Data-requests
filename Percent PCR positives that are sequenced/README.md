@@ -313,10 +313,70 @@ For the 150+ duplicate records, i.e. LSI with two VOC results, the observations 
 
 ![TT436_Num_Dup_Keys](images/TT436DupKeyCount.png)
 
-**Number of Dup Keys = 4:** Over 99% of duplicates were identical on all four key variables. In these cases the first record was kept and the other records were deleted in the cleaned dataset.
+**Number of Dup Keys = 4:** There were 5 duplicate LSI which had identical results for all four key variables. In these cases the first record was kept and the other records were deleted in the cleaned dataset.
 
 ![TT436_4_Dup_Keys](images/TT436w4DupKeys.png))
 
+**Number of Dup Keys = 3:** There were 11 duplicate LSI which had identical values for `LabSpecimenID`, `ResultID`, `ResultDate` but had different values for `CreateDate`. Here are the records:
+
+![TT436_2_Dup_Keys](images/TT436w2DupKeys.png)
+
+All 11 duplicate records had a `ResultDate = missing` for `CreateDate in 2021-03-xx` and `ELRID=missing`.  The record with the missing result date was deleted.
+
+**Number of Dup Keys = 1:** There were over a hundred duplicate specimens that had different reults and were different on other key variables. All but four of these had an initial `ResultID = 9` (Result is 'Unknown'). These records were deleted in the cleaned dataset. For the four duplicates (that didn't have an unknown result) - the initial record had `ResultDate = missing` and `ResultID=1071` (Result is 'Yes'). The second record had a result date and `ResultID=1072` (Result is 'No'). The first record was dropped.
+
+![TT436_1_Dup_Keys](images/TT436w1DupKey.png)
+
+**3. Check.Lab_TT437_read.sas**
+
+This program conducts data checks on selected variables in Lab_TT436_read. This dataset contains results for Test Type = "Variant of Concern". The full list of variables and their attributes for the Lab_TT436_read dataset are listed [HERE](./contents/PROC_Contents.Lab_TT437_read.pdf).
+
+````diff
++/*--------------------------------------------------------------------------------*
++| Check Lab_TT437_read data for:
++|  1. Compare "CreateBY" and "CreatedBY" variables
++|  2. Evaluate "CreateByID" and "CreateBy" variables
++|  3. Evaluate "UpdatedBy" variables
++|  4. Evaluate "TestBrandID" and "TestBrand" variables
++|  5. Explore relationship between LabID and LabSpecimenID
++|  6. Examine records with duplicate LabSpecimenID's
++|     a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results
++|     b) Records with duplicate LabSpecimenID that have 2 LabTest results
++|  7. Evaluate "ResultID" and "ResultText" variables
++|  8. Evaluate "ELRID" variable
++|  9. Evaluate date variables
++| 10. Explore relationship between CreateDate and ResultDate
++| 11. Check for results = "Specimen unsatisfactory for evaluation"
++*----------------------------------------------------------------------------------*/
+````
+Some of the findings from this program include:
+
+
+````diff
+For check 1:
++| CreateBYID has no missing responses
++| CreateDbyID only has 500 responses, most are missing.
++| ** DO NOT USE CreateDbyID
+
+For check 2:
++| CreateByID is the numeric code assigned to names
++| CreateBy holds the names.
++| Almost 90% of COVID lab test results were created by 7 people
++| n=25 different individuals have created lab tests results, including "System Admin" (ID=9999)
+
+For check 3:
++| UpdatedBy holds the names of individuals that updated lab results.
++| UpdatedBy does NOT match (or align with) CreateByID.
+
+For check 4:
++| All values of these variables are missing.
++| DROP these three variables (TestBrandID, TestBrand, LegacyTestID).
+
+For check 5:
++| Records with duplicate LabSpecimenID have same EventID but different, unique LabID's
++| In other words, a LabSpecimenID can have multiple LabID's.
+
+````
 
 
 ###

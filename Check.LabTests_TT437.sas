@@ -304,7 +304,7 @@ run;
  |    ResultID=1070 is for ResultText = 'Specimen unsatisfactory for evaluation'
  |    ResultID=1081 is for ResultText = 'B.1.617.2 - for surveillance only...'
  |    ResultID=1082 is for ResultText = 'B.1.617.2 - like...'
- |    etc.
+ |    Result ID's go from 1061 - 1089.
  | Several results of the same variant type have different result text, i.e. "-like". 
  | FIX: re-format results to combine result text pairs into variant type.
  *___________________________________________________________________________________________________*/

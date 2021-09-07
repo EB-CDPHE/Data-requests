@@ -127,7 +127,7 @@ Check 3 is to examine records with multiple LabSpecimenID's. The following table
 
 ![TT229_Dup_Count](images/TT229DupCounts.png)
 
-At the time this data check was run there were 1,296,291 unique values of LabSpecimenID (LSI). There were 24 LSI that had 3 or more records, i.e. PCR results. Here is the list:
+At the time this data check was run there were 1,396,291 unique values of LabSpecimenID (LSI). There were 24 LSI that had 3 or more records, i.e. PCR results. Here is the list:
 
 ![TT229_Multi_Dup](images/TT229MultiDups.png)
 
@@ -135,19 +135,19 @@ Since none of the PCR results for these LSI's have sequence results, i.e. they a
 
 For the 5000+ duplicate records, i.e. LSI with two PCR tests, the observations were grouped by the number of key variables containing identical values. The key variables evaluated were `LabSpecimenID`, `ResultID`, `ResultDate`, and `CreateDate`. Here is that distribution:
 
-![TT229 Num Dup Keys](images/TT229numdupkeys.png)
+![TT229_Num_Dup_Keys](images/TT229DupKeyCount.png)
 
 **Number of Dup Keys = 4:** Over 95% of these duplicates were identical on all four key variables. The record with the latest `ResultDate` and earliest `CreateDate` was kept and the others deleted.
 
 **Number of Dup Keys = 3:** There were 10 duplicate LSI which had identical values for `LabSpecimenID`, `ResultID`, `ResultDate` but had different values for `CreateDate`. Here are the records:
 
-![TT229 Num Dup Keys 3](images/TT229numdupkey3gray20.png)
+![TT229_3_Dup_Keys](images/TT229w3DupKeys.png)
 
 It can be seen that seven of them have a `CreateDate` that differs by a single day. The others differ by months. Since the duplicates have the same result, the record with the earliest `CreateDate` was kept and the other one dropped.
 
 **Number of Dup Keys = 2:** There were many more LSI with duplicate records that only had identical values for  `LabSpecimenID`, `ResultID` but different `ResultDate` and  `CreateDate`. In many cases they had the same `CreatedID` value, i.e. the record was created by the same person. Here are some of the records with two different values for `ResultDate`:
 
-![TT229 Num Dup Keys 2a](images/TT229numdupkey2agray.png)
+![TT229_2a_Dup_Keys](images\TT229w2aDupKeys.png)
 
 These records were de-duplicated as above, i.e. keep record with latest result date and earliest create date. The other group of duplicates that differed on `ResultDate` were in cases where the `ResultDate = .` Here are some example records:
 

@@ -432,12 +432,17 @@ For the 200+ duplicate records, i.e. LSI with two results for variant type, the 
 ![TT437_Num_Dup_Keys](images/TT437DupKeyCount.png)
 
 **Number of Dup Keys = 4:** 
-There were 18 duplicate LSI which had identical results for all four key variables. In these cases the first record was kept and the other records were deleted in the cleaned dataset.
+There were 18 duplicate LSI which had identical results for all four key variables. They all also had the same CreateDate. In these cases the first record was kept and the other records were deleted in the cleaned dataset.
 
 ![TT436_4_Dup_Keys](images/TT437w4DupKeys.png)
 
-**Number of Dup Keys = 3:**
+**Number of Dup Keys = 3:** There were 31 duplicate LSI which had identical values for `LabSpecimenID`, `ResultID`, `ResultDate` but had different values for `CreateDate`. Here are the records:
 
+![TT437_3_Dup_Keys](images/TT437w3DupKeys.png)
+
+All but two of the duplicate records had a `ResultDate in (1067, 1070)` and in all but three the CreateDate was in May 2021.  that differs by a single day. Since the duplicates have the same result, the record with the earliest `CreateDate` was kept and the other one dropped.
+
+**Number of Dup Keys = 2:** 
 
 ###
 ###

@@ -59,6 +59,8 @@ run;
 DATA TT436_fix;  set TT436_DeDup2;
    by LabSpecimenID ; 
 
+  if (LabSpecimenID= 1772736) AND (EventID= 1112136) AND (ResultID= 1071) AND CreateByID= 13508 then ResultDate='23APR21'd;
+
 * Delete duplicate records with different values for all variables (except LabSpecimenID) *;
 * AND have a ResultID = 9 *;
    if (first.LabSpecimenID ne last.LabSpecimenID)  AND  ResultID= 9 then delete;

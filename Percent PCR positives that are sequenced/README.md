@@ -376,7 +376,47 @@ For check 5:
 +| Records with duplicate LabSpecimenID have same EventID but different, unique LabID's
 +| In other words, a LabSpecimenID can have multiple LabID's.
 
+Check 6 - see below
+
+For check 7:
++| ResultID is the numeric code assigned to ResultText. In all but one case it is a 4 digit code.
++| ResultText holds the description of the sequencing result.
+ |    ResultID=9 for ResultText = 'Unknown'
+ |    ResultID=1061 is for ResultText = 'B.1.1.7 - for surveillance only...'
+ |    ResultID=1062 is for ResultText = 'B.1.1.7 - like...'
+ |    ResultID=1067 is for ResultText = 'Sequence inconclusive'
+ |    ResultID=1068 is for ResultText = 'Unassigned variant'
+ |    ResultID=1069 is for ResultText = 'Other'
+ |    ResultID=1070 is for ResultText = 'Specimen unsatisfactory for evaluation'
+ |    ResultID=1081 is for ResultText = 'B.1.617.2 - for surveillance only...'
+ |    ResultID=1082 is for ResultText = 'B.1.617.2 - like...'
+ |    Result ID's go from 1061 - 1089.
++| Several results of the same variant type have different result text, i.e. "-like". 
+
+For check 8:
++| Almost a third of records are missing ELRID value
++| Otherwise, ELRID is a 6 or 7 digit ID unique for each record.
+
+For check 9:
++| CreateDate has no missing values. 
++| ResultDate is missing in more than 25% of results. These dates shouldn't be missing. 
++| UpdateDate exists in about 3% of results, which is fine.
+
+For check 10:
++| CreateDate values begin week 3 of 2021 to the present. 
++| ResultDate values begin week 6 of 2020 to the present. 
++| No records have a ResultDate after CreateDate.
+
+For check 11:
++| n=3755 results where "Specimen unsatisfactory for evaluation"
++|FIX:  Delete these records
+
 ````
+
+For check 7, the edit program will re-format results to combine result text pairs into a single variant type.
+
+For check 11, records where `ResultText="Specimen unsatisfactory for evaluation"` will be deleted in the cleaned dataset.
+
 
 
 ###

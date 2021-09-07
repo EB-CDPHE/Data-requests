@@ -317,11 +317,11 @@ run;
       tables ELRID / missing missprint;
 run;
 
-/*_______________________________________________________________________________________*
+/*______________________________________________________________________*
  |FINDINGS:
  | Almost a third of records are missing ELRID value
- | Otherwise, ELRID is a 6 digit ID unique for each record.
- *_______________________________________________________________________________________*/
+ | Otherwise, ELRID is a 6 or 7 digit ID unique for each record.
+ *______________________________________________________________________*/
 
 
 ***  9. Evaluate date variables  ***;

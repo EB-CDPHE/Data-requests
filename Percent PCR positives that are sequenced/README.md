@@ -417,6 +417,26 @@ For check 7, the edit program will re-format results to combine result text pair
 
 For check 11, records where `ResultText="Specimen unsatisfactory for evaluation"` will be deleted in the cleaned dataset.
 
+Check 6 is to examine records with multiple LabSpecimenID's. The following table shows the frequency distribution of the number of records per LSI, i.e. multiple lab results of "Variant type" per specimen.
+
+![TT437_Dup_Count](images/TT437DupCounts.png)
+
+At the time this data check was run there were 38,438 unique values of LabSpecimenID (LSI). There was 1 specimen (`LabSpecimenID=1772736`) that had 3 records and another that had 4 records (`LabSpecimenID=1772736`).
+
+![TT437_triplicate](images/TT437MultiDups.png)
+
+These two specimens had duplicate results, result dates, create dates, and CreateByID. These records were de-duplicated by keeping the first record only. 
+
+For the 200+ duplicate records, i.e. LSI with two results for variant type, the observations were grouped by the number of key variables containing identical values. The key variables evaluated were `LabSpecimenID`, `ResultID`, `ResultDate`, and `CreateDate`. Here is that distribution:
+
+![TT437_Num_Dup_Keys](images/TT437DupKeyCount.png)
+
+**Number of Dup Keys = 4:** 
+There were 18 duplicate LSI which had identical results for all four key variables. In these cases the first record was kept and the other records were deleted in the cleaned dataset.
+
+![TT436_4_Dup_Keys](images/TT437w4DupKeys.png)
+
+**Number of Dup Keys = 3:**
 
 
 ###
@@ -431,29 +451,13 @@ For check 11, records where `ResultText="Specimen unsatisfactory for evaluation"
 
 
 
-|     | <p align="left">Steps taken to get data for revised table</p> |
-| --- | ------------------------------------------------------------------------------------ |
-|1| Access.Specimens.sas program reads and curates data from dphe66 zDSI_LabTests.Specimen. |
-| | This is a specimen-level dataset that includes every type of specimen for any reportable disease |
-
-
-|2| *Access.Lab_TT229* reads and curates data from dphe6 zDSI_LabTests and filters on TestTypeID=229, which is for 'RT-PCR' tests. |
-|3| Run Access.zDSI_Events to get Age. Creates zDSI_Events.read|
-|4| Run FIX.zDSI_Events to create Age_in_Years variable|
-|5| Run FIX.CEDRS_view to edit data in CEDRS_view_read, add Age_in_Years variable.  Creates CEDRS_view_fix
-|9| Run Access.COPHS to acquire data from hosp144 COPHS. Creates COPHS_read  |
-|10| Use Check.COPHS for data checks. Output informs edits made in Fix.COPHS|
-|11| Run FIX.COPHS to edit data in COPHS_read.  Creates COPHS_fix
-|12| Run RFI.MMWR_NFTF_Table3.sas to generate numbers for results table.  
-|   | It makes use of the output from these SAS programs that get automatically run:
-        1) MMWR.formats to create user-defined formats to recategorize data
-        2) Key_merge.COPHS.CEDRS to merge COPHS data with CEDRS data
-
 ```
  What does this look like?
 ```
 
   *does*
+  **does**
+  **_does_**
 
 ## SAS Programs in this folder:
 

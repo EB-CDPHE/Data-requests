@@ -296,13 +296,17 @@ run;
  | ResultID is the numeric code assigned to ResultText. In all but one case it is a 4 digit code.
  | ResultText holds the description of the sequencing result.
  |    ResultID=9 for ResultText = 'Unknown'
+ |    ResultID=1061 is for ResultText = 'B.1.1.7 - for surveillance only...'
+ |    ResultID=1062 is for ResultText = 'B.1.1.7 - like...'
  |    ResultID=1067 is for ResultText = 'Sequence inconclusive'
- |    ResultID=1068 is for ResultText = ' Unassigned variant'
+ |    ResultID=1068 is for ResultText = 'Unassigned variant'
  |    ResultID=1069 is for ResultText = 'Other'
  |    ResultID=1070 is for ResultText = 'Specimen unsatisfactory for evaluation'
- |
- | Several results of the same variant type have different result text. 
- | FIX: re-format results.
+ |    ResultID=1081 is for ResultText = 'B.1.617.2 - for surveillance only...'
+ |    ResultID=1082 is for ResultText = 'B.1.617.2 - like...'
+ |    etc.
+ | Several results of the same variant type have different result text, i.e. "-like". 
+ | FIX: re-format results to combine result text pairs into variant type.
  *___________________________________________________________________________________________________*/
 
 

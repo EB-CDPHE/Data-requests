@@ -137,7 +137,7 @@ For the 5000+ duplicate records, i.e. LSI with two PCR tests, the observations w
 
 ![TT229_Num_Dup_Keys](images/TT229DupKeyCount.png)
 
-**Number of Dup Keys = 4:** Over 95% of these duplicates were identical on all four key variables. The record with the latest `ResultDate` and earliest `CreateDate` was kept and the others deleted.
+**Number of Dup Keys = 4:** Over 95% of duplicates were identical on all four key variables. In these cases the first record was kept.
 
 **Number of Dup Keys = 3:** There were 10 duplicate LSI which had identical values for `LabSpecimenID`, `ResultID`, `ResultDate` but had different values for `CreateDate`. Here are the records:
 

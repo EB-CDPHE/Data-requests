@@ -20,16 +20,13 @@ options pageno=1;
  | Check Lab_TT436_read data for:
  |  1. Compare "CreateBY" and "CreatedBY" variables
  |  2. Evaluate "CreateByID" and "CreateBy" variables
- |  3. Evaluate "UpdatedBy" variables
- |  4. Evaluate "TestBrandID" and "TestBrand" variables
- |  5. Explore relationship between LabID and LabSpecimenID
- |  6. Examine records with duplicate LabSpecimenID's
- |     a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results  ***;
+ |  3. Evaluate "ResultID" and "ResultText" variables
+ |  4. Explore relationship between LabID and LabSpecimenID
+ |  5. Examine records with duplicate LabSpecimenID's
+ |     a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results
  |     b) Records with duplicate LabSpecimenID that have 2 LabTest results
- |  7. Evaluate "ResultID" and "ResultText" variables
- |  8. Evaluate "ELRID" variable
- |  9. Evaluate date variables
- | 10. Explore relationship between CreateDate and ResultDate
+ |  6. Evaluate date variables
+ |  7. Explore relationship between CreateDate and ResultDate
  *--------------------------------------------------------------------*/
 
 
@@ -81,9 +78,9 @@ run;
  |FINDINGS:
  | ResultID is the numeric code assigned to ResultText. In all but one case it is a 4 digit code.
  | ResultText holds the description of the sequencing result.
- |    ResultID=9 for ResultText = 'Unknown'
  |    ResultID=1071 is for ResultText = 'Yes'
  |    ResultID=1072 is for ResultText = 'No'
+ |    ResultID=9 for ResultText = 'Unknown' 
  | n=1 record has a missing Result. LabSpecimenID=2162300 and EventID=1232059 with CreateDate=2021-08-06
  *_________________________________________________________________________________________________________*/
 

@@ -129,7 +129,7 @@ Check 3 is to examine records with multiple LabSpecimenID's. The following table
 
 At the time this data check was run there were 1,296,291 unique values of LabSpecimenID (LSI). There were 24 LSI that had 3 or more records, i.e. PCR results. Here is the list:
 
-![TT229 Multi Dup](images/TT229multidup.png)
+![TT229_Multi_Dup](images/TT229MultiDups.png)
 
 Since none of the PCR results for these LSI's have sequence results, i.e. they are not found on Lab_TT437, they were deleted in the cleaned dataset.
 

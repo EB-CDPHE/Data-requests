@@ -251,16 +251,11 @@ This program conducts data checks on selected variables in Lab_TT436_read. This 
 +|  2. Evaluate "CreateByID" and "CreateBy" variables
 +|  3. Evaluate "ResultID" and "ResultText" variables
 +|  4. Explore relationship between LabID and LabSpecimenID
-
-+|  3. Evaluate "UpdatedBy" variables
-+|  4. Evaluate "TestBrandID" and "TestBrand" variables
-+|  6. Examine records with duplicate LabSpecimenID's
++|  5. Examine records with duplicate LabSpecimenID's
 +|     a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results
 +|     b) Records with duplicate LabSpecimenID that have 2 LabTest results
-+|  7. 
-+|  8. Evaluate "ELRID" variable
-+|  9. Evaluate date variables
-+| 10. Explore relationship between CreateDate and ResultDate
++|  6. Evaluate date variables
++|  7. Explore relationship between CreateDate and ResultDate
 +*--------------------------------------------------------------------*/
 
 ````
@@ -272,11 +267,13 @@ For check 1:
 +| CreateBYID has no missing responses
 +| CreateDbyID only has 500 responses, most are missing.
 +| ** DO NOT USE CreateDbyID
+
 For check 2:
 +| CreateByID is the numeric code assigned to names
 +| CreateBy holds the names. Same connection as TestTypeID=437.
 +| Almost 90% of VOC results were created by 8 people
 +| n=26 different individuals have created lab tests results, including "System Admin" (ID=9999)
+
 For check 3:
 +| ResultID is the numeric code assigned to ResultText. In all but one case it is a 4 digit code.
 +| ResultText holds the description of the sequencing result.
@@ -284,17 +281,51 @@ For check 3:
  |    ResultID = 1072 is for ResultText = 'No'
  |    ResultID = 9 is for ResultText = 'Unknown' 
 +| ++n=1 record has a missing Result. LabSpecimenID=2162300 and EventID=1232059 with CreateDate=2021-08-06++
-+|
 
+For check 4:
++| Records with duplicate LabSpecimenID have same EventID but different, unique LabID's
++| In other words, a LabSpecimenID can have multiple LabID's.
 
+Check 5 - see below
+
+For check 6:
++| CreateDate has no missing values. 
++| ResultDate is missing almost 40% of results. These dates shouldn't be missing. 
++| UpdateDate exists for less than 2% of results, which is fine.
+
+For check 7:
++| CreateDate values begin week 3 of 2021 to the present. 
++| ResultDate values begin week 6 of 2020 to the present. 
++| No records have a ResultDate after CreateDate.
 ````
+
+Check 5 is to examine records with multiple LabSpecimenID's. The following table shows the frequency distribution of the number of records per LSI, i.e. multiple lab results of "Variant of Concern" (VOC) per specimen.
+
+![TT436_Dup_Count](images/TT436DupCounts.png)
+
+At the time this data check was run there were 29,091 unique values of LabSpecimenID (LSI). There was 1 specimen (`LabSpecimenID=1772736`) that had 3 records, i.e. sequence results for "VOC".
+
+![TT436_triplicate](images/LSIw3Dups.png)
+
+The first record with `ResultID = 9` was deleted. The remaining two records were de-duplicated keeping the first record. Finally, the missing result date was filled based on record with missing result.
+
+For the 150+ duplicate records, i.e. LSI with two VOC results, the observations were grouped by the number of key variables containing identical values. The key variables evaluated were `LabSpecimenID`, `ResultID`, `ResultDate`, and `CreateDate`. Here is that distribution:
+
+![TT436_Num_Dup_Keys](images/TT436DupKeyCount.png)
+
+**Number of Dup Keys = 4:** Over 99% of duplicates were identical on all four key variables. In these cases the first record was kept and the other records were deleted in the cleaned dataset.
+
+![TT436_4_Dup_Keys](images/TT436w4DupKeys.png))
+
+
 
 ###
 ###
 ###
 ## Data editing:
 
-
+###
+###
 ###
 ## Data merging:
 

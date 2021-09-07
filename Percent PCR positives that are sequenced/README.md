@@ -440,9 +440,17 @@ There were 18 duplicate LSI which had identical results for all four key variabl
 
 ![TT437_3_Dup_Keys](images/TT437w3DupKeys.png)
 
-All but two of the duplicate records had a `ResultDate in (1067, 1070)` and in all but three the CreateDate was in May 2021.  that differs by a single day. Since the duplicates have the same result, the record with the earliest `CreateDate` was kept and the other one dropped.
+All but two of the duplicate records had a `ResultID in (1067, 1070)` and in all but three the CreateDate was in May 2021. The Result text for these two is "Sequence inconclusive" and "Specimen unsatisfactory for evaluation" respectively. In either case the result is irrelevant and so the records were de-duplicated by keeping the first record.
 
-**Number of Dup Keys = 2:** 
+**Number of Dup Keys = 2:** There were two specimens with duplicate variant type results. They had identical values for  `LabSpecimenID` and `ResultID` but the first record had  `ResultDate = missing`. Didn't keep the orginal create date though. 
+
+![TT437_2_Dup_Keys](images/TT437w2DupKeys.png)
+
+**Number of Dup Keys = 1:** There were over 150 duplicate specimens that had different reults on variant type and were different on other key variables. All but two of these had an initial `ResultID in (1069 or 1070)` which corresponds to sequence type of "Other" or "Specimen unsatisfactory" respectively. The initial records also had `ResultDate=missing`. For these cases, the first record was deleted in the cleaned dataset. 
+
+![TT436_1_Dup_Keys](images/TT437w1DupKey.png)
+
+
 
 ###
 ###

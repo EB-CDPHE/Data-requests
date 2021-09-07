@@ -240,6 +240,54 @@ The duplicate records where `ResultID = missing` were deleted. For the others, t
 ![TT434_1_Dup_Keys](images/TT434w1DupKey.png)
 
 
+**3. Check.Lab_TT436_read.sas**
+
+This program conducts data checks on selected variables in Lab_TT436_read. This dataset contains results for Test Type = "Variant of Concern". The full list of variables and their attributes for the Lab_TT436_read dataset are listed [HERE](./contents/PROC_Contents.Lab_TT436_read.pdf).
+
+````diff
++/*--------------------------------------------------------------------*
++| Check Lab_TT436_read data for:
++|  1. Compare "CreateBY" and "CreatedBY" variables
++|  2. Evaluate "CreateByID" and "CreateBy" variables
++|  3. Evaluate "ResultID" and "ResultText" variables
++|  4. Explore relationship between LabID and LabSpecimenID
+
++|  3. Evaluate "UpdatedBy" variables
++|  4. Evaluate "TestBrandID" and "TestBrand" variables
++|  6. Examine records with duplicate LabSpecimenID's
++|     a) Records with duplicate LabSpecimenID that have 3 or 4 LabTest results
++|     b) Records with duplicate LabSpecimenID that have 2 LabTest results
++|  7. 
++|  8. Evaluate "ELRID" variable
++|  9. Evaluate date variables
++| 10. Explore relationship between CreateDate and ResultDate
++*--------------------------------------------------------------------*/
+
+````
+Some of the findings from this program include:
+
+````diff
+For check 1:
++| "CreatedID" is the numeric c
++| CreateBYID has no missing responses
++| CreateDbyID only has 500 responses, most are missing.
++| ** DO NOT USE CreateDbyID
+For check 2:
++| CreateByID is the numeric code assigned to names
++| CreateBy holds the names. Same connection as TestTypeID=437.
++| Almost 90% of VOC results were created by 8 people
++| n=26 different individuals have created lab tests results, including "System Admin" (ID=9999)
+For check 3:
++| ResultID is the numeric code assigned to ResultText. In all but one case it is a 4 digit code.
++| ResultText holds the description of the sequencing result.
+ |    ResultID = 1071 is for ResultText = 'Yes'
+ |    ResultID = 1072 is for ResultText = 'No'
+ |    ResultID = 9 is for ResultText = 'Unknown' 
++| ++n=1 record has a missing Result. LabSpecimenID=2162300 and EventID=1232059 with CreateDate=2021-08-06++
++|
+
+
+````
 
 ###
 ###

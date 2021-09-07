@@ -123,9 +123,9 @@ For check 4:
 
 ````
 
-Dealing with records with multiple LabSpecimenID's
+Check 3 is to examine records with multiple LabSpecimenID's. The following table shows the frequency distribution of records by number of records, i.e. RT-PCR tests, per specimen.
 
-![TT229 Dup Count](images/TT229dupcount.PNG)
+![TT229_Dup_Count](images/TT229DupCounts.png)
 
 At the time this data check was run there were 1,296,291 unique values of LabSpecimenID (LSI). There were 24 LSI that had 3 or more records, i.e. PCR results. Here is the list:
 

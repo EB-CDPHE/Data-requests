@@ -147,11 +147,11 @@ It can be seen that seven of them have a `CreateDate` that differs by a single d
 
 **Number of Dup Keys = 2:** There were many more LSI with duplicate records that only had identical values for  `LabSpecimenID`, `ResultID` but different `ResultDate` and  `CreateDate`. In many cases they had the same `CreatedID` value, i.e. the record was created by the same person. Here are some of the records with two different values for `ResultDate`:
 
-![TT229_2a_Dup_Keys](images\TT229w2aDupKeys.png)
+![TT229_2a_Dup_Keys](images/TT229w2aDupKeys.png)
 
 These records were de-duplicated as above, i.e. keep record with latest result date and earliest create date. The other group of duplicates that differed on `ResultDate` were in cases where the `ResultDate = .` Here are some example records:
 
-![TT229 Num Dup Keys 2b](images/TT229numdupkey2bgray.png)
+![TT229_2b_Dup_Keys](images/TT229w2bDupKeys.png)
 
 These records were deduplicated by deleting the record where `ResultDate = .`.
 
@@ -159,7 +159,7 @@ These records were deduplicated by deleting the record where `ResultDate = .`.
 
 The others had two different results, e.g. `ResultText = Positive` for one record and for the duplicate record (on LSI) `ResultText = Negative`. Here are some examples:
 
-![TT229 Num Dup Keys 1](images/TT229numdupkey1gray.png)
+![TT229_1Dup_Key](images/TT229w1DupKey.png)
 
 For these duplicates, the record with the lowest value of ResultID was kept, e.g. `ResultID=1` was kept and `ResultID=2` was deleted. 
 

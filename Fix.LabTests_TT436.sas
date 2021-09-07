@@ -62,8 +62,8 @@ DATA TT436_fix;  set TT436_DeDup2;
   if (LabSpecimenID= 1772736) AND (EventID= 1112136) AND (ResultID= 1071) AND CreateByID= 13508 then ResultDate='23APR21'd;
 
 * Delete duplicate records with different values for all variables (except LabSpecimenID) *;
-* AND have a ResultID = 9 *;
-   if (first.LabSpecimenID ne last.LabSpecimenID)  AND  ResultID= 9 then delete;
+* AND have a ResultID = 9 or 1072 *;
+   if (first.LabSpecimenID ne last.LabSpecimenID)  AND  ResultID in (9, 1072) then delete;
 
 * RENAME variables to keep when merging with Lab_TT437_fix  *;
    RENAME   TestTypeID         = TestTypeID_TT436

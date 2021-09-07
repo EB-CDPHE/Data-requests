@@ -125,7 +125,7 @@ For check 4:
 
 Dealing with records with multiple LabSpecimenID's
 
-![TT229 Dup Count](images/TT229dupcount.png)
+![TT229 Dup Count](images/TT229dupcount.PNG)
 
 At the time this data check was run there were 1,296,291 unique values of LabSpecimenID (LSI). There were 24 LSI that had 3 or more records, i.e. PCR results. Here is the list:
 

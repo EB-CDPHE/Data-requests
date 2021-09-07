@@ -334,8 +334,8 @@ run;
 /*_______________________________________________________________________________________*
  |FINDINGS:
  | CreateDate has no missing values. 
- | ResultDate is missing almost 10% of results. These dates shouldn't be missing. 
- | UpdateDate exists for less than 10% of results, which is fine.
+ | ResultDate is missing in more than 25% of results. These dates shouldn't be missing. 
+ | UpdateDate exists in about 3% of results, which is fine.
  *_______________________________________________________________________________________*/
 
 

@@ -7,7 +7,7 @@ This request is for the proportion of specimens collected from confirmed and pro
 Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
 
 #### Source data tables:
-![Source_Data_Tables](images/SourceDataTables.png)
+![Source_Data_Tables](images/SourceDataTables2.png)
 
 The five source data tables were read and curated using a separate "Access.*.sas" program for each.
  * [Access.Specimens.sas](../Access.Specimens.sas)            
@@ -24,7 +24,7 @@ These programs are nearly identical. They change SQL columns with date values in
 The five `Access.*.sas` programs result is the following curated SAS datasets.
 ###
 #### Curated data tables:
-![Curated_Datasets](images/Curated%20datasets.png)
+![Curated_Datasets](images/CuratedDatasets2.png)
 ###
 ## Data cleaning:
 

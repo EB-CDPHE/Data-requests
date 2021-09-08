@@ -450,12 +450,87 @@ All but two of the duplicate records had a `ResultID in (1067, 1070)` and in all
 
 ![TT436_1_Dup_Keys](images/TT437w1DupKey.png)
 
-
-
-###
 ###
 ###
 ## Data editing:
+
+No data edits were needed for the Specimens_read dataset. Edits to the data in the other four curated datasets were made using a separate "Fix.*.sas" program for each. The programs keep the two key variables - `LabSpecimenID` and `EventID`. The test-level variables are kept and renamed by adding extension for specific test type, e.g. _TT229.
+            
+ * [Fix.Lab_TT229.sas](../Fix.LabTests_TT229.sas) - links to the full program; the list of edits made are below.
+````diff  
++/*---------------------------------------------------------------------------------------------------------------*
++Fixes made in this code:
++|1. De-duplicate records with two LabTest results per Specimen that have identical values in FOUR variables
++|2. De-duplicate records with two LabTest results per Specimen that have identical values in THREE variables
++|3. De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables
++    AND ResultDate = missing.
++|4. De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables
++|    AND ResultDate ^= missing.
++|5. De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable
++|    AND ResultDate = missing.
++|6. De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable
++|    AND ResultDate ^= missing.
++|7. a) DROP extraneous variables (TestBrandID  TestBrand  LegacyTestID  CreatedByID)
++|7. b) Delete duplicate records that are irrelevant, i.e. NO sequence results 
++|7. c) RENAME variables to keep when merging 
++|7. d) DROP variables not needed for merging 
++|8. SORT fixed data for merging
++|9. Contents of new dataset with edits
++*---------------------------------------------------------------------------------------------------------------*/
+````
+##
+ * [Fix.Lab_TT434.sas](../Fix.LabTests_TT434.sas)   - links to the full program; the list of edits made are below.     
+  
+````diff
++/*---------------------------------------------------------------------------------------------------------------*
++| Fixes made in this code:
++| 1. De-dup records with two Test results per Specimen with identical values in FOUR variables
++| 2. De-duplicate records with two LabTest results per Specimen that have identical values in THREE variables
++| 3. De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  AND ResultDate = missing.
++| 3. DROP extraneous variables (TestBrandID  TestBrand  LegacyTestID  CreatedByID)
++| 4. De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  AND ResultDate ^= missing.
++| 5. a) De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable  AND ResultID = missing.
++| 5. b) RENAME variables to keep when merging with Lab_TT437_fix
++| 5. c) DROP variables not needed for merging with Lab_TT437_fix
++| 6. SORT fixed data for merging
++| 7. Contents of new dataset with edits
++*---------------------------------------------------------------------------------------------------------------*/
+````
+##
+ * [Fix.Lab_TT436.sas](../Fix.LabTests_TT436.sas)  - links to the full program; the list of edits made are below.
+
+````diff
++/*---------------------------------------------------------------------------------------------*
++| Fixes made in this code:
++| 1. DROP extraneous variables (TestBrandID  TestBrand  LegacyTestID  CreatedByID)
++| 2. Delete one obs of triplicate record where ResultID = 9
++| 3. Delete duplicate records that are irrelevant, i.e. NO sequence results
++| 4. De-dup records with two Test results per Specimen with identical values in FOUR variables
++| 5. De-dup records with two Test results per Specimen with identical values in TWO variables
++| 6. For duplicate records with identical values in ONE variable, delete record where result='No'
++| 7. RENAME variables to keep when merging with Lab_TT437_fix
++| 8. DROP variables not needed for merging with Lab_TT437_fix
++| 9. SORT fixed data for merging
++*---------------------------------------------------------------------------------------------*/
+````
+
+##
+ * [Fix.Lab_TT437.sas](../Fix.LabTests_TT437.sas)  - links to the full program; the list of edits made are below.
+````diff
++/*------------------------------------------------------------------------------------------------*
++| Fixes made in this code:
++| 1. De-dup records with two Test results per Specimen with identical values in FOUR variables
++| 2. De-dup records with two Test results per Specimen with identical values in THREE variables 
++| 3. Delete duplicate record where ResultDate = missing (dups with identical values in TWO vars)
++| 4. Delete duplicate records with different values for all variables (except LabSpecimenID)
++| 5. Delete results = "Specimen unsatisfactory for evaluation"
++| 6. Re-format ResultText field: i.e. extract lineage name and ignore descriptive text
++| 7. RENAME variables to keep when merging with Lab_TT437_fix
++| 8. DROP variables not needed for merging with Lab_TT437_fix
++| 9. SORT fixed data for merging
++*------------------------------------------------------------------------------------------------*/
+````
+
 
 ###
 ###

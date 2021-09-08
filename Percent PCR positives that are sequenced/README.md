@@ -2,8 +2,7 @@
 ## Background:
 This request is for the proportion of specimens collected from confirmed and probable COVID cases.  **Population**:  Confirmed and probable cases with specimen create date or collection date from January 1, 2021 to present that have a positive PCR or other molecular assay result.  **Outcomes**: percent of positive specimens that have been sequenced.  **Groups**: Week of collection date (or create date) and type of laboratory that provided sequencing results, i.e. CDPHE lab or other lab.  
 
-#
-
+###
 ## Data sources:
 Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
 
@@ -451,7 +450,6 @@ All but two of the duplicate records had a `ResultID in (1067, 1070)` and in all
 ![TT436_1_Dup_Keys](images/TT437w1DupKey.png)
 
 ###
-###
 ## Data editing:
 
 No data edits were needed for the Specimens_read dataset. Edits to the data in the other four curated datasets were made using a separate "Fix.*.sas" program for each. The programs keep the two key variables - `LabSpecimenID` and `EventID`. The test-level variables are kept and renamed by adding extension for specific test type, e.g. _TT229.
@@ -530,14 +528,14 @@ No data edits were needed for the Specimens_read dataset. Edits to the data in t
 +| 9. SORT fixed data for merging
 +*------------------------------------------------------------------------------------------------*/
 ````
-
+![Cleaned_Datasets]()
 
 ###
 ###
 ###
 ## Data merging:
 
-
+![Data_flow](images/Data_flow.png)
 
 ```
  What does this look like?

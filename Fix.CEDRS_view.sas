@@ -94,5 +94,11 @@ run;
 
 
 
+   PROC freq data = COVID.CEDRS_view_fix  noprint;
+      tables  EventID / out=EventID_Count ;
+   PROC freq data = EventID_Count;
+      tables COUNT;
+run;
+
 
 

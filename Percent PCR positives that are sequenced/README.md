@@ -528,39 +528,46 @@ No data edits were needed for the Specimens_read dataset. Edits to the data in t
 +| 9. SORT fixed data for merging
 +*------------------------------------------------------------------------------------------------*/
 ````
-![Cleaned_Datasets]()
 
 ###
-###
-###
+#### Cleaned data tables:
+![Cleaned_Datasets](images/Cleaned_Datasets.PNG)
+
+##
 ## Data merging:
 
+The PROC contents for the five cleaned datasets can be found via the links below:
+1. [Specimens_read](./contents/PROC_Contents.Specimens_read.pdf)
+2. [Lab_TT229_fix](./contents/PROC_Contents.Lab_TT229_fix.pdf)
+3. [Lab_TT434_fix](contents/PROC_Contents.Lab_TT434_fix.pdf)
+4. [Lab_TT436_fix](contents/PROC_Contents.Lab_TT436_fix.pdf)
+5. [Lab_TT437_fix](contents/PROC_Contents.Lab_TT437_fix.pdf)
+
+The PCR-level results data (Lab_TT229_fix) is merged with the Specimen-level data by LabSpecimenID. Only records on Lab_TT229_fix are kept in the new dataset: Specimens_w_PCR.
+
+**Check.Lab_TT436_read.sas**
+This program conducts data checks on selected variables in Specimens_w_PCR dataset. This datsaset has the collection date and specimen data for ALL RT-PCR tests. The full list of variables and their attributes for the ??????
+
+````diff
++toc
+````
+
+
+##
+### Data flow for merging the cleaned data together.
+
 ![Data_flow](images/Data_flow.png)
+
+
 
 ```
  What does this look like?
 ```
-
   *does*
   **does**
   **_does_**
 
-## SAS Programs in this folder:
 
-| Program name    | Input Dataset  | Output Dataset   | Purpose                                  
-| --------------- | -------------- | ---------------- | ---------------------------------------| 
-|RFI.MMWR_NFTF_Table1|CEDRS_view_fix; B6172_fix; COPHS_fix|MMWR_Cases & MMWR_ICU|Generate numbers for **first** data request table
-|RFI.MMWR_NFTF_Table2|CEDRS_view_fix; B6172_fix; COPHS_fix|MMWR_Cases & MMWR_ICU|Generate numbers for **second** data request table
-|RFI.MMWR_NFTF_Table3|CEDRS_view_fix; B6172_fix; COPHS_fix|MMWR_Cases & MMWR_ICU|Generate numbers for **third** data request table
-|MMWR_formats| *N/A* | *N/A* |Create user defined formats
-|Key_merge.COPHS.CEDRS|dbo66.Profiles; & COVID.COPHS_fix; & MMWR_cases|MMWR_ICU|Merge ICU data from COPHS into MMWR_Cases
-|Delta_Story.sas| COVID.CEDRS_view; COVID.B6172_fix; COVID.County_Population | MMWR_cases | free lance code for telling story of delta emergence during third COVID wave in CO |
-|Vx data merge|Sheet from Rachel with CIIS data attached||Merge vaccination data to CEDRS data
-||
-|**RETIRED PROGRAMS:** | |
-| OLD_Check.CEDRS_view| CEDRS_view_fix; B6172_fix; COPHS_fix| *N/A*|Run data checks on CEDRS view|
-|RFI.MMWR_NFTF_Table1|CEDRS_view_fix; B6172_fix; COPHS_fix|MMWR_Cases & MMWR_ICU|Generate numbers for **first** data request table
-|RFI.MMWR_NFTF_Table2|CEDRS_view_fix; B6172_fix; COPHS_fix|MMWR_Cases & MMWR_ICU|Generate numbers for **second** data request table
-
-
-
+```
+ It looks like the end :(
+```

@@ -2,10 +2,11 @@
 PROGRAM:    Access.LabTests_TT229      
 AUTHOR:		Eric Bush
 CREATED:	   August 27, 2021
-MODIFIED:   090121:  Add additional Test Types to documentation
+MODIFIED:   090921:  Add code to reduce dataset to EventIDs on CEDRS
+            090121:  Add additional Test Types to documentation
 PURPOSE:	   Connect to CEDRS backend (dphe66) to access LabTests
 INPUT:		dbo66.zDSI_LabTests  WHERE TestTypeID= 229 (TestType = 'RT-PCR')
-OUTPUT:		      Lab_TT229_read
+OUTPUT:		      Lab_TT229_read   AND   Lab_TT229_reduced
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
@@ -97,6 +98,33 @@ DATA Lab_TT229_read ; set TT229_temp_;
 run;
 
 
-**  7. PROC contents of final dataset  **;
+**  7. PROC contents of final FULL dataset  **;
    PROC contents data=Lab_TT229_read  varnum ;  title1 'Lab_TT229_read';  run;
 
+
+**  8. Create list of unique EventID's from CEDRS data  **;
+   PROC freq data = COVID.CEDRS_view_fix  noprint;
+      tables  EventID / out=CEDRS_Events ;
+run;
+
+
+**  9. Reduce dataset to only records where EventID is in CEDRS  **;
+  PROC sort data= CEDRS_Events 
+              out= CEDRS_Events_sort;
+      by EventID;
+run;
+   PROC sort data= Lab_TT229_read 
+               out= Lab_TT229_sort;
+      by EventID LabSpecimenID;
+run;  
+
+DATA Lab_TT229_reduced(DROP=COUNT PERCENT);
+   merge Lab_TT229_sort(in=p)   CEDRS_Events_sort(in=c) ;
+   by EventID ;
+
+   if p=1 AND c=1;
+run;
+
+
+**  10. PROC contents of final REDUCED dataset  **;
+  PROC contents data=Lab_TT229_reduced; title1 'Lab_TT229_reduced';  run;

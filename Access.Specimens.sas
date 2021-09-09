@@ -2,10 +2,10 @@
 PROGRAM:    Access.Specimens      
 AUTHOR:		Eric Bush
 CREATED:	   August 30, 2021
-MODIFIED:   
+MODIFIED:   090921: add code to reduce dataset to EventIDs on CEDRS
 PURPOSE:	   Connect to CEDRS backend (dphe66) to access Specimens
 INPUT:		dbo66.zDSI_Specimens  
-OUTPUT:		      Specimens_read
+OUTPUT:		      Specimens_read   AND   Specimens_reduced
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
@@ -87,6 +87,33 @@ DATA Specimens_read ; set Specimens_temp_;
 run;
 
 
-**  7. PROC contents of final dataset  **;
+**  7. PROC contents of final FULL dataset  **;
    PROC contents data=Specimens_read  varnum ;  title1 'Specimens_read';  run;
 
+
+**  8. Create list of unique EventID's from CEDRS data  **;
+   PROC freq data = COVID.CEDRS_view_fix  noprint;
+      tables  EventID / out=CEDRS_Events ;
+run;
+
+
+**  9. Reduce dataset to only records where EventID is in CEDRS  **;
+  PROC sort data= CEDRS_Events 
+              out= CEDRS_Events_sort;
+      by EventID;
+run;
+   PROC sort data= Specimens_read 
+               out= Specimens_sort;
+      by EventID LabSpecimenID;
+run;  
+
+DATA Specimens_reduced(DROP=COUNT PERCENT);
+   merge Specimens_sort(in=s)   CEDRS_Events_sort(in=c) ;
+   by EventID ;
+
+   if s=1 AND c=1;
+run;
+
+
+**  10. PROC contents of final REDUCED dataset  **;
+  PROC contents data=Specimens_reduced; title1 'Specimens_reduced';  run;

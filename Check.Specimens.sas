@@ -5,16 +5,16 @@ CREATED:  August 30, 2021
 MODIFIED: 090121
 PURPOSE:	 After a SQL data table has been read using Access.Specimens_read, 
             this program can be used to explore the SAS dataset.
-INPUT:	 Specimens_read
+INPUT:	 Specimens_reduced   OR   Specimens_read
 OUTPUT:	 printed output
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
-%Let SpecDSN = Specimens_read ;
+%Let SpecDSN = Specimens_reduced ;
 
 options pageno=1;
-   PROC contents data=Specimens_read  varnum ;  title1 'Specimens_read';  run;
+   PROC contents data=Specimens_reduced  varnum ;  title1 'Specimens_reduced';  run;
 
 /*-----------------------------------------------------------------*
  | Check Specimens_read data for:
@@ -22,13 +22,13 @@ options pageno=1;
  |  2. Evaluate "UpdatedID" and "Updated" variables
  |  3. Evaluate "SpecimenTypeID" and "Specimen" variables
  |  4. Examine records with duplicate LabSpecimenID's
- |  5. Evaluate date variables
+ |  5. Number of specimens per EventID
+ |  6. Evaluate date variables
  *-----------------------------------------------------------------*/
 
 
 ***  1. Evaluate "CreatedID" and "Created" variables  ***;
 ***---------------------------------------------------***;
-
    PROC freq data = &SpecDSN  order=freq;
       tables CreatedID * Created /list; ** Name of person that created the test result record;
 run;
@@ -37,13 +37,12 @@ run;
  |FINDINGS:
  | CreatedID is the numeric code assigned to names
  | Created holds the names.
- | Over 60% of Specimens were created by "System Admin" (38%) or ELRAutoImport (23%).
+ | 80% of Specimens were created by "System Admin" (50%) or ELRAutoImport (30%).
  *_______________________________________________________________________________________*/
 
 
 ***  2. Evaluate "UpdatedID" and "Updated" variables  ***;
 ***---------------------------------------------------***;
-
 Data &SpecDSN._temp; set &SpecDSN;
 UpdatedAbbrev = scan(Updated,1,' '); 
 
@@ -51,17 +50,21 @@ UpdatedAbbrev = scan(Updated,1,' ');
       tables UpdatedID * UpdatedAbbrev /list; ** Name of person that created the test result record;
 run;
 
+   PROC means data = &SpecDSN  n nmiss;
+      var LabSpecimenID  CollectionDate  UpdatedID;
+run;
+
 /*____________________________________________________________________________________________________*
  |FINDINGS:
  | UpdatedID is the numeric code assigned to names. There are multiple names assigned to each code.
  | However, all names assigned to a code have the same first name but different last name.
  | Updated holds the names.
+ | UpdatedID had data in only <1% of records
  *____________________________________________________________________________________________________*/
 
 
 ***  3. Evaluate "SpecimenTypeID" and "Specimen" variables  ***;
 ***---------------------------------------------------------***;
-
    PROC freq data = &SpecDSN  order=freq;
       tables SpecimenTypeID * Specimen /list; ** Name of person that created the test result record;
 run;
@@ -70,12 +73,12 @@ run;
  |FINDINGS:
  | SpecimenTypeID is a two digit numeric code assigned to Specimen types. 
  | Specimen describes the Specimen type.
+ | Over 90% of specimens either "NP Swab" (61%) or "Other" (31%).
  *_______________________________________________________________________________*/
 
 
 ***  4. Examine records with duplicate LabSpecimenID's  ***;
 ***-----------------------------------------------------***;
-
    PROC freq data = &SpecDSN  NoPrint ;
       tables  LabSpecimenID / out=Specimen_Count ;
    PROC freq data = Specimen_Count;
@@ -89,36 +92,83 @@ run;
  *_______________________________________________________________________*/
 
 
-***  5. Evaluate date variables  ***;
+***  5. Number of specimens per EventID  ***;
+***--------------------------------------***;
+   PROC freq data = &SpecDSN   ;
+      tables  EventID  /  out=Specimen_per_EventID ;
+   PROC freq data = Specimen_per_EventID;
+      tables COUNT;
+run;
+   PROC means data= Specimen_per_EventID  n min max median mean  maxdec=2;
+      var COUNT;
+run;
+/*_________________________________________________________________________________________________*
+ |FINDINGS:
+ | The frequency distribution of EventID gives the count of LabSpecimenID per EventID 
+ | (since only one LSI per record)
+ | More than 75% of EventID's had 1 (54%) or 2 (24%) specimens.
+ | The number of specimens per EventID ranged from 1-215 with a median of 1 (and mean = 2.6).
+ *_________________________________________________________________________________________________*/
+
+
+***  6. Evaluate date variables  ***;
 ***------------------------------***;
 
 ** Missing values for date variables **;
    PROC means data = &SpecDSN  n nmiss ;
-      var CollectionDate  CreatedDate  UpdatedDate ; 
+      var  CreatedDate  CollectionDate  UpdatedDate ; 
 run;
 
 /*_______________________________________________________*
  |FINDINGS:
  | CreatedDate has no missing values. 
- | UpdatedDate exists for approx 1.5% of Specimens.
- | Collection date is missing in < 1% of Specimens.  
+ | Collection date is missing in < 0.3% of Specimens.  
+ | UpdatedDate exists for approx 0.7% of Specimens.
  *_______________________________________________________*/
 
 
 ** Invalid values (i.e. date ranges) for date variables **;
    PROC freq data = &SpecDSN  ;
-      tables CollectionDate  CreatedDate  UpdatedDate ;
-      format CollectionDate  CreatedDate  UpdatedDate  WeekW11. ;
+      tables CreatedDate  CollectionDate  UpdatedDate ;
+/*      format CreatedDate  CollectionDate  UpdatedDate  WeekW11. ;*/
 run;
 
 /*____________________________________________________________________________*
  |FINDINGS:
  | All date values are from much earlier time period than COVID. 
- | CollectionDate goes from 1900 to 2106, i.e. there are some wrong values.
- | CreatedDate goes from 1999 to present.
- | UpdatedDate goes from 2017 to present.
+ | CreatedDate goes from 3/5/20 to present.
+ | CollectionDate goes from 1901 to 12/5/21, i.e. there are some wrong values.
+ | UpdatedDate goes from 3/5/20 to present.
  |FIX:
  | Re-do data check after merging with COVID LabTests.
+ *____________________________________________________________________________*/
+
+   PROC print data= &SpecDSN ;
+      where . < CollectionDate < '01JAN20'd;
+      id LabSpecimenID ;
+      var EventiD CreatedDate  CollectionDate  UpdatedDate  Specimen   ;
+    title1 'Specimens_reduced';
+    title2 'CollectionDate < Jan 1, 2020';
+run;
+
+/*____________________________________________________________________________*
+ |FINDINGS:
+ | LSI=1561333 (EventID=1072252) - CollectionDate mistakenly set to DOB
+ | LSI=1689658 (EventID=1113099) - CollectionDate mistakenly set to DOB
+ | LSI=2431550 (EventID=1302922) - CollectionDate mistakenly set to DOB
+ | LSI=1149683 (EventID=913588)  - CollectionDate mistakenly set to DOB
+ | LSI=1293814 (EventID=981962)  - CollectionDate mistakenly set to DOB
+ |
+ |FIX:
+ | LSI=1561333 (EventID=1072252) - set CollectionDate = CreatedDate
+ | LSI=1689658 (EventID=1113099) - set CollectionDate = CreatedDate
+ | LSI=2356909 (EventID=1282253) - set CollectionDate = 8/23/21
+ | LSI=2412211 (EventID=1298160) - set CollectionDate = 8/26/21
+ | LSI=2420472 (EventID=1299594) - set CollectionDate = 4/23/21 per CEDRS Labs
+ | LSI=2430255 (EventID=1302072) - set CollectionDate = 9/2/21 per CEDRS Labs
+ | LSI=2431550 (EventID=1302922) - set CollectionDate = 9/2/21 per CEDRS Labs
+ | LSI=1149683 (EventID=913588)  - set CollectionDate = .
+ | LSI=1293814 (EventID=981962)  - set CollectionDate = .
  *____________________________________________________________________________*/
 
 

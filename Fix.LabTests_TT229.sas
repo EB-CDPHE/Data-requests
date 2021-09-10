@@ -96,7 +96,7 @@ DATA Lab_TT229_temp ;   set TT229_DeDup1 (DROP=  TestBrandID  TestBrand  LegacyT
 * Delete duplicate records that are irrelevant, i.e. do NOT have corresponding sequence results *;
    where LabSpecimenID ^in (406724, 446580, 540252, 576509, 851118, 871502, 897632, 909746, 
                             1057570, 1097798, 1098131, 1119791, 1344237, 1536073, 1725558, 
-                            1735642, 1798732, 1925013, 2005303, 2362747, 2376934 ) ;
+                            1735642, 1798732, 1925013, 2005303, 2362747, 2376934) ;
 
 * RENAME variables to keep when merging with Lab_TT437_fix  *;
    RENAME   TestTypeID         = TestTypeID_TT229

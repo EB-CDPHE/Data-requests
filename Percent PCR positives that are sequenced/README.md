@@ -7,7 +7,7 @@ This request is for the proportion of specimens collected from confirmed and pro
 Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
 
 #### Source data tables:
-![Source_Data_Tables](images/SourceDataTables2.png)
+![Source_Data_Tables2](images/SourceDataTables2.png)
 
 The five source data tables were read and curated using a separate "Access.*.sas" program for each.
  * [Access.Specimens.sas](../Access.Specimens.sas)            

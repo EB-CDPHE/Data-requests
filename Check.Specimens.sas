@@ -144,12 +144,14 @@ run;
  *____________________________________________________________________________*/
 
    PROC print data= &SpecDSN ;
-      where . < CollectionDate < '01JAN20'd;
+      where (. < CollectionDate < '01JAN20'd)  OR  CollectionDate > '01NOV21'd;
       id LabSpecimenID ;
       var EventiD CreatedDate  CollectionDate  UpdatedDate  Specimen   ;
     title1 'Specimens_reduced';
-    title2 'CollectionDate < Jan 1, 2020';
+    title2 'CollectionDate > Nov 1, 2020';
 run;
+
+** NOTE: ALL of the FINDINGS below have been fixed at source **;
 
 /*____________________________________________________________________________*
  |FINDINGS:
@@ -170,6 +172,8 @@ run;
  | LSI=1149683 (EventID=913588)  - set CollectionDate = .
  | LSI=1293814 (EventID=981962)  - set CollectionDate = .
  *____________________________________________________________________________*/
+
+
 
 
 ***  6. Pre-merge analysis  ***;

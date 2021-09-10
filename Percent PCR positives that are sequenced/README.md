@@ -25,7 +25,7 @@ These programs are nearly identical. They change SQL columns with date values in
 The five `Access.*.sas` programs result is the following curated SAS datasets.
 ###
 #### Curated data tables:
-![Curated_Datasets](images/CuratedDatasets2.png)
+![Curated_Datasets](images/CuratedDatasets2.PNG)
 ###
 ## Data cleaning:
 

@@ -32,13 +32,14 @@ DATA COPHS_RFI; set COVID.COPHS_fix(KEEP=MR_Number Hosp_Admission Positive_Test 
    Admit_Date = Hosp_Admission;
    format Admit_Date MMDDYY10. ;
 run;
+
 ** 4. Contents of datasets to query for RFI **;
    PROC contents data=COPHS_RFI varnum; 
       title1 'dphe144 = COPHS_FIX reduced';
 run;
 
 
-** Daily count of hospital admissions **;
+** 5. Daily count of hospital admissions **;
    PROC FREQ data= COPHS_RFI;
       where '01MAR20'd le Admit_Date le '10SEP21'd ;
       tables Admit_Date / out=Hosp_Admit_Count; 
@@ -47,9 +48,7 @@ run;
 run;
 
 
-*** Create timeline of all dates ***;
-***------------------------------***;
-
+*** 6. Create timeline of all dates ***;
 DATA timeline;
    Admit_Date='01MAR20'd;
    output;
@@ -63,18 +62,20 @@ run;
 proc print data= timeline;  run;
 
 
-** Merge Timeline so have full calendar **;
+** 7. Merge Timeline so have full calendar **;
 DATA Hosp_Admit_ALLdates ;
    merge Hosp_Admit_Count  timeline ;
    by Admit_Date ;
 run;
    proc print data= Hosp_Admit_ALLdates; id Admit_Date; run;
 
-**  Calculate 7-day moving averages  **;
+
+**  8. Calculate 7-day moving averages  **;
    PROC expand data=Hosp_Admit_ALLdates   out=Hosp_Admit_MoveAv  method=none;
       id Admit_Date;
       convert COUNT=Admits7dAv / transformout=(movave 7);
 run;
+
    PROC print data= Hosp_Admit_MoveAv;
 run;
 

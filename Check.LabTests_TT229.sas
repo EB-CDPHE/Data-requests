@@ -11,10 +11,10 @@ OUTPUT:	 printed output
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
-%Let TT229dsn = Lab_TT229_read ;
+%Let TT229dsn = Lab_TT229_reduced ;
 
 options pageno=1;
-   PROC contents data=Lab_TT229_read  varnum ;  title1 'Lab_TT229_read';  run;
+   PROC contents data=Lab_TT229_reduced  varnum ;  title1 'Lab_TT229_reduced';  run;
 
 /*------------------------------------------------------------------------------*
  | Check Lab_TT229_read data for:
@@ -37,7 +37,7 @@ run;
 /*_______________________________________________________________________________*
  |FINDINGS:
  | CreateBYID has no missing responses
- | CreateDbyID only has 3900 responses, most are missing.
+ | CreateDbyID only has 3500 responses, most are missing.
  | ** DO NOT USE CreateDbyID
  *_______________________________________________________________________________*/
 
@@ -47,7 +47,7 @@ run;
 
    PROC freq data = &TT229dsn  ;
       tables ResultID * ResultText /list missing missprint; 
-      tables QuantitativeResult ; 
+/*      tables QuantitativeResult ; */
 run;
 
 /*_________________________________________________________________________________________________*
@@ -62,6 +62,42 @@ run;
  | QuantitativeResult variable is nearly useless given wide range of responses.
  *___________________________________________________________________________________________________*/
 
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
+options ps=50 ls=150 ;     * Landscape pagesize settings *;
+   PROC print data = &TT229dsn ;
+      where ResultID = .  AND  QuantitativeResult ne '';
+      id LabSpecimenID;
+      var EventiD CreateDate  ResultDate  UpdateDate  ResultID QuantitativeResult ReferenceRange   ;
+      format QuantitativeResult $40.  ReferenceRange $20.  ;
+run;
+/*_________________________________________________________________________________________________*
+ |FIX (per Quantitative Result field):
+ | LSI=1344495 (EventID=1002427): ResultID=1, ResultText='Positive'
+ | LSI=1605633 (EventID=1085549): ResultID=1, ResultText='Positive'
+ | LSI=1627961 (EventID=1091908): ResultID=1, ResultText='Positive'
+ | LSI=1680801 (EventID=1110152): ResultID=1, ResultText='Positive'
+ | LSI=2038648 (EventID=1206561): ResultID=1, ResultText='Positive'
+ | LSI=579427 (EventID=544660): ResultID=1, ResultText='Positive'
+ | LSI=617879 (EventID=572526): ResultID=4, ResultText='Indeterminate'
+ | LSI=638528 (EventID=579672): ResultID=9, ResultText='Pending'
+ | LSI=656034 (EventID=595394): ResultID=4, ResultText='Indeterminate'
+ | LSI=725079 (EventID=626506): ResultID=1, ResultText='Positive'
+ | LSI=777605 (EventID=634247): ResultID=2, ResultText='Negative'
+ | LSI=777643 (EventID=656772): ResultID=2, ResultText='Negative'
+ | LSI=809156 (EventID=699093): ResultID=1, ResultText='Positive'
+ | LSI=1024782 (EventID=849329): ResultID=1, ResultText='Positive'
+ | LSI=1144576 (EventID=911381): ResultID=1, ResultText='Positive'
+ *___________________________________________________________________________________________________*/
+
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
+/*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
+   PROC print data = &TT229dsn ;
+      where ResultID = 99;*  AND  QuantitativeResult ne '';
+      id LabSpecimenID;
+      var EventiD CreateDate  ResultDate  UpdateDate  ResultID QuantitativeResult ReferenceRange   ;
+      format QuantitativeResult $40.  ReferenceRange $20.  ;
+run;
+
 
 ***  3. Examine records with duplicate LabSpecimenID's  ***;
 ***-----------------------------------------------------***;
@@ -70,8 +106,8 @@ run;
       tables  LabSpecimenID / out=Lab_TT229_Count ;
    PROC freq data = Lab_TT229_Count;
       tables COUNT;
-      title1 'Lab_TT229_read';
-      title2 'Frequency count of LabSpecimenID';
+      title1 'Lab_TT229_reduced'; title2;
+      label count= 'Number of PCR results per Specimen from Lab_TT229_reduced';
 run;
 
 
@@ -82,6 +118,7 @@ run;
    PROC print data=  Lab_TT229_Count; 
       where COUNT > 2 ;
       id LabSpecimenID; var COUNT;
+      label COUNT = 'Number of PCR results per Specimen from Lab_TT229_reduced';
 run;
 
 * Print data from  Lab_TT229_read  for these records *;
@@ -235,30 +272,45 @@ run;
 
 ** Missing values for date variables **;
    PROC means data = &TT229dsn  n nmiss ;
-      var ResultDate  CreateDate  UpdateDate ; 
+      var CreateDate  ResultDate  UpdateDate ; 
 run;
 
 /*____________________________________________________________*
  |FINDINGS:
  | CreateDate has no missing values. 
- | UpdateDate exists for approx 0.3% of PCR results.
  | Result date is missing for approx 2.0% of PCR results.  
+ | UpdateDate exists for approx 0.25% of PCR results.
  *____________________________________________________________*/
 
 
 ** Invalid values (i.e. date ranges) for date variables **;
    PROC freq data = &TT229dsn  ;
-      tables ResultDate  CreateDate  UpdateDate  ;
-      format ResultDate  CreateDate  UpdateDate   WeekW11. ;
+      tables CreateDate  ResultDate  UpdateDate  ;
+/*      format CreateDate  ResultDate  UpdateDate   WeekW11. ;*/
 run;
 
 /*_____________________________________________________________________________*
  |FINDINGS:
- | All date values are from much earlier time period than COVID, i.e. 1920.
- | ResultDate has values several months into the future, i.e. Dec 2021
- | CreateDate goes from 2013 to present. 
- | UpdateDate goes from 2017 to present. 
+ | CreateDate goes from 3/5/20 to present. 
+ | ResultDate goes from 2/1/1920 to several months into the future, i.e. Dec 2021
+ | UpdateDate goes from 3/10/20 to present. 
  |FIX:
  | Re-do data check after merging with COVID LabTests.
  *______________________________________________________________________________*/
 
+options ps=65 ls=110 ;     * Portrait pagesize settings *;
+options ps=50 ls=150 ;     * Landscape pagesize settings *;
+   PROC print data= &TT229dsn ;
+      where (. < ResultDate < '01MAR20'd) ;
+      id LabSpecimenID ;
+      var EventiD CreateDate  ResultDate  UpdateDate  ResultID ResultText QuantitativeResult ReferenceRange  ;
+      format QuantitativeResult $40.  ReferenceRange $20.  ;
+    title1 'Lab_TT229_reduced';
+    title2 'ResultDate < March 1, 2020';
+run;
+/*_____________________________________________________________________________*
+ |FIX:
+ | If ResultDate between Jan 1 - March 1, 2020 then change year to 2021
+ | If LSI=852489 (EventID=732059) then change year to 2020 for ResultDate
+ | If LSI=852489 (EventID=732059) then change year to 2020 for ResultDate
+ *______________________________________________________________________________*/

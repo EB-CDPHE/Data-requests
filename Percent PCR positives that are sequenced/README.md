@@ -125,17 +125,17 @@ For check 4:
 
 Check 3 is to examine records with multiple LabSpecimenID's. The following table shows the frequency distribution of the number of records per LabSpecimenID, i.e. PCR tests per specimen.
 
-![TT229_Dup_Count](images/TT229DupCounts.png)
+![TT229_Dup_Counts](images/TT229rDupCounts.png)
 
 At the time this data check was run there were 1,396,291 unique values of LabSpecimenID (LSI). There were 24 LSI that had 3 or more records, i.e. PCR results. Here is the list:
 
-![TT229_Multi_Dup](images/TT229MultiDups.png)
+![TT229_Multi_Dup](images/TT229rMultiDups.png)
 
 Since none of the PCR results for these LSI's have sequence results, i.e. they are not found on Lab_TT437, they were deleted in the cleaned dataset.
 
 For the 5000+ duplicate records, i.e. LSI with two PCR tests, the observations were grouped by the number of key variables containing identical values. The key variables evaluated were `LabSpecimenID`, `ResultID`, `ResultDate`, and `CreateDate`. Here is that distribution:
 
-![TT229_Num_Dup_Keys](images/TT229DupKeyCount.png)
+![TT229_Num_Dup_Keys](images/TT229DupKeyCounts.png)
 
 **Number of Dup Keys = 4:** Over 95% of duplicates were identical on all four key variables. In these cases the first record was kept.
 

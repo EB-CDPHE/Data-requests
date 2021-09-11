@@ -5,7 +5,7 @@ CREATED:	   August 27, 2021
 MODIFIED:   
 PURPOSE:	   Connect to CEDRS backend (dphe66) to access LabTests
 INPUT:		dbo66.zDSI_LabTests  WHERE TestTypeID= 436 (TestType = 'Variant of public health concern')
-OUTPUT:		      Lab_TT436_read
+OUTPUT:		      Lab_TT436_read   AND   Lab_TT436_reduced
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/

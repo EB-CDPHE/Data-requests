@@ -7,7 +7,7 @@ This request is for the proportion of specimens collected from confirmed and pro
 Diagnostic testing is sequential and begins with specimen collection. The vast majority of specimens are tested for COVID using RT-PCR. Some are tested using other molecular assays. Those with positive test results are eligible for whole genome sequencing. Sequenced results include SARS2 variant type and "VOC" indicator (variant of concern). 
 
 #### Source data tables:
-![Source_Data_Tables2](images/SourceDataTables2.PNG)
+![Source_Data_Tables2](images/SourceDataTables3.PNG)
 
 
 The five source data tables were read and curated using a separate "Access.*.sas" program for each.
@@ -21,11 +21,14 @@ These programs are nearly identical. They change SQL columns with date values in
 
 ![Access_SAS_Code](images/AccessCode.png)
 
+For Specimen data and PCR data, the added step was taken to reduce the number of observations to just those specimens associated with EventID's that were in CEDRS.
+
+![Access_SAS_Code2](images/AccessCode2.png)
 ###
 The five `Access.*.sas` programs result is the following curated SAS datasets.
 ###
 #### Curated data tables:
-![Curated_Datasets](images/CuratedDatasets2.PNG)
+![Curated_Datasets](images/CuratedDatasets3.PNG)
 ###
 ## Data cleaning:
 
@@ -145,23 +148,25 @@ For the 5000+ duplicate records, i.e. LSI with two PCR tests, the observations w
 
 ![TT229_3_Dup_Keys](images/TT229w3DupKeys.png)
 
-It can be seen that seven of them have a `CreateDate` that differs by a single day. The others differ by months. Since the duplicates have the same result, the record with the earliest `CreateDate` was kept and the other one dropped.
+Since the duplicates have the same result, the record with the earliest `CreateDate` was kept and the other one dropped.
 
-**Number of Dup Keys = 2:** There were many more LSI with duplicate records that only had identical values for  `LabSpecimenID`, `ResultID` but different `ResultDate` and sometimes a different  `CreateDate`. A small handful of these were due to missing ResultDate that was later added. These records were deduplicated by deleting the record where `ResultDate = .`.
+**Number of Dup Keys = 2:** There were many more LSI with duplicate records that only had identical values for  `LabSpecimenID` and `ResultID` but different `ResultDate` and sometimes a different  `CreateDate`. A small handful of these were due to missing ResultDate that was later added. These records were deduplicated by deleting the record where `ResultDate = .`.
 
 ![TT229_2a_Dup_Keys](images/TT229w2aDupKeys.png)
 
-There were different scenarios for the specimens with duplicate, identical results. The majority of them (26/49 pairs) differed on `QuantitativeResult` or only differed on `CreateDate` (15/49 pairs). For all cases, these records were de-duplicated as above, i.e. keep record with latest result date and earliest create date. Here are some example duplicate records per two key variables (LSI and ResultID):
+There were different scenarios for the specimens with duplicate, identical results. The majority of them (26/49 pairs) differed on `QuantitativeResult` or only differed on `CreateDate` (15/49 pairs). For all cases, these records were de-duplicated by keeping the record with the latest result date and earliest create date. Here are some example duplicate records per two key variables (LSI and ResultID):
 
 ![TT229_2b_Dup_Keys](images/TT229w2bDupKeys.png)
 
-**Number of Dup Keys = 1:** The final group of duplicates were those that only had one key variable with identical results. These records had different results for the same LSI. As with the previous group of duplicates, some of these had one record with a missing result and the other record had a result. In these cases the record with the missing result was deleted. 
+**Number of Dup Keys = 1:** The final group of duplicates were those that only had one key variable with identical results. These records had different results for the same LSI. The majority of these had one record with a missing result and the second record with a result. These records were deduplicated by deleting the record where `ResultID = .`.
 
-The others had two different results, e.g. `ResultText = Positive` for one record and for the duplicate record (on LSI) `ResultText = Negative`. Here are some examples:
+![TT229_1aDup_Key](images/TT229w1aDupKey.png)
 
-![TT229_1Dup_Key](images/TT229w1DupKey.png)
+A few of these had two different results. In all but one case the initial record had `ResultText = Negative` while the subsequent record had `ResultText = Positive`. Here are some examples:
 
-For these duplicates, the record with the lowest value of ResultID was kept, e.g. `ResultID=1` was kept and `ResultID=2` was deleted. 
+![TT229_1bDup_Key](images/TT229w1bDupKey.png)
+
+For these duplicates, the record with the lowest value of ResultID was kept, e.g. `ResultID=1` was kept and `ResultID=2` was deleted. This corresponds to keeping the later ResultDate. 
 
 **3. Check Lab_TT434_read**
 
@@ -532,7 +537,7 @@ No data edits were needed for the Specimens_read dataset. Edits to the data in t
 
 ###
 #### Cleaned data tables:
-![Cleaned_Datasets](images/Cleaned_Datasets.PNG)
+![Cleaned_Datasets](images/Cleaned_Datasets2.PNG)
 
 ##
 ## Data merging:

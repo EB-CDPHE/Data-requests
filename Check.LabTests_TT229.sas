@@ -2,7 +2,7 @@
 PROGRAM:  Check.LabTests_TT229
 AUTHOR:   Eric Bush
 CREATED:  August 27, 2021
-MODIFIED: 090121
+MODIFIED: 091121: redirect data checks to Lab_TT229_reduced
 PURPOSE:	 After a SQL data table has been read using Access.LabTests_TT229, 
             this program can be used to explore the SAS dataset.
 INPUT:	 Lab_TT229_read
@@ -167,9 +167,9 @@ run;
 ** Calculate number of variables with identical values for Dups. Creates NumDupKey **;
 DATA Two_TT229_Spec ;  set TT229_Spec ;
    by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
-   where LabSpecimenID ^in (406724, 446580, 540252, 576509, 851118, 871502, 897632, 909746, 
-                            1057570, 1097798, 1098131, 1119791, 1344237, 1536073, 1725558, 
-                            1735642, 1798732, 1925013, 2005303, 2362747, 2376934) ;
+   where LabSpecimenID ^in (576509, 851118, 871502, 909746, 1057570, 1097798, 
+                            1098131, 1119791, 1344237, 1725558, 1735642, 
+                            1925013, 2005303, 2362747, 2399014, 2405702) ;
 
    * duplicate on all 4 variables;
         if (first.LabSpecimenID ne last.LabSpecimenID)  AND (first.ResultID ne last.ResultID)  AND  
@@ -194,34 +194,34 @@ run;
 
 /*______________________________________________________________________________________________________________*
  |FINDINGS:
- | n=32 records with duplicate LabSpecimenID's have identical values in FOUR vars
+ | n=10030 records with duplicate LabSpecimenID's have identical values in FOUR vars.
  | FIX: DeDup on FOUR keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  |
- | n=4 records with duplicate LabSpecimenID's have identical values in THREE vars
- | Most have CreateDate that differs by a one day. Some differ by 1 or more months.
+ | n=10 records with duplicate LabSpecimenID's have identical values in THREE vars
+ | All of these are from March-April 2020 and they differ on QuantitativeResult.  
+ | CreateDate differs by a one day.
  | FIX: DeDup on THREE keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  | Previous sort should be for descending CreateDate so this de-dup will keep most recent record.
  |
  | n=4 records with duplicate LabSpecimenID's have identical values in TWO vars
- | These records have same ResultID and ResultText. The ResultDate differs because one value is missing.
- | FIX: Delete record with missing ResultDate. OTherwise take the record with latest result date.
+ | These records have same ResultID and ResultText.
+ | Both ResultDate and CreateDate differ. Keep record with first ResultDate.
+ | FIX: DeDup on TWO keys using PROC SORT NODUPKEY option (which keeps the FIRST obs).
  |
  | n=10 records with duplicate LabSpecimenID's have identical values in ONE var (LabSpecimenID)
- | Some of these had missing results.
- | Other times the results differed, e.g. Positive result on one record and negative result on the other
- | FIX: delete record with ResultID= missing and keep matching record with other ResultID.
- | FIX: keep record with lowest value for ResultID, e.g. Positive result over the Negative result 
+ | All of these have missing results (ResultID, ResultText, ResultDate) in first record.
+ | FIX: delete record with ResultID= missing and keep matching record with results.
  *_______________________________________________________________________________________________________________*/
 
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
-options ps=50 ls=150 ;     * Landscape pagesize settings *;
+options ps=50 ls=150 pageno=1 ;     * Landscape pagesize settings *;
 **  Print records with duplicate LabTest results per Specimen  **;
 **  that have FOUR variables that are identical between the two records **;
    PROC print data= Two_TT229_Spec; 
       where NumDupKeys=4;
       id LabSpecimenID;
-      by LabSpecimenID;
-      var EventID ResultID ResultText QuantitativeResult ReferenceRange ResultDate CreateDate  CreateByID  NumDupKeys ;
+      *by LabSpecimenID;
+      var EventID ResultID ResultText QuantitativeResult  ResultDate CreateDate  CreateByID   ;
       format  ResultID 3.   ResultText $10. QuantitativeResult $40.   CreateByID 5. ;
    title1 "Source data = &TT229dsn";
    title2 'NumDupKeys=4';
@@ -247,7 +247,7 @@ run;
       where NumDupKeys=2;
       id LabSpecimenID;
       by LabSpecimenID;
-      var EventID ResultID ResultText QuantitativeResult ReferenceRange ResultDate CreateDate  CreateByID  NumDupKeys ;
+      var EventID ResultID ResultText QuantitativeResult ReferenceRange ResultDate CreateDate  CreateByID   ;
       format  ResultID 3.   ResultText $10. QuantitativeResult $40.   CreateByID 5. ;
    title1 "Source data = &TT229dsn";
    title2 'NumDupKeys=2';
@@ -260,7 +260,7 @@ run;
       where NumDupKeys=1;
       id LabSpecimenID;
       by LabSpecimenID;
-      var EventID ResultID ResultText QuantitativeResult ReferenceRange ResultDate CreateDate  CreateByID  NumDupKeys ;
+      var EventID ResultID ResultText QuantitativeResult ReferenceRange ResultDate CreateDate  CreateByID   ;
       format  ResultID 3.   ResultText $10. QuantitativeResult $40.   CreateByID 5. ;
    title1 "Source data = &TT229dsn";
    title2 'NumDupKeys=1';

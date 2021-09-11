@@ -2,9 +2,9 @@
 PROGRAM:  Fix.LabTests_TT229
 AUTHOR:   Eric Bush
 CREATED:	 August 26, 2021
-MODIFIED: 090121 
+MODIFIED: 091121: change to fix "reduced" version of TT229 
 PURPOSE:	 Make data edits to Lab_TT229_read per edit checks in CHECK.LabTests_TT229.sas
-INPUT:	      Lab_TT229_read 
+INPUT:	      Lab_TT229_reduced 
 OUTPUT:	      Lab_TT229_fix
 ***********************************************************************************************/
 
@@ -33,25 +33,25 @@ OUTPUT:	      Lab_TT229_fix
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
 title;
-   PROC contents data=Lab_TT229_read varnum;  title1 'Lab_TT229_read';  run;
+   PROC contents data=Lab_TT229_reduced varnum;  title1 'Lab_TT229_reduced';  run;
 
 
 ** STEP 1:  De-duplicate records with two LabTest results per Specimen that have identical values in FOUR variables **;
-   proc sort data= Lab_TT229_read  
+   proc sort data= Lab_TT229_reduced  
               out= TT229_DeDup4  NODUPKEY ;  
       by LabSpecimenID  ResultID  ResultDate  descending CreateDate  ; 
 run;
 
 
 ** STEP 2:  De-duplicate records with two LabTest results per Specimen that have identical values in THREE variables **;
-** Keep record with most recent CreateDate **;
+** Keeps record with most recent (latest) CreateDate **;
    proc sort data= TT229_DeDup4  
               out= TT229_DeDup3  NODUPKEY ;  
       by LabSpecimenID  ResultID  ResultDate    ; 
 run;
 
 
-** STEP 3:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  **;
+** STEP 3a:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  **;
 **          AND ResultDate = .  **;
 DATA TT229_DeDup2a ;   
    set TT229_DeDup3;
@@ -61,9 +61,8 @@ DATA TT229_DeDup2a ;
     AND ResultDate= . then delete ;
 run;
 
-
-** STEP 4:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  **;
-**          AND ResultDate is NOT missing.  **;
+** STEP 3b:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  **;
+**          AND ResultDate NOT = .  **;
 ** Keep record with the earlier ResultDate  **;
    proc sort data= TT229_DeDup2a  
               out= TT229_DeDup2  NODUPKEY ;  
@@ -71,32 +70,32 @@ run;
 run;
 
 
-** STEP 5:  De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable  **;
+** STEP 4a:  De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable  **;
 **          AND ResultDate = .  **;
 DATA TT229_DeDup1a ;   
    set TT229_DeDup2;
    by LabSpecimenID ResultID;
+
 * Delete duplicate record where ResultDate = missing *;
    if (first.LabSpecimenID ne last.LabSpecimenID)  AND ResultDate= . then delete ;
 run;
 
-
-** STEP 6:  De-duplicate records with two LabTest results per Specimen that have identical values in ONE variable  **;
-**          AND ResultDate is NOT missing.  **;
+** STEP 4b:  De-duplicate records with two LabTest results per Specimen that have identical values in TWO variables  **;
+**          AND ResultDate NOT = .  **;
 ** Keep record with the earlier ResultDate  **;
    proc sort data= TT229_DeDup1a  
               out= TT229_DeDup1  NODUPKEY ;  
-      by LabSpecimenID   ; 
+      by LabSpecimenID ; 
 run;
 
 
-** STEP 7:  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
+** STEP 5:  Fix data errors per findings in Check.LabTests_TT437.sas program  **;
 DATA Lab_TT229_temp ;   set TT229_DeDup1 (DROP=  TestBrandID  TestBrand  LegacyTestID  CreatedByID)  ;
 
 * Delete duplicate records that are irrelevant, i.e. do NOT have corresponding sequence results *;
-   where LabSpecimenID ^in (406724, 446580, 540252, 576509, 851118, 871502, 897632, 909746, 
-                            1057570, 1097798, 1098131, 1119791, 1344237, 1536073, 1725558, 
-                            1735642, 1798732, 1925013, 2005303, 2362747, 2376934) ;
+   where LabSpecimenID ^in (576509, 851118, 871502, 909746, 1057570, 1097798, 
+                            1098131, 1119791, 1344237, 1725558, 1735642, 
+                            1925013, 2005303, 2362747, 2399014, 2405702) ;
 
 * RENAME variables to keep when merging with Lab_TT437_fix  *;
    RENAME   TestTypeID         = TestTypeID_TT229
@@ -107,8 +106,7 @@ DATA Lab_TT229_temp ;   set TT229_DeDup1 (DROP=  TestBrandID  TestBrand  LegacyT
             ResultID           = ResultID_TT229
             ResultDate         = ResultDate_TT229
             CreateDate         = CreateDate_TT229
-            UpdateDate         = UpdateDate_TT229
-       ;
+            UpdateDate         = UpdateDate_TT229  ;
 
 * DROP variables not needed for merging  *;
    DROP CreateBy  UpdatedBy  LabID  ELRID  CreateByID  ;

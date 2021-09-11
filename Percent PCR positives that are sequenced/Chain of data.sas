@@ -1,4 +1,18 @@
 
+** CONTENTS **;
+options pageno=1;
+   PROC contents data=Specimens_read  varnum ;  title1 'Specimens_read';  run;
+options pageno=1;
+   PROC contents data=Lab_TT229_fix  varnum ;  title1 'Lab_TT229_fix';  run;
+options pageno=1;
+   PROC contents data=Lab_TT434_fix  varnum ;  title1 'Lab_TT434_fix';  run;
+options pageno=1;
+   PROC contents data=Lab_TT436_fix  varnum ;  title1 'Lab_TT436_fix';  run;
+options pageno=1;
+   PROC contents data=Lab_TT437_fix  varnum ;  title1 'Lab_TT437_fix';  run;
+
+
+
 
 ** CHAIN **;
 title;

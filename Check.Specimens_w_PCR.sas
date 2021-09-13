@@ -11,10 +11,10 @@ OUTPUT:	 printed output
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
-%Let SpecDSN = Specimens_read ;
+%Let SpecDSN = Specimens_w_PCR ;
 
 options pageno=1;
-   PROC contents data=Specimens_read  varnum ;  title1 'Specimens_read';  run;
+   PROC contents data=Specimens_w_PCR  varnum ;  title1 'Specimens_w_PCR';  run;
 
 /*-----------------------------------------------------------------*
  | Check Specimens_w_PCR data for:

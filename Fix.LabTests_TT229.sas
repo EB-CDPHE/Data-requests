@@ -3,7 +3,7 @@ PROGRAM:  Fix.LabTests_TT229
 AUTHOR:   Eric Bush
 CREATED:	 August 26, 2021
 MODIFIED: 091121: change to fix "reduced" version of TT229 
-PURPOSE:	 Make data edits to Lab_TT229_read per edit checks in CHECK.LabTests_TT229.sas
+PURPOSE:	 Make data edits to Lab_TT229_reduced per edit checks in CHECK.LabTests_TT229.sas
 INPUT:	      Lab_TT229_reduced 
 OUTPUT:	      Lab_TT229_fix
 ***********************************************************************************************/

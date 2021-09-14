@@ -36,4 +36,4 @@ run;
 
 
 ** 2. Contents of new dataset with edits **;
-   PROC contents data=zDSI_Events_fix varnum; run;
+   PROC contents data=zDSI_Events_fix varnum; title1 'zDSI_Events_fix'; run;

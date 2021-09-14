@@ -94,4 +94,4 @@ run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data= CEDRS_view_read  varnum ; run;
+   PROC contents data= CEDRS_view_read  varnum ; title1 'CEDRS_view_read'; run;

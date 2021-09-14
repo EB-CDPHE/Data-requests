@@ -73,6 +73,6 @@ run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=zDSI_Events_read varnum; run;
+   PROC contents data=zDSI_Events_read varnum; title1 'zDSI_Events_read'; run;
 
 

@@ -135,21 +135,21 @@ run;
 
 /*____________________________________________________________________________*
  |FINDINGS:
- | All date values are from much earlier time period than COVID. 
  | CreatedDate goes from 3/5/20 to present.
- | CollectionDate goes from 1901 to 12/5/21, i.e. there are some wrong values.
+ | CollectionDate used to go from 1901 to 12/5/21, i.e. there are some wrong values.
+ | CollectionDate now goes from 1/2/2020 to present.
  | UpdatedDate goes from 3/5/20 to present.
  |FIX:
- | Re-do data check after merging with COVID LabTests.
+ | Previous data errors fixed at source via LeAnna Kent.
  *____________________________________________________________________________*/
 
-   PROC print data= &SpecDSN ;
-      where (. < CollectionDate < '01JAN20'd)  OR  CollectionDate > '01NOV21'd;
-      id LabSpecimenID ;
-      var EventiD CreatedDate  CollectionDate  UpdatedDate  Specimen   ;
-    title1 'Specimens_reduced';
-    title2 'CollectionDate > Nov 1, 2020';
-run;
+/*   PROC print data= &SpecDSN ;*/
+/*      where (. < CollectionDate < '01JAN20'd)  OR  CollectionDate > '01NOV21'd;*/
+/*      id LabSpecimenID ;*/
+/*      var EventiD CreatedDate  CollectionDate  UpdatedDate  Specimen   ;*/
+/*    title1 'Specimens_reduced';*/
+/*    title2 'CollectionDate > Nov 1, 2020';*/
+/*run;*/
 
 ** NOTE: ALL of the FINDINGS below have been fixed at source **;
 

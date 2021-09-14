@@ -62,7 +62,7 @@ run;
 
 **  3. Contents of final SAS dataset  **;
 
-   PROC contents data=COVID.CEDRS_view_fix varnum; run;
+   PROC contents data=COVID.CEDRS_view_fix varnum;  title1 'COVID.CEDRS_view_fix'; run;
 
 
 

@@ -139,6 +139,6 @@ run;
 
 
 **  8. PROC contents of final dataset  **;
-   PROC contents data= COPHS_read varnum; run;
+   PROC contents data= COPHS_read varnum;  title1 'COPHS_read'; run;
 
 

@@ -2,7 +2,7 @@
 PROGRAM:  Check.Specimens_w_PCR
 AUTHOR:   Eric Bush
 CREATED:  August 31, 2021
-MODIFIED: 
+MODIFIED: 091221: Modify for merging reduced datasets
 PURPOSE:	 After a SQL data table has been read using Access.Specimens_read, 
             this program can be used to explore the SAS dataset.
 INPUT:	 Specimens_w_PCR
@@ -18,24 +18,53 @@ options pageno=1;
 
 /*-----------------------------------------------------------------*
  | Check Specimens_w_PCR data for:
+ | 1. Completeness of ID variables and CollectionDate
+ | 2. Number of Collection Dates per EventID
+ | 3. 
  *-----------------------------------------------------------------*/
 
-** Any missing CollectionDate? **;
+** Completeness of ID variables and CollectionDate **;
    PROC means data= Specimens_w_PCR  n nmiss;
-      var CollectionDate  LabSpecimenID ;
+      var  LabSpecimenID  SpecimenTypeID  CollectionDate  ;
 run;
 
+/*_______________________________________________________*
+ |FINDINGS:
+ | LabSpecimenID has no missing values. 
+ | Collection date is missing in < 0.3% of Specimens.  
+ *_______________________________________________________*/
 
-** How many Specimens per EventID?  **;
+** Completeness of ID variables and CollectionDate **;
+   PROC means data= Specimens_w_PCR  n nmiss;
+      var  TestTypeID_TT229  ResultID_TT229 ResultDate_TT229  CreateDate_TT229 
+           CreatedID CreatedDate  ;
+run;
+
+** Print obs with missing SpecimenTypeID **;
+   PROC print data= Specimens_w_PCR ;
+      where SpecimenTypeID = .;
+      ID EventID;
+      var LabSpecimenID  SpecimenTypeID  CollectionDate  ResultID_TT229  ResultDate_TT229  CreateDate_TT229  CreatedID  CreatedDate ;
+run;
+
+/*____________________________________________________________________________*
+ |FINDINGS:
+ | The four variables with missing values are all from Specimen_Fix dataset. 
+ | SpecimenTypeID, CollectionDate, CreatedID, and CreatedDate are missing.  
+ | The PCR result date exists for EventID=1295681 (LSI+2522041).
+ *____________________________________________________________________________*/
+
+
+
+** Number of Collection Dates per EventID **;
    PROC freq data = Specimens_w_PCR  NOPRINT ;
       where CollectionDate ne .;
-      tables  EventID*CollectionDate / out=Event_Coll_Count ;
+      tables  EventID*CollectionDate / out=Event_Coll_Count(drop=CollectionDate) ;
 run;
 
 /*      proc print data= Event_Coll_Count; where count=1;     run;*/
 /*      proc print data= Specimens_w_PCR; where EventID='1000140'; */
-/*         var EventID  LabSpecimenID CollectionDate   ;*/
-/*run;*/
+/*         var EventID  LabSpecimenID CollectionDate ;  run;*/
 
    PROC freq data = Event_Coll_Count;
       tables COUNT;
@@ -43,11 +72,24 @@ run;
       title2 'Frequency of Collection Dates per EventID';
 run;
 
+/*_____________________________________________________________________________________*
+ |FINDINGS:
+ | Almost 95% of Specimens with PCR results have only one record per EventID
+ | Therefore, these can be merged to CEDRS data by EventID alone. 
+ |
+ | There are 23 Events that have more than 4 different Collection dates.
+ | These need to be further investigated.  
+ | 
+ *_____________________________________________________________________________________*/
 
-proc print data= Event_Count;
-where count>50;
+
+** Get list of EventID's with more than 4 specimens (CollectionDates) **;
+   PROC print data= Event_Coll_Count;  
+      where count>4;  
+      id EventID;   var Count ;
 run;
 
+** Investigate these EventID's on Specimens_w_PCR dataset **;
    proc sort data= Specimens_w_PCR
                out= Specimens_w_PCR_Sort ;
       by EventID  CollectionDate   LabSpecimenID  ;
@@ -55,13 +97,22 @@ run;
 
    PROC print data= Specimens_w_PCR_Sort ;
       where EventID in 
-         ('1007196', '1210721', '552404', '647800', '664619', '741091', '792031', '998246'
-         );
+         ('1018213','1078661','1128147','1185097','1232689','1247010','1262762','1266150','1277564','534338',
+          '537479','542441','562847','574742','610290','720059','771417','780002','891221','909204','977155' );
       ID EventID; 
       by EventID;
-      var LabSpecimenID  Specimen  CollectionDate   ResultDate_TT229  ResultText_TT229  ;
+      var LabSpecimenID  SpecimenTypeID  Specimen  CollectionDate   ResultDate_TT229  ResultText_TT229   ;
       format Specimen  $10.;
 run;
+
+/*__________________________________________________________________________*
+ |FINDINGS:
+ | Some are tested regularly, and have different collection date.
+ | Others have multiple specimens with same collection date.
+ *___________________________________________________________________________*/
+
+
+
 
 
 

@@ -4,8 +4,8 @@ AUTHOR:   Eric Bush
 CREATED:	 August 31, 2021
 MODIFIED: 090121
 PURPOSE:	 Make data edits to Lab_TT437_read per edit checks in CHECK.LabTests_TT437.sas
-INPUT:	 Specimens_read  &  Lab_TT229_fix  |_|  Lab_TT436_fix  &  Lab_TT436_fix  ||
-OUTPUT:	 Specimens_w_PCR                   |+|  COVID_Sequence                   ==  COVID.CEDRS_Sequence
+INPUT:	 Specimens_reduced  &  Lab_TT229_fix  |_|  Lab_TT436_fix  &  Lab_TT436_fix  ||
+OUTPUT:	 Specimens_w_PCR                      |+|  COVID_Sequence                   ==  COVID.CEDRS_Sequence
 **********************************************************************************************************/
 
 /*-----------------------------------------------------------------------------------------------------*
@@ -28,28 +28,35 @@ OUTPUT:	 Specimens_w_PCR                   |+|  COVID_Sequence                  
  *------------------------------------------------------------------------------------------------------*/
 
 
-*** STEP 1:  Merge Lab_TT229_fix (PCR LabTest data)  AND  Specimens_read (Specimen data) ***;
+*** STEP 1:  Merge Lab_TT229_fix (PCR LabTest data)  AND  Specimens_reduced (Specimen data) ***;
 *** CREATES:  Specimens_w_PCR
 ***--------------------------------------------------------------------------------------***;
 
 /*_____________________________________________________________________________________*
  | Lab_TT229_fix dataset comes from zDSI.LabTests where TestType='RT-PCR'.
  |    zDSI.LabTests was curated and cleaned to create Lab_TT229_fix.
- |    Lab_TT229_fix is a LabTest level dataset, i.e. multiple PCR's per EventID.
- |    It is already sorted by LabSpecimenID EventID.
+ |    Lab_TT229_fix is merged with list of EventID's from CEDRS to create Lab_TT229_reduced.
+ |    Lab_TT229_reduced is a LabTest level dataset, i.e. multiple PCR's per EventID.
+ |    It is already sorted by LabSpecimenID EventID and filtered for CEDRS events.
+ |
  | Specimens_read dataset comes from zDSI.Specimens.
  |    zDSI.Specimens was curated to create Specimens_read.
  |    It is a specimen level dataset. There is only one specimen per record.
  *______________________________________________________________________________________*/
 
-   proc sort data= Specimens_read
-               out= Specimens_sort;
-      by LabSpecimenID EventID;
-run;
+   PROC contents data=Specimens_fix  varnum ;  title1 'Specimens_fix';  run;
+   PROC contents data=Lab_TT229_fix  varnum ;  title1 'Lab_TT229_fix';  run;
+
+   proc sort data= Specimens_fix
+               out= Specimens_fix_sort;
+      by EventID LabSpecimenID ;
+   proc sort data= Lab_TT229_fix
+               out= Lab_TT229_fix_sort;
+      by EventID  LabSpecimenID ;
 
 DATA Specimens_w_PCR; 
-   merge Lab_TT229_fix(in=pcr)  Specimens_sort ;
-   by LabSpecimenID EventID;
+   merge Lab_TT229_fix_sort(in=pcr)  Specimens_fix_sort ;
+   by EventID  LabSpecimenID ;
    if pcr=1;            * <--  KEEP only the specimen records that have had a PCR test;
 run;
 
@@ -57,10 +64,13 @@ run;
 
 
 *** Repeat above for other molecular assays ***;
+   proc sort data= Lab_TT434_fix
+               out= Lab_TT434_fix_sort;
+      by EventID  LabSpecimenID ;
 
 DATA Specimens_w_OMA; 
-   merge Lab_TT434_fix(in=OMA)  Specimens_sort ;
-   by LabSpecimenID EventID;
+   merge Lab_TT434_fix_sort(in=OMA)  Specimens_fix_sort ;
+   by EventID  LabSpecimenID ;
    if OMA=1;            * <--  KEEP only the specimen records that have had a OMA test;
 run;
 

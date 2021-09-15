@@ -8,4 +8,7 @@ Final response was delivered via a few slides that can be seen [here](https://do
 `SELECT date_opened, hcw, hcw_type, direct_patient_care, occupation, case_id, event_id FROM DM_CO_PROD.DM.CASE_PATIENT_ALL WHERE patient_type = 'confirmed' AND (stub= 'no' OR stub is null)`
 #
 #### The SAS program used to generate the response was [RFI.HCW.sas](RFI.HCW.sas)
+#
+**Issues:**
+* can we adjust our query to restrict it to confirmed cases in people between 18-65 years old? i.e. those eligible to be a HCW
 

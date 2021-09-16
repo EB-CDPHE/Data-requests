@@ -1,14 +1,18 @@
 ## Background 
-This data request came from Rachel H. via Breanna and Nisha. The request was specifically for Snowflake to be used to generate the proportion of COVID-19 cases that are healthcare workers and show this over time. **Population**:  Confirmed cases in Dr Justina that had a `Date_Opened` between October 1, 2020 and August 31, 2021. **Groups**: Healthcare workers (`HCW=1`) or Occupation contains 'healthcare' as a proportion of confirmed cases. **Data requested**: Proportion of confirmed cases that were healthcare workers by month. 
+This data request came from DeLilah Collins, Assistant Director at Colorado Department of Education (CDE). They are applying for a grant ("Emergency Assistance to non-public schools" and the application requires data on COVID. Non-public schools however are autonomous from the State. Data needs to address:
+1. Which non-public schools are most impacted by COVID19?
+2. What is the economic impact of COVID19 in these communities?
+
+Since non-public schools are not required to report COVID19 cases, the data will have to be county-level measure of disease burden.
+**Population**:  Confirmed and probable cases in CEDRS per 100K population. **Groups**: All Colorado counties. All time and also restricted to FY20-21. **Data requested**: Case rate per 100K by county for all time and FY20-21 sorted in descending order. 
 
 ## Response
 Final response was delivered via a few slides that can be seen [here](https://docs.google.com/presentation/d/1JiUm_GukAfzZLlpAABx0JAVU9GNQR_MyNJMTOy-enxA/edit?usp=sharing).
 #
-#### Snowflake query
-`SELECT date_opened, hcw, hcw_type, direct_patient_care, occupation, case_id, event_id FROM DM_CO_PROD.DM.CASE_PATIENT_ALL WHERE patient_type = 'confirmed' AND (stub= 'no' OR stub is null)`
+
+#### The SAS program used to generate the response was [RFI.Cases_by_County.sas](RFI.Cases_by_County.sas). This may also require running [Access.Population](../Access.Populations.sas) to obtain COVID.Population data if not already available.
 #
-#### The SAS program used to generate the response was [RFI.HCW.sas](RFI.HCW.sas)
-#
+
 **Issues:**
-* can we adjust our query to restrict it to confirmed cases in people between 18-65 years old? i.e. those eligible to be a HCW
+* Update the Access.Population program to point to 2020 census data instead of 2019 data. 
 

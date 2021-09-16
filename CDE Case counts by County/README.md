@@ -7,7 +7,10 @@ Since non-public schools are not required to report COVID19 cases, the data will
 **Population**:  Confirmed and probable cases in CEDRS per 100K population. **Groups**: All Colorado counties. All time and also restricted to FY20-21. **Data requested**: Case rate per 100K by county for all time and FY20-21 sorted in descending order. 
 
 ## Response
-Final response was delivered via a few slides that can be seen [here](https://docs.google.com/presentation/d/1JiUm_GukAfzZLlpAABx0JAVU9GNQR_MyNJMTOy-enxA/edit?usp=sharing).
+Final response was delivered as two CSV files.
+1. [AllCaseRate](AllCaseRate.csv)
+2. 
+3. via a few slides that can be seen [here](https://docs.google.com/presentation/d/1JiUm_GukAfzZLlpAABx0JAVU9GNQR_MyNJMTOy-enxA/edit?usp=sharing).
 #
 
 #### The SAS program used to generate the response was [RFI.Cases_by_County.sas](RFI.Cases_by_County.sas). This may also require running [Access.Population](../Access.Populations.sas) to obtain COVID.Population data if not already available.

@@ -9,10 +9,10 @@ Since non-public schools are not required to report COVID19 cases, the data will
 ## Response
 Final response was delivered as two CSV files.
 1. [AllCaseRate](AllCaseRate.csv)
-2. 
-3. via a few slides that can be seen [here](https://docs.google.com/presentation/d/1JiUm_GukAfzZLlpAABx0JAVU9GNQR_MyNJMTOy-enxA/edit?usp=sharing).
+2. [FY20-21CaseRate](FY20-21CaseRate.csv)
 #
 
+## Code
 #### The SAS program used to generate the response was [RFI.Cases_by_County.sas](RFI.Cases_by_County.sas). This may also require running [Access.Population](../Access.Populations.sas) to obtain COVID.Population data if not already available.
 #
 

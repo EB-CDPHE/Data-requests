@@ -549,10 +549,10 @@ The PROC contents for the five cleaned datasets can be found via the links below
 4. [Lab_TT436_fix](contents/PROC_Contents.Lab_TT436_fix.pdf)
 5. [Lab_TT437_fix](contents/PROC_Contents.Lab_TT437_fix.pdf)
 
-The PCR-level results data (Lab_TT229_fix) is merged with the Specimen-level data by LabSpecimenID. Only records on Lab_TT229_fix are kept in the new dataset: Specimens_w_PCR.
+The PCR-level results data (Lab_TT229_fix) is merged with the Specimen-level data by LabSpecimenID. Only records on Lab_TT229_fix, i.e. Specimens with PCR test result, are kept in the new dataset: Specimens_w_PCR.
 
-**Check.Lab_TT436_read.sas**
-This program conducts data checks on selected variables in Specimens_w_PCR dataset. This datsaset has the collection date and specimen data for ALL RT-PCR tests. The full list of variables and their attributes for the ??????
+**Check.Specimens_w_PCR.sas**
+This program conducts data checks on selected variables in Specimens_w_PCR dataset. The intent is to merge this datsaset with CEDRS data based on EventID and Collection Date.  has the collection date and specimen data for ALL RT-PCR tests. The full list of variables and their attributes for the ??????
 
 ````diff
 +toc

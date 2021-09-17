@@ -16,9 +16,9 @@ OUTPUT:		[name of output - SAS data tables, printed output, etc]
 ***-----------------------------***;
 
 ** Set population for age group **;
-   PROC means data= CountyPop_est n sum  maxdec=0 ;   where County = 'LARIMER' ;   var Yrs0_5 ;   run;
-
-   %Let agepopulation = 22114 ;      * <-- pull number from county population;
+data _null_; set CountyPop_est; where County = 'LARIMER' ;
+   call symputx("agepopulation", Yrs0_5);    * <-- put number from county population into macro variable;
+run;
 
 
 **  Create age specific dataset and sort by date  **;
@@ -75,10 +75,9 @@ run;
 ***-----------------------------***;
 
 ** Set population for age group **;
-   PROC means data= CountyPop_est n sum  maxdec=0 ;   where County = 'LARIMER' ;   var Yrs6_11 ;   run;
-
-   %Let agepopulation = 25038 ;      * <-- pull number from county population;
-
+data _null_; set CountyPop_est; where County = 'LARIMER' ;
+   call symputx("agepopulation", Yrs6_11);    * <-- put number from county population into macro variable;
+run;
 
 **  Create age specific dataset and sort by date  **;
  Data Larimer6_11; set COVID.CEDRS_view_fix ;
@@ -86,7 +85,7 @@ run;
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
   PROC sort data=Larimer6_11  out= Larimer6_11_sort; by ReportedDate;
-   proc print data= Larimer6_11_sort ;  ID ReportedDate ;  run;
+/*   proc print data= Larimer6_11_sort ;  ID ReportedDate ;  run;*/
 
 **  Reduce dataset from patient level to date level (one obs per date reported)  **;
 Data Larimer6_11_rate; set Larimer6_11_sort;
@@ -103,7 +102,7 @@ Data Larimer6_11_rate; set Larimer6_11_sort;
 * drop patient level variables  *;
    drop ProfileID  EventID  Age_at_Reported  County;
 run;
-   proc print data= Larimer6_11_rate ;  ID ReportedDate ;  run;
+/*   proc print data= Larimer6_11_rate ;  ID ReportedDate ;  run;*/
 
 ** add ALL reported dates for populations with sparse data **;
 Data Larimer6_11_dates; merge Timeline  Larimer6_11_rate;
@@ -114,7 +113,7 @@ Data Larimer6_11_dates; merge Timeline  Larimer6_11_rate;
    if CaseRate=. then CaseRate=0 ; 
    Counties='Larimer';  Ages='6-11 yo';
 run;
-   proc print data= Larimer6_11_dates ;  ID ReportedDate ;  run;
+/*   proc print data= Larimer6_11_dates ;  ID ReportedDate ;  run;*/
 
 
 **  Calculate 7-day moving averages  **;
@@ -132,9 +131,9 @@ run;
 ***-----------------------------***;
 
 ** Set population for age group **;
-   PROC means data= CountyPop_est n sum  maxdec=0 ;   where County = 'LARIMER' ;   var Yrs12_17 ;   run;
-
-   %Let agepopulation = 25653 ;      * <-- pull number from county population;
+data _null_; set CountyPop_est; where County = 'LARIMER' ;
+   call symputx("agepopulation", Yrs12_17);    * <-- put number from county population into macro variable;
+run;
 
 
 **  Create age specific dataset and sort by date  **;
@@ -189,10 +188,9 @@ run;
 ***-----------------------------***;
 
 ** Set population for age group **;
-   PROC means data= CountyPop_est n sum  maxdec=0 ;   where County = 'LARIMER' ;   var Yrs18_121 ;   run;
-
-   %Let agepopulation = 284131 ;      * <-- pull number from county population;
-
+data _null_; set CountyPop_est; where County = 'LARIMER' ;
+   call symputx("agepopulation", Yrs18_121);    * <-- put number from county population into macro variable;
+run;
 
 **  Create age specific dataset and sort by date  **;
  Data Larimer18_115; set COVID.CEDRS_view_fix ;
@@ -246,10 +244,9 @@ run;
 ***------------------------***;
 
 ** Set population for age group **;
-   PROC means data= CountyPop_est n sum  maxdec=0 ;   where County = 'LARIMER' ;   var County_Population_Est ;   run;
-
-   %Let agepopulation = 356936 ;      * <-- pull number from county population;
-
+data _null_; set CountyPop_est; where County = 'LARIMER' ;
+   call symputx("agepopulation", County_Population_Est);    * <-- put number from county population into macro variable;
+run;
 
 **  Create age specific dataset and sort by date  **;
  Data Larimer0_115; set COVID.CEDRS_view_fix ;

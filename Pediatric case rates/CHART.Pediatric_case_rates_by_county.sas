@@ -121,11 +121,7 @@ run;
 
 
 
-%Macro CaseRates(COcnty, AgeGrp, AgeLB, AgeUB);
-DATA CEDRS_&COcnty;  set CEDRS_view_fix;
-   where County = "&COcnty";   
-   keep ProfileID EventID ReportedDate Age_at_Reported County;
-run;
+%Macro AgeGrpRates(COcnty, AgeGrp, AgeLB, AgeUB);
 
 ** Create macro variable of population data for county and age group **;
 data _null_; set CountyPop_est; where County = "&COcnty" ;
@@ -183,6 +179,51 @@ proc datasets library=work NOlist ;
    delete &COcnty   &COcnty._rate   &COcnty._sort   &COcnty._dates  ;
 run;
 
+%mend;
+
+
+%macro CntyRates(countyname);
+
+* create county level dataset *;
+DATA CEDRS_&countyname;  set CEDRS_view_fix;
+   where County = "&countyname";   
+   keep ProfileID EventID ReportedDate Age_at_Reported County;
+run;
+
+* run macro to create county level case rates for each age group *;
+%AgeGrpRates(&countyname, Yrs0_5, 0, 6)  
+%AgeGrpRates(&countyname, Yrs6_11, 6, 12)  
+%AgeGrpRates(&countyname, Yrs12_17, 12, 18)  
+%AgeGrpRates(&countyname, Yrs18_121, 18, 116)
+
+* combine the four age group datasets into one county level dataset *;
+Data &countyname._combine; 
+   set &countyname._yrs0_5   &countyname._yrs6_11   &countyname._yrs12_17   &countyname._yrs18_121  ;
+   proc sort data=&countyname._combine
+               out=&countyname._cases;
+      by ReportedDate;
+run;
+
+* delete age group specific datasets  *;
+proc datasets library=work NOlist ;
+   delete  &countyname._yrs0_5   &countyname._yrs6_11   &countyname._yrs12_17   &countyname._yrs18_121  ;
+run;
+%mend;
+
+
+
+
+
+%CntyRates(ADAMS)
+%CntyRates(ALAMOSA)
+%CntyRates(ARAPAHOE)
+%CntyRates(ARCHULETA)
+%CntyRates(BACA)
+%CntyRates(DELTA)
+%CntyRates(DELTA)
+
+
+
 
 * Export data to Excel file (XLS) to be used in Tableau *;
 PROC EXPORT DATA= &COcnty._&AgeGrp 
@@ -191,13 +232,6 @@ PROC EXPORT DATA= &COcnty._&AgeGrp
      SHEET="data"; 
 RUN;
 
-%mend;
-
-
-%CaseRates(ADAMS, Yrs0_5, 0, 6)  
-%CaseRates(ADAMS, Yrs6_11, 6, 12)  
-%CaseRates(ADAMS, Yrs12_17, 12, 18)  
-%CaseRates(ADAMS, Yrs18_121, 18, 116)
 
 
 %CaseRates(BACA, Yrs0_5, 0, 6)  

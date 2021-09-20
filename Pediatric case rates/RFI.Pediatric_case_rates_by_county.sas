@@ -73,7 +73,7 @@ DATA CountyPop_est ;
        Yrs6_11    = 'Population for 6-11 year olds'
       Yrs12_17    = 'Population for 12-17 year olds'
      Yrs18_121  = 'Population for 18-121 year olds' ;
-   drop _NAME_  tmp_county  _0_to_5   _6_to_11   _12_to_17   _18_to_121   ;
+   drop _LABEL_  _NAME_  tmp_county  _0_to_5   _6_to_11   _12_to_17   _18_to_121   ;
 run;
    PROC print data= CountyPop_est; run;
 
@@ -109,7 +109,7 @@ run;
 DATA timeline;
    ReportedDate='01MAR20'd;
    output;
-   do t = 1 to 530;
+   do t = 1 to 560;
       ReportedDate+1;
       output;
    end;
@@ -195,7 +195,7 @@ proc expand data=ALL0_121_rate   out=ALL0_121_MoveAv  method=none;
    convert NumCases=Mov7dAv / transformout=(movave 7);
 run;
 proc print data= ALL0_121_MoveAv; run;
-
+proc contents data= ALL0_121_MoveAv; title1 'ALL0_121_MoveAv'; run;
 
 
 ***----------------------***;
@@ -217,7 +217,7 @@ proc print data= ALL0_121_MoveAv; run;
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
   PROC sort data=Boulder0_5  out= Boulder0_5_sort; by ReportedDate;
-/*   proc print data= Boulder0_5_sort ;  ID ReportedDate ;  run;*/
+   proc print data= Boulder0_5_sort ;  ID ReportedDate ;  run;
 
 **  Reduce dataset from patient level to date level **;
 **  Result is one obs per date reported  **;

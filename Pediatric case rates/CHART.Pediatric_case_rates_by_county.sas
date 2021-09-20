@@ -214,13 +214,15 @@ run;
 ***  Export data to Excel file (XLS) to be used in Tableau  ***;
 ***---------------------------------------------------------***;
 
-PROC EXPORT DATA= AD_combine 
+PROC EXPORT DATA= All_County_combine 
             OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\Pediatric case rates\County data\All_County_combine.xls" 
             DBMS=EXCEL REPLACE;
      SHEET="data"; 
 RUN;
 
 
-
+libname RFIPED 'C:\Users\eabush\Documents\GitHub\Data-requests\Pediatric case rates\County data' ; run;
+DATA RFIPED.All_County_combine ; set All_County_combine; 
+run;
 
 

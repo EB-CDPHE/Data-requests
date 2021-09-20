@@ -9,22 +9,16 @@ INPUT:		COVID.CEDRS_fix   COVID.County_Population
 OUTPUT:		
 ***********************************************************************************************/
 
+/*________________________________________________________________________________*
+ | TABLE OF CONTENTS:
+ | 1. Obtain county population data for specified age groups
+ | 2. Make local copy of source data
+ | x. Create timeline of all dates for COVID epidemic (March 1, 2020 - present)
+ *________________________________________________________________________________*/
 
-/*----------------------------------------------------------------------------------*
- | The county level population data is created via Access.Populations.sas
- | This is only useful when using entire county population, not age-specific pop
- *----------------------------------------------------------------------------------*/
 
-** County Population data **;
-   PROC contents data=COVID.County_Population; run;
-
-/*   PROC print data= COVID.County_Population; id county; run;*/
-
-   PROC means data= COVID.County_Population sum  maxdec=0;
-      var population;
-      class county;
-run;
-
+*** Obtain county population data for specified age groups ***;
+***--------------------------------------------------------***;
 
 /*_________________________________________________________________________________________*
  | For 2019 county level population data BY AGE GROUPS:
@@ -39,14 +33,10 @@ run;
 libname mysheets xlsx 'C:\Users\eabush\Documents\CDPHE\Requests\data\Pediatric pop by county.xlsx' ;
 
 ** see contents of libref - one dataset for each tab of the spreadsheet **;
-proc contents data=mysheets._all_ ; title1; run;
+   PROC contents data=mysheets._all_ ; title1; run;
 
 ** print tabs from spreadsheet **;
-proc print data=mysheets.data; run;
-
-/*DATA CntyPopAge; set mysheets.data;*/
-/*   keep County Age Total;*/
-/*run;*/
+   proc print data=mysheets.data; run;
 
 **  Sort by county and transpose pop data by age groups  **;
    proc sort data=mysheets.data(keep=County Age Total)  out=CntyPopAge; by County; 
@@ -57,7 +47,7 @@ proc print data=mysheets.data; run;
 run;
 /*   proc print data= CountyPopbyAge; run;*/
 
-**  Define age pop variables  **;
+**  Define age population variables  **;
 DATA CountyPop_est ; 
    length County $ 11;
    set CountyPopbyAge(rename=(County=tmp_county)) ;
@@ -79,184 +69,153 @@ run;
    PROC print data= CountyPop_est; run;
 
 
-*** Make local copies of source data ***;
-***----------------------------------***;
-
-**  local copy of COVID.County_Population  **;
-/*Data County_Pop; length County $13; set COVID.County_Population;*/
-/*   keep County Population;*/
-/*run;*/
+*** Make local copy of source data ***;
+***--------------------------------***;
 
 **  local copy of COVID.CEDRS_view_fix  **;
 DATA CEDRS_view_fix;  set COVID.CEDRS_view_fix;
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
+proc contents data=CEDRS_view_fix varnum ; title1 'CEDRS_view_fix'; run;
+
+
+***  Submit %AgeGrpRates macro  ***;
+***-----------------------------***;
+
+** Run macro to Calculate age-specific case rates for a county **;
+%inc 'C:\Users\eabush\Documents\My SAS Files\Code\macro.AgeGrpRates.sas' ;
+
+/*______________________________________________________________*
+| NOTE:
+| This macro will be called below inside the %CntyRates macro
+| Final output will be dataset for County and AgeGroup 
+| Dataset name is &COcnty._&AgeGrp  e.g. Larimer_Yrs0_5
+*_______________________________________________________________*/
+
+
+***  Define %CntyRates macro  ***;
+***---------------------------***;
+
+                                                         /*------------------*
+                                                          | CntyRates Macro  |
+*----------------------------------------------------------------------------*
+| PURPOSE: Combines age-specific case rates for a county into single dataset |
+|                                                                            |
+| Defines macro variable:                                                    |
+|     &CountyName  -->  county name                                          |
+|                                                                            |
+| What this macro does:                                                      |
+|  a) Add underscore to two part county names for use in DATA step statements|
+|  b) Create county level dataset                                            |
+|  c) Run %AgeGrpRates macro to create 4 age-specific county level case rates|
+|     - Yrs0_5                                                               |
+|     - Yrs6_11                                                              |
+|     - Yrs12_17                                                             |
+|     - Yrs18_121                                                            |
+|  d) Combine the four age group datasets into one county level dataset      |
+|  e) Delete age-specific datasets                                           |
+*----------------------------------------------------------------------------*/
 
 
 
-                                                  /*------------------*
-                                                   | CaseRates Macro  |
-*---------------------------------------------------------------------*
-| Create macro to check calculate case rates by age group             |
-| Defines macro variable:                                             |
-|     &COcnty  -->  county name                                       |
-|     &AgeGrp  -->  age group variable                                |
-|     &AgeLB   -->  lower bound of age range                          |
-|     &AgeUB   -->  upper bound of age range                          |
-|                                                                     |
-| What this macro does:                                               |
-|  a) Create macro variable of population data for county and age group |
-|  b) Create age specific dataset and sort by date |
-|  c) Reduce dataset from patient level to date level (obs=reported date) |
-|     - count cases per reported date
-|     - calculate case rate
-|     - drop patient level variables
-|  d) add ALL reported dates for populations with sparse data |
-|     - backfill missing caserate data with 0's |
-|     - add vars to describe population                                |
-|  f) Calculate 7-day moving averages |
-|  g) delete temporary datasets created by macro that are not needed
-|  h) Export data to Excel file (XLS) to be used in Tableau 
-*---------------------------------------------------------------------*/
+%macro CntyRates(CountyName);
+
+   * Add underscore to two part county names for use in DATA step statements *;
+   data _null_;  set CountyPop_est; 
+      where County = "&CountyName" ;
+
+      IF County in ("CLEAR CREEK", "EL PASO", "KIT CARSON", "LA PLATA", "LAS ANIMAS", "RIO BLANCO", "RIO GRANDE", "SAN JUAN", "SAN MIGUEL") 
+      THEN DO;
+         Cnty1= scan("&CountyName",1,' ');   
+         Cnty2= scan("&CountyName",2,' ');   
+         Cnty_Name= CATS(Cnty1, '_', Cnty2);
+      END;
+      ELSE  Cnty_Name= "&CountyName" ;
+   
+      call symputx("County_Name", Cnty_Name);    
+   run;
 
 
+   * Create county level dataset *;
+   DATA CEDRS_&County_Name;  set CEDRS_view_fix;
+     where County = "&CountyName";   
+     keep ProfileID EventID ReportedDate Age_at_Reported County;
+   run;
 
-%Macro AgeGrpRates(COcnty, AgeGrp, AgeLB, AgeUB);
+   * Run %AgeGrpRates macro to create age-specific county level case rates *;
+   %AgeGrpRates(&CountyName, &County_Name, Yrs0_5, 0, 6)  
+   %AgeGrpRates(&CountyName, &County_Name, Yrs6_11, 6, 12)  
+   %AgeGrpRates(&CountyName, &County_Name, Yrs12_17, 12, 18)  
+   %AgeGrpRates(&CountyName, &County_Name, Yrs18_121, 18, 116)
+   
+   * Combine the four age group datasets into one county level dataset *;
+   Data &County_Name._combine; 
+      set &County_Name._yrs0_5   &County_Name._yrs6_11   &County_Name._yrs12_17   &County_Name._yrs18_121  ;
+      proc sort data=&County_Name._combine
+                  out=&County_Name._cases;
+         by ReportedDate;
+   run;
 
-** Create macro variable of population data for county and age group **;
-data _null_; set CountyPop_est; where County = "&COcnty" ;
-   call symputx("agepopulation", &AgeGrp);    * <-- put number from county population into macro variable;
-run;
-
-**  Create age specific dataset and sort by date  **;
- Data &COcnty; set CEDRS_&COcnty;
-    if &AgeLB le  Age_at_Reported  < &AgeUB;
-run;
-   PROC sort data= &COcnty  
-              out= &COcnty._sort; 
-      by ReportedDate;
-run;
-
-**  Reduce dataset from patient level to date level (one obs per date reported)  **;
-Data &COcnty._rate; set &COcnty._sort;
-   by ReportedDate;
-
-* count cases per reported date *;
-   if first.ReportedDate then NumCases=0;
-   NumCases+1;
-* calculate case rate  *;
-   if last.ReportedDate then do;
-      CaseRate= NumCases / (&agepopulation/100000);
-      output;
-   end;
-* drop patient level variables  *;
-   drop ProfileID  EventID  Age_at_Reported  County;
-run;
-
-** add ALL reported dates for populations with sparse data **;
-Data &COcnty._dates; length Ages $ 9;  merge Timeline  &COcnty._rate;
-   by ReportedDate;
-
-* backfill missing with 0 *; 
-   if NumCases=. then NumCases=0 ; 
-   if CaseRate=. then CaseRate=0 ; 
-
-*add vars to describe population *;
-   Counties="&COcnty";  
-   Ages="&AgeGrp";  format Ages $9.;
-
-run;
-
-**  Calculate 7-day moving averages  **;
-   PROC expand data=&COcnty._dates   out=&COcnty._&AgeGrp  method=none;
-      id ReportedDate;
-      convert NumCases=Cases7dAv / transformout=(movave 7);
-      convert CaseRate=Rates7dAv / transformout=(movave 7);
-run;
-
-* delete temp datasets not needed *;
-proc datasets library=work NOlist ;
-   delete &COcnty   &COcnty._rate   &COcnty._sort   &COcnty._dates  ;
-run;
+   * Delete age-specific datasets  *;
+   proc datasets library=work NOlist ;
+      delete  &County_Name._yrs0_5   &County_Name._yrs6_11   &County_Name._yrs12_17   &County_Name._yrs18_121  ;
+   run;
 
 %mend;
 
 
-%macro CntyRates(countyname);
+***  Submit %CntyRates macro for each county  ***;
+***-------------------------------------------***;
 
-* create county level dataset *;
-DATA CEDRS_&countyname;  set CEDRS_view_fix;
-   where County = "&countyname";   
-   keep ProfileID EventID ReportedDate Age_at_Reported County;
+%CntyRates(ADAMS)	      %CntyRates(ALAMOSA)	      %CntyRates(ARAPAHOE)	    %CntyRates(ARCHULETA)
+%CntyRates(BACA)	         %CntyRates(BENT)	         %CntyRates(BOULDER)	       %CntyRates(BROOMFIELD)
+%CntyRates(CHAFFEE)	      %CntyRates(CHEYENNE)	   %CntyRates(CLEAR CREEK)    %CntyRates(CONEJOS)
+%CntyRates(COSTILLA)	   %CntyRates(CROWLEY)	      %CntyRates(CUSTER)	       %CntyRates(DELTA)
+%CntyRates(DENVER)	      %CntyRates(DOLORES)	      %CntyRates(DOUGLAS)	       %CntyRates(EAGLE)
+%CntyRates(EL PASO)	      %CntyRates(ELBERT)	      %CntyRates(FREMONT)	       %CntyRates(GARFIELD)
+%CntyRates(GILPIN)	      %CntyRates(GRAND)	      %CntyRates(GUNNISON)	    %CntyRates(HINSDALE)
+%CntyRates(HUERFANO)	   %CntyRates(JACKSON)	      %CntyRates(JEFFERSON)	    %CntyRates(KIOWA)
+%CntyRates(KIT CARSON)	   %CntyRates(LA PLATA)	   %CntyRates(LAKE)	          %CntyRates(LARIMER)
+%CntyRates(LAS ANIMAS)	   %CntyRates(LINCOLN)	      %CntyRates(LOGAN)	       %CntyRates(MESA)
+%CntyRates(MINERAL)	      %CntyRates(MOFFAT)	      %CntyRates(MONTEZUMA)	    %CntyRates(MONTROSE)
+%CntyRates(MORGAN)	      %CntyRates(OTERO)	      %CntyRates(OURAY)	       %CntyRates(PARK)
+%CntyRates(PHILLIPS)	   %CntyRates(PITKIN)	      %CntyRates(PROWERS)	       %CntyRates(PUEBLO)
+%CntyRates(RIO BLANCO)	   %CntyRates(RIO GRANDE)	   %CntyRates(ROUTT)	       %CntyRates(SAGUACHE)
+%CntyRates(SAN JUAN)	   %CntyRates(SAN MIGUEL)    %CntyRates(SEDGWICK)	    %CntyRates(SUMMIT)
+%CntyRates(TELLER)	      %CntyRates(WASHINGTON)	   %CntyRates(WELD)	          %CntyRates(YUMA)
+
+
+
+
+***  Combine all of the County datasets into one dataset  ***;
+***-------------------------------------------------------***;
+
+Data All_County_combine; 
+   set
+         ADAMS_combine          ALAMOSA_combine        ARAPAHOE_combine       ARCHULETA_combine
+         BACA_combine           BENT_combine           BOULDER_combine        BROOMFIELD_combine
+         CHAFFEE_combine        CHEYENNE_combine       CLEAR_CREEK_combine    CONEJOS_combine
+         COSTILLA_combine       CROWLEY_combine        CUSTER_combine         DELTA_combine
+         DENVER_combine         DOLORES_combine        DOUGLAS_combine        EAGLE_combine
+         EL_PASO_combine        ELBERT_combine         FREMONT_combine        GARFIELD_combine
+         GILPIN_combine         GRAND_combine          GUNNISON_combine       HINSDALE_combine
+         HUERFANO_combine       JACKSON_combine        JEFFERSON_combine      KIOWA_combine
+         KIT_CARSON_combine     LA_PLATA_combine       LAKE_combine           LARIMER_combine
+         LAS_ANIMAS_combine     LINCOLN_combine        LOGAN_combine          MESA_combine
+         MINERAL_combine        MOFFAT_combine         MONTEZUMA_combine      MONTROSE_combine
+         MORGAN_combine         OTERO_combine          OURAY_combine          PARK_combine
+         PHILLIPS_combine       PITKIN_combine         PROWERS_combine        PUEBLO_combine
+         RIO_BLANCO_combine     RIO_GRANDE_combine     ROUTT_combine          SAGUACHE_combine
+         SAN_JUAN_combine       SAN_MIGUEL_combine     SEDGWICK_combine       SUMMIT_combine
+         TELLER_combine         WASHINGTON_combine     WELD_combine           YUMA_combine        ;
 run;
 
-* run macro to create county level case rates for each age group *;
-%AgeGrpRates(&countyname, Yrs0_5, 0, 6)  
-%AgeGrpRates(&countyname, Yrs6_11, 6, 12)  
-%AgeGrpRates(&countyname, Yrs12_17, 12, 18)  
-%AgeGrpRates(&countyname, Yrs18_121, 18, 116)
 
-* combine the four age group datasets into one county level dataset *;
-Data &countyname._combine; 
-   set &countyname._yrs0_5   &countyname._yrs6_11   &countyname._yrs12_17   &countyname._yrs18_121  ;
-   proc sort data=&countyname._combine
-               out=&countyname._cases;
-      by ReportedDate;
-run;
+***  Export data to Excel file (XLS) to be used in Tableau  ***;
+***---------------------------------------------------------***;
 
-* delete age group specific datasets  *;
-proc datasets library=work NOlist ;
-   delete  &countyname._yrs0_5   &countyname._yrs6_11   &countyname._yrs12_17   &countyname._yrs18_121  ;
-run;
-%mend;
-
-
-
-
-
-%CntyRates(ADAMS)
-%CntyRates(ALAMOSA)
-%CntyRates(ARAPAHOE)
-%CntyRates(ARCHULETA)
-%CntyRates(BACA)
-%CntyRates(DELTA)
-%CntyRates(DELTA)
-
-
-
-
-* Export data to Excel file (XLS) to be used in Tableau *;
-PROC EXPORT DATA= &COcnty._&AgeGrp 
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\Pediatric case rates\County data\Case_rates_&COcnty._&AgeGrp.xls" 
-            DBMS=EXCEL REPLACE;
-     SHEET="data"; 
-RUN;
-
-
-
-%CaseRates(BACA, Yrs0_5, 0, 6)  
-%CaseRates(BACA, Yrs6_11, 6, 12)  
-%CaseRates(BACA, Yrs12_17, 12, 18)  
-%CaseRates(BACA, Yrs18_121, 18, 116)
-
-
-%CaseRates(ALAMOSA)
-%CaseRates(ARAPAHOE)
-%CaseRates(ARCHULETA)
-
-Data Baca_combine; 
-   set Baca_yrs0_5   Baca_yrs6_11   Baca_yrs12_17   Baca_yrs18_121  ;
-   proc sort data=Baca_combine
-               out=Baca_cases;
-      by ReportedDate;
-run;
-
-proc print data=Baca_cases ;
-   where '01JUL20'd le ReportedDate le '31JUL20'd;
-run;
-
-PROC EXPORT DATA= Adams_combine 
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\Pediatric case rates\County data\Adams_combine.xls" 
+PROC EXPORT DATA= AD_combine 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\Pediatric case rates\County data\All_County_combine.xls" 
             DBMS=EXCEL REPLACE;
      SHEET="data"; 
 RUN;

@@ -74,6 +74,7 @@ run;
 
 **  local copy of COVID.CEDRS_view_fix  **;
 DATA CEDRS_view_fix;  set COVID.CEDRS_view_fix;
+   if CountyAssigned ^= 'INTERNATIONAL'  ;
    keep ProfileID EventID ReportedDate Age_at_Reported County;
 run;
 proc contents data=CEDRS_view_fix varnum ; title1 'CEDRS_view_fix'; run;

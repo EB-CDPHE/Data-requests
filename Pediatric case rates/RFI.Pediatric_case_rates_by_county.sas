@@ -133,7 +133,8 @@ run;
 
 **  Create age specific dataset and sort by date  **;
  Data ALL0_121; set COVID.CEDRS_view_fix ;
-   if (0 < Age_at_Reported < 121);
+   if CountyAssigned ^= 'INTERNATIONAL'  AND  (0 le  Age_at_Reported < 121);
+
    keep ProfileID  EventID  ReportedDate  Age_at_Reported  County;
 run;
   PROC sort data=ALL0_121  out= ALL0_121_sort; by ReportedDate;

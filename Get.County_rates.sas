@@ -66,6 +66,7 @@ proc print data= timeline;  run;
 ***--------------------------------------------------------------***;
 
 DATA CEDRS_view_fix;  set COVID.CEDRS_view_fix;
+   if CountyAssigned ^= 'INTERNATIONAL' ;
    keep ProfileID  EventID  ReportedDate  Age_at_Reported  County  hospitalized  hospitalized_cophs ;
 run;
 
@@ -100,8 +101,8 @@ Data Colorado_rate; set CEDRS_view_sort;
 * count cases per reported date *;
    if first.ReportedDate then DO;  NumCases=0;  NumHosp=0;  NumCOPHS=0;  END;
    NumCases+1;
-   NumHosp+1;
-   NumCOPHS+1;
+   if hospitalized=1 then NumHosp+1;
+   if hospitalized_cophs then NumCOPHS+1;
 * calculate case rate  *;
    if last.ReportedDate then do;
       CaseRate=  NumCases / (&ColoPop/100000);

@@ -36,7 +36,7 @@ run;
  *----------------------------------------------------------------------------*/
 
 ** County Population data **;
-   PROC contents data=COVID.County_Population; run;
+   PROC contents data=COVID.County_Population; title1 'COVID.County_Population';  run;
 
 /*   PROC print data= COVID.County_Population; id county; run;*/
 
@@ -46,9 +46,11 @@ run;
 run;
 
 
-Data All_Pop; length County $13; set COVID.County_Population;
+Data All_County_Pop; length County $13; set COVID.County_Population;
    keep County Population;
 run;
+   PROC contents data=All_County_Pop; title1 'All_County_Pop';  run;
+
 
 
 ** Total Cases by county - ALL dates **;

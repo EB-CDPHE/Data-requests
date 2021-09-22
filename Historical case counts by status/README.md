@@ -1,5 +1,5 @@
 ## Background 
-This data request came from CDC Aggregate Date team that requested historical data update for Colorado. Here is the [email](). The original request came in ??, 2021. I was tasked with in on September 22, 2021.  Data needs to address:
+This data request came from CDC Aggregate Date team that requested historical data update for Colorado. Here is the [email](./CDC_email.pdf). The original request came in August 3, 2021. I was tasked with it on September 22, 2021.  Data needs to address:
 1. Which non-public schools are most impacted by COVID19?
 2. What is the economic impact of COVID19 in these communities?
 

@@ -1,10 +1,11 @@
 ## Background 
-This data request came from CDC Aggregate Date team that requested historical data update for Colorado. Here is the [email](./CDC_email.pdf). The original request came in August 3, 2021. I was tasked with it on September 22, 2021.  Data needs to address:
-1. Which non-public schools are most impacted by COVID19?
-2. What is the economic impact of COVID19 in these communities?
+This data request came from CDC Aggregate Data team for historical data in order to reconcile Colorado COVID cases and deaths in their aggregate dataset. Here is the [email](./CDC_email.pdf). The original request came in August 3, 2021. I was tasked with it on September 22, 2021.  The email contains the specific data elements requested. 
 
-Since non-public schools are not required to report COVID19 cases, the data will have to be county-level measure of disease burden.
-**Population**:  Confirmed and probable cases in CEDRS by ReportedDate. **Groups**: Case status.  **Data requested**: Case rate per 100K by county for all time and FY20-21 sorted in descending order. 
+**Population**:  Confirmed and probable cases in CEDRS by ReportedDate. **Groups**: Case status (confirmed and probable) and Outcome (Patient died).  **Data requested**: Daily count of confirmed, probable, and total cases. Daily count of deaths for confirmed and probable cases, and total deaths. For each of these outcomes a cumulative daily total was calcualted. Daily change in cumulative totals was calcuated for total cases and total deaths. 
+
+## Findings
+At the time of this response, here are the calculated totals for the requested data:
+
 
 ## Response
 Final response was delivered as two CSV files.

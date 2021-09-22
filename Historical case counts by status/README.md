@@ -7,6 +7,7 @@ This data request came from CDC Aggregate Data team for historical data in order
 At the time of this response, here are the calculated totals for the requested data:
 
 
+
 ## Response
 Final response was delivered as two CSV files.
 1. [AllCaseRate](AllCaseRate.csv)

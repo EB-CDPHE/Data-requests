@@ -13,7 +13,7 @@ The N=631 is the number of days between January 1, 2020 and September 22, 2021.
 #
 
 ## Response
-Final response was delivered as a CSV file:  [Colorado Hisotrical Data](Colorado_Historical_data.csv)
+Final response was delivered as a CSV file:  [Colorado Historical Data](Colorado_Historical_data.csv)
 
 #
 

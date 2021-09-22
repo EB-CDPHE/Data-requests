@@ -41,16 +41,14 @@ proc print data= timeline;  run;
 
 DATA CO_cases;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL' ;
-
    keep ReportedDate  CaseStatus  Outcome ;
 run;
 
    PROC contents data=CO_cases varnum ;  title1 'CO_cases';  run;
 
 
-
-*** Colorado - Case counts ***:
-***------------------------***;
+*** Colorado - Daily Case counts by status ***:
+***----------------------------------------***;
 
 **  Create age specific dataset and sort by date  **;
   PROC sort data=CO_cases  
@@ -63,12 +61,18 @@ Data Cases_counted; set Rpt_Date_sort;
    by ReportedDate;
 
 * set accumulator vars to 0 for first reported date in group *;
-   if first.ReportedDate then DO;  NumProbable=0;  NumConfirmed=0;  NumDead=0;  END;
+   if first.ReportedDate then DO;  NumProbable=0;  NumConfirmed=0;  NumProbDead=0;  NumConfDead=0;   END;
 
 * count cases within reported date group *;
-   if CaseStatus = 'probable'     then NumProbable+1;
-   if CaseStatus = 'confirmed'    then NumConfirmed+1;
-   if   outcome  = 'Patient died' then NumDead+1;
+   if CaseStatus = 'probable' then do;
+      NumProbable+1;
+      if outcome = 'Patient died' then NumProbDead+1;
+   end;
+
+   if CaseStatus = 'confirmed' then do;
+      NumConfirmed+1;
+      if outcome = 'Patient died' then NumConfDead+1;
+   end;
 
 * keep last reported date in group (with daily totals) *;
    if last.ReportedDate then output;
@@ -85,8 +89,68 @@ Data Colorado_dates;  merge Timeline  Cases_counted;
 * backfill missing with 0 and add vars to describe population *;
    if NumProbable=. then NumProbable=0 ; 
    if NumConfirmed=. then NumConfirmed=0 ; 
-   if NumDead=. then NumDead=0 ; 
+
+   if NumProbDead=. then NumProbDead=0 ; 
+   if NumConfDead=. then NumConfDead=0 ; 
+
+* create total vars *;
+   TotalCases = NumProbable + NumConfirmed ;
+   TotalDead = NumProbDead + NumConfDead ;
 
 run;
 
 
+*** Check numbers ***;
+***---------------***;
+
+* Starting dataset (Patient level) *;
+   PROC freq data= CO_cases ;  tables CaseStatus  Outcome ;  run;
+
+ * Reduced dataset (Date level) *;
+  PROC means data= Colorado_dates  sum maxdec=0;
+      var  NumProbable  NumConfirmed  TotalDead ;
+run;
+
+
+***  Cumulate totals  ***;
+***-------------------***;
+
+Data Cases_stats; set Colorado_dates;
+   by ReportedDate;
+
+* calculate cumulative counts *;
+   CumProbable + NumProbable;
+   CumConfirmed + NumConfirmed;
+   CumProbDead + NumProbDead;
+   CumConfDead + NumConfDead;
+
+* create total vars *;
+   TotalCumCases = CumProbable + CumConfirmed ;
+   TotalCumDead = CumProbDead + CumConfDead ;
+
+   DailyChangeCases = TotalCumCases - lag(TotalCumCases); 
+   DailyChangeDead = TotalCumDead - lag(TotalCumDead);
+
+* add labels *;
+   LABEL 
+      NumConfirmed = 'New confirmed cases for the day'
+      NumProbable = 'New probable cases for the day'
+      TotalCases = 'Total of Confirmed and Probable cases'
+
+      NumConfDead = 'Confirmed cases that died'
+      NumProbDead = 'Probable cases that died day'
+      TotalDead = 'Total of Confirmed and Probable deaths'
+
+      CumConfirmed = 'Cumulative total of confirmed cases'
+      CumProbable = 'Cumulative total of probable cases'
+      TotalCumCases = 'Cumulative total of all cases'
+
+      CumConfDead = 'Confirmed cases that died'
+      CumProbDead = 'Probable cases that died day'
+      TotalCumDead = 'Cumulative total of all deaths'  ;
+
+run;
+
+proc print; 
+where ReportedDate ge '01MAR20'd;
+run;

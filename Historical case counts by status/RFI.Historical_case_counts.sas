@@ -3,7 +3,7 @@ PROGRAM:  RFI.Historical_case_counts.sas
 AUTHOR:   Eric Bush
 CREATED:  September 21, 2021
 MODIFIED:	
-PURPOSE:	 RFI on creating chart that compares case rate (7d mov avg) for NOCO vs CO
+PURPOSE:	 CDC request for historical data 
 INPUT:	 COVID.County_Population   COVID.CEDRS_view_fix	
 OUTPUT:		
 ***********************************************************************************************/
@@ -11,7 +11,6 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
-
 
 TITLE;
 OPTIONS pageno=1;
@@ -31,7 +30,6 @@ DATA timeline;
    drop t ;
 run;
 proc print data= timeline;  run;
-
 
 
 *** Create local copy of CEDRS case data for selected variables  ***;
@@ -60,10 +58,10 @@ run;
 Data Cases_counted; set Rpt_Date_sort;
    by ReportedDate;
 
-* set accumulator vars to 0 for first reported date in group *;
+   * set accumulator vars to 0 for first ReportedDate in group *;
    if first.ReportedDate then DO;  NumProbable=0;  NumConfirmed=0;  NumProbDead=0;  NumConfDead=0;   END;
 
-* count cases within reported date group *;
+   * count daily cases (i.e. sum within ReportedDate group) *;
    if CaseStatus = 'probable' then do;
       NumProbable+1;
       if outcome = 'Patient died' then NumProbDead+1;
@@ -74,10 +72,10 @@ Data Cases_counted; set Rpt_Date_sort;
       if outcome = 'Patient died' then NumConfDead+1;
    end;
 
-* keep last reported date in group (with daily totals) *;
+   * keep last ReportedDate in group (with daily totals) *;
    if last.ReportedDate then output;
 
-* drop patient level variables  *;
+   * drop patient level variables  *;
    drop  CaseStatus  Outcome   ;
 run;
 
@@ -86,14 +84,14 @@ run;
 Data Colorado_dates;  merge Timeline  Cases_counted;
    by ReportedDate;
 
-* backfill missing with 0 and add vars to describe population *;
+   * backfill missing with 0 and add vars to describe population *;
    if NumProbable=. then NumProbable=0 ; 
    if NumConfirmed=. then NumConfirmed=0 ; 
 
    if NumProbDead=. then NumProbDead=0 ; 
    if NumConfDead=. then NumConfDead=0 ; 
 
-* create total vars *;
+   * create total vars *;
    TotalCases = NumProbable + NumConfirmed ;
    TotalDead = NumProbDead + NumConfDead ;
 
@@ -112,8 +110,8 @@ run;
 run;
 
 
-***  Cumulate totals  ***;
-***-------------------***;
+***  Calculate Cumulatitive values and totals  ***;
+***--------------------------------------------***;
 
 Data Cases_stats; set Colorado_dates;
    by ReportedDate;
@@ -151,6 +149,15 @@ Data Cases_stats; set Colorado_dates;
 
 run;
 
-proc print; 
-where ReportedDate ge '01MAR20'd;
+
+***  Evaluate outcome  ***;
+***--------------------***;
+
+   PROC print data= Cases_stats l; 
+      where ReportedDate ge '01MAR20'd;
+      sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead;
+run;
+
+   PROC means data= Cases_stats n sum maxdec=0;
+      var NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
 run;

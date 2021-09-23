@@ -85,7 +85,7 @@ run;
 /*   proc print data= CO_Pop; run;*/
 
 data _null_; set CO_Pop; 
-   call symputx("ColoPop", population);    * <-- put number from county population into macro variable;
+   call symputx("ColoPop", population);    * <-- put population value into macro variable;
 run;
 
 **  Create age specific dataset and sort by date  **;
@@ -100,9 +100,9 @@ Data Colorado_rate; set CEDRS_view_sort;
 
 * count cases per reported date *;
    if first.ReportedDate then DO;  NumCases=0;  NumHosp=0;  NumCOPHS=0;  END;
-   NumCases+1;
-   if hospitalized=1 then NumHosp+1;
-   if hospitalized_cophs then NumCOPHS+1;
+      NumCases+1;
+      NumHosp+hospitalized;
+      NumCOPHS+hospitalized_cophs;
 * calculate case rate  *;
    if last.ReportedDate then do;
       CaseRate=  NumCases / (&ColoPop/100000);
@@ -145,6 +145,11 @@ run;
 
 *** MACRO to calculate County rates ***:
 ***---------------------------------***;
+
+** Run macro **;
+
+/*%inc 'C:\Users\eabush\Documents\My SAS Files\Code\macro.CountyRates.sas' ;*/
+
 
 ** Selected County  **;
 
@@ -204,11 +209,16 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 DATA DASH.All_County_movavg ;  set All_County_movavg; 
 run;
 
+DATA DASH.CO_County_movavg; set  Colorado_MovingAverage   All_County_movavg;
+run;
+
 
 
 
 ** view data **;
 /*   PROC print data= Larimer_MovAvg;  title1 'Larimer_MovAvg';  run;*/
+
+
 
 
 

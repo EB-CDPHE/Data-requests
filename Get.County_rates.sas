@@ -123,12 +123,13 @@ Data Colorado_dates;  merge Timeline  Colorado_rate;
    if NumCases=. then NumCases=0 ; 
    if NumHosp=. then NumHosp=0 ; 
    if NumCOPHS=. then NumCOPHS=0 ; 
+
    if CaseRate=. then CaseRate=0 ; 
    if HospRate=. then HospRate=0 ; 
    if COPHSRate=. then COPHSRate=0 ; 
 
 *add vars to describe population (will be missing for obs from Timeline only) *;
-   County="ALL";  
+   County="COLORADO";  
 
 run;
 
@@ -218,6 +219,20 @@ run;
 ** view data **;
 /*   PROC print data= Larimer_MovAvg;  title1 'Larimer_MovAvg';  run;*/
 
+   PROC contents data= Colorado_MovingAverage; title1 'Colorado_MovingAverage'; run;
+
+   PROC means data= Colorado_MovingAverage mean;
+      var Rates7dAv ; 
+run;
+
+   PROC means data= All_County_movavg mean;
+      where county='LARIMER';
+      var Rates7dAv ; 
+run;
+
+   PROC print data= Colorado_MovingAverage;  title1 'Colorado_MovingAverage';  
+
+run;
 
 
 

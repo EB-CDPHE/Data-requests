@@ -117,10 +117,10 @@ Data Cases_stats; set Colorado_dates;
    by ReportedDate;
 
 * calculate cumulative counts *;
-   CumProbable + NumProbable;
    CumConfirmed + NumConfirmed;
-   CumProbDead + NumProbDead;
+   CumProbable + NumProbable;
    CumConfDead + NumConfDead;
+   CumProbDead + NumProbDead;
 
 * create total vars *;
    TotalCumCases = CumProbable + CumConfirmed ;

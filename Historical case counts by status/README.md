@@ -13,7 +13,7 @@ The N=631 is the number of days between January 1, 2020 and September 22, 2021.
 #
 
 ## Response
-Final response was delivered as a CSV file:  [Colorado Historical Data](Colorado_Historical_data.csv)
+Final output from SAS was saved as a CSV file:  [Colorado Historical Data](Colorado_Historical_data.csv) CDC provided a template for recieving historical data. I re-ordered the columns in the CSV file to match their template and then copied the column headers. I saved the modifed csv file as and Excel file named [Bulk Historical Update Colorado](Bulk_Historical_Update_Colorado.xlsx). This was emailed to Sarah of the Aggregate Data team at CDC on September 24, 2021.
 
 #
 

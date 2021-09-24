@@ -85,11 +85,11 @@ Data Colorado_dates;  merge Timeline  Cases_counted;
    by ReportedDate;
 
    * backfill missing with 0 and add vars to describe population *;
-   if NumProbable=. then NumProbable=0 ; 
    if NumConfirmed=. then NumConfirmed=0 ; 
+   if NumProbable=. then NumProbable=0 ; 
 
-   if NumProbDead=. then NumProbDead=0 ; 
    if NumConfDead=. then NumConfDead=0 ; 
+   if NumProbDead=. then NumProbDead=0 ; 
 
    * create total vars *;
    TotalCases = NumProbable + NumConfirmed ;

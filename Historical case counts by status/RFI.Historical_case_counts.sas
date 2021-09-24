@@ -20,9 +20,9 @@ OPTIONS pageno=1;
 ***------------------------------***;
 
 DATA timeline;
-   ReportedDate='01JAN20'd;
+   ReportedDate='01MAR20'd;
    output;
-   do t = 1 to 630;
+   do t = 1 to 575;
       ReportedDate+1;
       output;
    end;
@@ -161,3 +161,14 @@ run;
    PROC means data= Cases_stats n sum maxdec=0;
       var NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
 run;
+
+
+***  Export data to CSV  ***;
+***----------------------***;
+
+PROC EXPORT DATA= WORK.Cases_stats 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\His
+torical case counts by status\Colorado_Historical_data_092321.csv" 
+            DBMS=CSV REPLACE;
+     PUTNAMES=YES;
+RUN;

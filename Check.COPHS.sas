@@ -2,14 +2,15 @@
 PROGRAM:  Check.COPHS
 AUTHOR:   Eric Bush
 CREATED:  June 22, 2021
-MODIFIED: 081221: Add data checks for a more comprehensive check of COPHS data
+MODIFIED: 092921:  Add data checks for race var
+          081221: Add data checks for a more comprehensive check of COPHS data
           071921: Update per other RFI patterns for SAS programs.	
 PURPOSE:	 After a SQL data table has been read using Read.CEDRS_SQL_table, this program can be used to explore the SAS dataset
 INPUT:	 COPHS_read
 OUTPUT:	 printed output
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
-options ps=50 ls=150 ;     * Landscape pagesize settings *;
+/*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
 /*-----------------------------------------------------------------------------------------*
  | Data Checks for COPHS:
@@ -22,6 +23,7 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
  | 4. Invalid values for County_of_Residence variable
  | -->  HOSPITAL level variables  <--
  | 5. Invalid Hospital admission dates
+ | 6. Race
  *-----------------------------------------------------------------------------------------*/
 
 
@@ -697,7 +699,7 @@ run;
 /*_____________________________________________________________________________*
  |FINDINGS:
  | n=2 "died" and n=1 "other" (all lower case).  FIX: change to propcase.
- |
+ | n=3 "OTHER". FIX: change to propcase.
  *______________________________________________________________________________*/
 
 
@@ -730,3 +732,36 @@ run;
 proc contents data= Hosp_sort varnum ; run;
 
 
+
+*** Check values of Race variables ***;
+***--------------------------------***;
+
+   PROC freq data= COPHS_read ;
+      tables  Race  Ethnicity ; *  Single.race.ethnicity_with_CIIS ;
+run;
+
+/*-----------------------------------------------------------------------*
+ |FINDINGS:
+ | n=1 "Other Race".  FIX: Change to "Other".
+ | n=3 "Native Hawaiian or Other Pacific Islan".  
+ |     FIX:  Change to "Pacific Islander/Native Hawaiian"
+ |
+ | n=1 "Declined to specify".   FIX: Change to "Unknown or Unreported"
+ | n=1 "Non-Hispanic or Latino".   FIX: remove '-'
+ *-----------------------------------------------------------------------*/
+
+PROC format;
+   value $RaceFmt  "More than one Race", "Other Race" = "Other" ;
+   value $EthnicFmt 
+      "Declined to specify", "Pre-Admission" = "Unknown or Unreported"
+      "Non-Hispanic or Latino" = "Non Hispanic or Latino" ;
+
+   PROC freq data= COPHS_read ;
+      tables  Race  Ethnicity ; *  Single.race.ethnicity_with_CIIS ;
+      format  Race  $RaceFmt38.  Ethnicity  $EthnicFmt22. ;
+run;
+
+   PROC freq data= COPHS_read ;
+      tables  Ethnicity * Race  /list ; *  Single.race.ethnicity_with_CIIS ;
+      format  Race  $RaceFmt38.  Ethnicity  $EthnicFmt22. ;
+run;

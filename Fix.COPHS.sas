@@ -41,6 +41,9 @@ DATA COVID.COPHS_fix;  set COPHS_read;
 ** 2) Restrict County_of_Residence = 'GRAND' to only Colorado **;
 /*   if upcase(County_of_Residence) = 'GRAND' and Zip_Code in ('84515', '84532', '84540') then delete;*/
 
+** Bad county name **;
+   if County_of_Residence = 'LATIMER' then County_of_Residence = 'LARIMER';
+
 ** 3) Edit Hospital admission dates  **;
    if Hosp_Admission = '01NOV2019'd then Hosp_Admission = '01NOV2020'd ;
    if Hosp_Admission = '22MAR1921'd then Hosp_Admission = '22MAR2021'd ;

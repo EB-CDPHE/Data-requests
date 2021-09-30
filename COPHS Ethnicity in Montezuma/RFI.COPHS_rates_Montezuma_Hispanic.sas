@@ -24,17 +24,20 @@ DATA timeline;
    format Hosp_Admission_first mmddyy10.;
    drop t ;
 run;
-proc print data= timeline;  run;
+/*proc print data= timeline;  run;*/
 
 
-*** Colorado - ALL Counties ***:
-***-------------------------***;
+*** Colorado - MONTEZUMA County ***:
+***-----------------------------***;
 
 *** Create local copy of COPHS data for Ethnicity = 'Hispanic or Latino' ***;
 ***----------------------------------------------------------------------***;
 
+   %Let Grp_population = 3361 ;      * <-- put population here **;
+
+
 DATA COPHS_CY21; set COVID.COPHS_fix; 
-   where Hosp_Admission ge '01JAN21'd   AND  Ethnicity = 'Hispanic or Latino';
+   where Hosp_Admission ge '01JAN21'd   AND  Ethnicity = 'Hispanic or Latino'  AND  county_of_residence = 'MONTEZUMA';
    keep MR_Number  EventID   Hosp_Admission  county_of_residence   race   ethnicity    ICU_Admission  DOB  Positive_test UTD ChkCounty  ;
 run;
 
@@ -87,12 +90,12 @@ Data COPHS_CY21_rate; set COPHS_CY21_date;
 
 * calculate case rate  *;
    if last.Hosp_Admission_first then do;
-      HospRate= NumHosp_perDay / (1270060/100000);
+      HospRate= NumHosp_perDay / (&Grp_population / 100000);
       output;
    end;
 
 run;
-   proc print data= COPHS_CY21_rate ;  ID Hosp_Admission_first ;  run;
+/*   proc print data= COPHS_CY21_rate ;  ID Hosp_Admission_first ;  run;*/
 
 
       
@@ -106,7 +109,7 @@ Data COPHS_CY21_dates; length  County $ 13  ;  merge Timeline  COPHS_CY21_rate;
    if HospRate = . then HospRate = 0 ; 
 
 *add vars to describe population (which will be missing for obs from Timeline only) *;
-      Counties='ALL counties';  Race_Ethnic='Hispanic, all races';
+      Counties='MONTEZUMA';  Race_Ethnic='Hispanic, all races';
 run;
 
 

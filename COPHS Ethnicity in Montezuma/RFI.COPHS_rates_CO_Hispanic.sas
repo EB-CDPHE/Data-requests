@@ -15,9 +15,9 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 ***------------------------------***;
 
 DATA timeline;
-   Hosp_Admission_first='01JAN20'd;
+   Hosp_Admission_first='01JAN21'd;
    output;
-   do t = 1 to 638;
+   do t = 1 to 272;
       Hosp_Admission_first+1;
       output;
    end;

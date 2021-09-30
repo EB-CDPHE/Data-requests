@@ -28,6 +28,9 @@ run;
 
 
 ** Create dataset for response to this RFI **;
+*1. apply selection criteria to COPHS data, i.e. time reference period;
+*2. keep only necessary variables;
+*3. create new var that combines Ethnicity-Race;
 
 DATA COPHS_fixCY21; set COVID.COPHS_fix; 
    where Hosp_Admission ge '01JAN21'd  ; * AND  ChkCounty^='NON-COLO COUNTY NAME';
@@ -80,7 +83,7 @@ run;
  *---------------------------------------------------------------------------------------*/
 
 
-** sort by date and Create patient-level dataset   **;
+** sort by MR_Number and Create patient-level dataset   **;
   PROC sort data=COPHS_fixCY21  
              out= COPHS_sort; 
       by MR_Number Hosp_Admission ;

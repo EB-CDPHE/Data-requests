@@ -431,10 +431,12 @@ run;
 
 ***  3. Check that all Grand county records are in Colorado and NOT in Grand county, Utah  ***;
 ***----------------------------------------------------------------------------------------***;
+
    PROC freq data= COPHS_read;
       where upcase(County_of_Residence) = 'GRAND';
-      tables  County_of_Residence * City * Zip_Code / list;
+      tables  CO * County_of_Residence * City * Zip_Code / list;
 run;
+
 
 /*______________________________________________________________________________________________________________*
  | FINDINGS:
@@ -780,10 +782,19 @@ run;
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
    PROC print data= Chk_CO_resident; 
       where CO=1  AND  ChkCounty='NON-COLO COUNTY NAME';
-      id MR_Number; var Facility_Name Hosp_Admission   CO address_line_1 city  County_of_Residence     ;
+      id MR_Number; var Facility_Name Hosp_Admission   CO address_line_1 city zip_code County_of_Residence     ;
       format Facility_Name  $40.  address_line_1 $30.  city $20.  ;
       title1 'COPHS_read';
       title2 'NON-COLO COUNTY NAME';
 run;
+
+   PROC print data= Chk_CO_resident; 
+      where CO=0  AND  ChkCounty^='NON-COLO COUNTY NAME';
+      id MR_Number; var Facility_Name Hosp_Admission   CO address_line_1 city zip_code County_of_Residence     ;
+      format Facility_Name  $40.  address_line_1 $30.  city $20.  ;
+      title1 'COPHS_read';
+      title2 'Valid COLO COUNTY NAME BUT CO=0';
+run;
+
 
 options ps=65 ls=110 ;     * Portrait pagesize settings *;

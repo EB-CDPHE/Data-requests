@@ -47,7 +47,7 @@ DATA Pop_temp; set dbo144.populations(Rename=(Group=County));
 run;
 
 
-** 4. Shrink character variables in data set to shortest possible lenght (based on longest value) **;
+** 4. Shrink character variables in data set to shortest possible length (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
  %shrink(Pop_temp)

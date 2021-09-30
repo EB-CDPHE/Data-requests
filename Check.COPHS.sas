@@ -42,8 +42,8 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
 
-   PROC contents data= COPHS_read varnum; run;
-title1 'COPHS_read';
+   PROC contents data= COPHS_read varnum;  title1 'COPHS_read';  run;
+
 
 ***  1. Duplicate records  ***;
 ***------------------------***;
@@ -527,7 +527,7 @@ run;
 
 * Print records where County name is NOT valid;
 DATA ChkHospCounty; set COPHS_read;
-   keep MR_Number Facility_Name County_of_Residence Last_Name  First_Name  Hosp_Admission ChkCounty;
+   keep MR_Number Facility_Name County_of_Residence Last_Name  First_Name  Hosp_Admission ChkCounty  CO;
    ChkCounty = put(County_of_Residence, $CntyChk.);
    PROC print data= ChkHospCounty; 
       where ChkCounty='NON-COLO COUNTY NAME';
@@ -737,7 +737,7 @@ proc contents data= Hosp_sort varnum ; run;
 ***--------------------------------***;
 
    PROC freq data= COPHS_read ;
-      tables  Race  Ethnicity ; *  Single.race.ethnicity_with_CIIS ;
+      tables  Race  Ethnicity ; 
 run;
 
 /*-----------------------------------------------------------------------*
@@ -765,3 +765,25 @@ run;
       tables  Ethnicity * Race  /list ; *  Single.race.ethnicity_with_CIIS ;
       format  Race  $RaceFmt38.  Ethnicity  $EthnicFmt22. ;
 run;
+
+
+
+*** CO=1 for County outside of Colorado ***;
+***-------------------------------------***;
+
+* Print records where County name is NOT valid;
+DATA Chk_CO_resident; set COPHS_read;
+   keep MR_Number Facility_Name County_of_Residence Last_Name  First_Name address_line_1 city zip_code  Hosp_Admission ChkCounty  CO;
+   ChkCounty = put(County_of_Residence, $CntyChk.);
+run;
+
+options ps=50 ls=150 ;     * Landscape pagesize settings *;
+   PROC print data= Chk_CO_resident; 
+      where CO=1  AND  ChkCounty='NON-COLO COUNTY NAME';
+      id MR_Number; var Facility_Name Hosp_Admission   CO address_line_1 city  County_of_Residence     ;
+      format Facility_Name  $40.  address_line_1 $30.  city $20.  ;
+      title1 'COPHS_read';
+      title2 'NON-COLO COUNTY NAME';
+run;
+
+options ps=65 ls=110 ;     * Portrait pagesize settings *;

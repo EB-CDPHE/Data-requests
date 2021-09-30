@@ -133,3 +133,15 @@ run;
 
 
 
+
+Data CO_races_movavg;   set    CO_W_MovingAverage    CO_B_MovingAverage      CO_API_MovingAverage   CO_AI_MovingAverage ;
+run;
+
+
+**  Save combined dataset to Dashboard data directory (for Tableau)  **;
+
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
+
+DATA DASH.CO_races_movavg ;  set CO_races_movavg; 
+run;
+

@@ -15,9 +15,9 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 ***------------------------------***;
 
 DATA timeline;
-   Hosp_Admission_first='01JAN20'd;
+   Hosp_Admission_first='01JAN21'd;
    output;
-   do t = 1 to 638;
+   do t = 1 to 272;
       Hosp_Admission_first+1;
       output;
    end;
@@ -134,5 +134,13 @@ run;
 
 
 
-/*Data Hispanic_movavg; */
-/*   set  MONT_H_MovingAverage   ALAMOSA_movavg */
+Data Hispanic_movavg;   set  MONT_H_MovingAverage   CO_H_MovingAverage ;
+run;
+
+
+**  Save combined dataset to Dashboard data directory (for Tableau)  **;
+
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
+
+DATA DASH.Hispanic_movavg ;  set Hispanic_movavg; 
+run;

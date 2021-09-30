@@ -39,7 +39,7 @@ DATA COVID.COPHS_fix;  set COPHS_read;
    if MR_Number = 'M1535914' and Hosp_Admission='08NOV20'd and Facility_Name = 'West Pines Hospital' then delete;
 
 ** 2) Restrict County_of_Residence = 'GRAND' to only Colorado **;
-   if upcase(County_of_Residence) = 'GRAND' and Zip_Code in ('84515', '84532', '84540') then delete;
+/*   if upcase(County_of_Residence) = 'GRAND' and Zip_Code in ('84515', '84532', '84540') then delete;*/
 
 ** 3) Edit Hospital admission dates  **;
    if Hosp_Admission = '01NOV2019'd then Hosp_Admission = '01NOV2020'd ;
@@ -63,14 +63,21 @@ DATA COVID.COPHS_fix;  set COPHS_read;
 ** 5) Fix bad merges  **;
  if Last_Name = 'Dutchie-Cooley' then Last_Name = 'Dutchie Cooley';
 
-** 6) Fix values of that are lower case  **;
+** 6) Fix values that are lower case  **;
    Discharge_Transfer_Death_Disposi = propcase(Discharge_Transfer_Death_Disposi);
+
+** 7) Fix race and ethncity responses  **;
+   if Race = "Other Race" then Race = "Other";
+   if Race = "Native Hawaiian or Other Pacific Islan" then Race = "Pacific Islander/Native Hawaiian";
+   if Ethnicity = "Declined to specify" then Ethnicity = "Unknown or Unreported";
+   if Ethnicity = "Non-Hispanic or Latino" then Ethnicity = "Non Hispanic or Latino";
+
 run;
 
 
 **  5. Contents of final SAS dataset  **;
 
-   PROC contents data=COVID.COPHS_fix varnum; run;
+   PROC contents data=COVID.COPHS_fix varnum;  title1 'COVID.COPHS_fix'; run;
 
 
 
@@ -83,4 +90,9 @@ run;
 /*      var Hosp_Admission Facility_Name First_Name Last_Name Gender DOB Positive_Test Date_Left_Facility City County_of_Residence  ;*/
 /*      format Facility_Name $45. First_Name Last_Name  $12.  City $15. ;*/
 /*      title2 'Extreme values of hospital admission dates from COPHS';*/
+/*run;*/
+
+
+/*   PROC freq data= COVID.COPHS_fix ;*/
+/*      tables  Race  Ethnicity ; */
 /*run;*/

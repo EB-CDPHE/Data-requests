@@ -41,7 +41,7 @@ DATA COPHS_CY21; set COVID.COPHS_fix;
    keep MR_Number  EventID   Hosp_Admission  county_of_residence   race   ethnicity    ICU_Admission  DOB  Positive_test UTD ChkCounty  ;
 run;
 
-   PROC contents data=COPHS_CY21 varnum ;  title1 'COPHS_CY21';  run;
+/*   PROC contents data=COPHS_CY21 varnum ;  title1 'COPHS_CY21';  run;*/
 
 
 ** sort by MR_Number and create patient-level dataset   **;
@@ -100,7 +100,7 @@ run;
 
       
 ** add ALL reported dates for populations with sparse data **;
-Data COPHS_CY21_dates; length  County $ 13  ;  merge Timeline  COPHS_CY21_rate;
+Data COPHS_CY21_dates; length  county_of_residence $ 14  ;  merge Timeline  COPHS_CY21_rate;
    by Hosp_Admission_first;
 
 * backfill missing with 0 *; 
@@ -109,24 +109,30 @@ Data COPHS_CY21_dates; length  County $ 13  ;  merge Timeline  COPHS_CY21_rate;
    if HospRate = . then HospRate = 0 ; 
 
 *add vars to describe population (which will be missing for obs from Timeline only) *;
-      Counties='MONTEZUMA';  Race_Ethnic='Hispanic, all races';
+      county_of_residence='MONTEZUMA';  Race_Ethnic='Hispanic, all races';
 run;
 
 
 **  Calculate 7-day moving averages  **;
-   PROC expand data=COPHS_CY21_dates   out=COPHS_CY21_MovingAverage  method=none;
+   PROC expand data=COPHS_CY21_dates   out=MONT_H_MovingAverage  method=none;
       id Hosp_Admission_first;
       convert NumHosp_perDay=NumHosp7dAv / transformout=(movave 7);
       convert HospRate=Hosp7dAv / transformout=(movave 7);
 run;
 
+   PROC contents data=MONT_H_MovingAverage varnum ;  title1 'MONT_H_MovingAverage';  run;
+
 
 * delete temp datasets not needed *;
 proc datasets library=work NOlist ;
    delete  COPHS_CY21   COPHS_CY21_sort   COPHS_CY21_patient   COPHS_CY21_date   COPHS_CY21_rate   COPHS_CY21_dates  ;
+quit;
 run;
 
 
 
 
 
+
+/*Data Hispanic_movavg; */
+/*   set  MONT_H_MovingAverage   ALAMOSA_movavg */

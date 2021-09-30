@@ -33,12 +33,15 @@ proc print data= timeline;  run;
 *** Create local copy of COPHS data for Ethnicity = 'Hispanic or Latino' ***;
 ***----------------------------------------------------------------------***;
 
+   %Let Grp_population = 1270060 ;      * <-- put population here **;
+
+
 DATA COPHS_CY21; set COVID.COPHS_fix; 
    where Hosp_Admission ge '01JAN21'd   AND  Ethnicity = 'Hispanic or Latino';
-   keep MR_Number  EventID   Hosp_Admission  county_of_residence   race   ethnicity    ICU_Admission  DOB  Positive_test UTD ChkCounty  ;
+   keep MR_Number  EventID   Hosp_Admission  county_of_residence   race   ethnicity    ICU_Admission  DOB  Positive_test  UTD  ChkCounty  ;
 run;
 
-   PROC contents data=COPHS_CY21 varnum ;  title1 'COPHS_CY21';  run;
+/*   PROC contents data=COPHS_CY21 varnum ;  title1 'COPHS_CY21';  run;*/
 
 
 ** sort by MR_Number and create patient-level dataset   **;
@@ -87,17 +90,17 @@ Data COPHS_CY21_rate; set COPHS_CY21_date;
 
 * calculate case rate  *;
    if last.Hosp_Admission_first then do;
-      HospRate= NumHosp_perDay / (1270060/100000);
+      HospRate= NumHosp_perDay / (&Grp_population / 100000);
       output;
    end;
 
 run;
-   proc print data= COPHS_CY21_rate ;  ID Hosp_Admission_first ;  run;
+/*   proc print data= COPHS_CY21_rate ;  ID Hosp_Admission_first ;  run;*/
 
 
       
 ** add ALL reported dates for populations with sparse data **;
-Data COPHS_CY21_dates; length  County $ 13  ;  merge Timeline  COPHS_CY21_rate;
+Data COPHS_CY21_dates;  length county_of_residence $ 13  ;  merge Timeline  COPHS_CY21_rate;
    by Hosp_Admission_first;
 
 * backfill missing with 0 *; 
@@ -106,21 +109,24 @@ Data COPHS_CY21_dates; length  County $ 13  ;  merge Timeline  COPHS_CY21_rate;
    if HospRate = . then HospRate = 0 ; 
 
 *add vars to describe population (which will be missing for obs from Timeline only) *;
-      Counties='ALL counties';  Race_Ethnic='Hispanic, all races';
+      county_of_residence='ALL counties';  Race_Ethnic='Hispanic, all races';
 run;
 
 
 **  Calculate 7-day moving averages  **;
-   PROC expand data=COPHS_CY21_dates   out=COPHS_CY21_MovingAverage  method=none;
+   PROC expand data=COPHS_CY21_dates   out=CO_H_MovingAverage  method=none;
       id Hosp_Admission_first;
       convert NumHosp_perDay=NumHosp7dAv / transformout=(movave 7);
       convert HospRate=Hosp7dAv / transformout=(movave 7);
 run;
 
+   PROC contents data=CO_H_MovingAverage varnum ;  title1 'CO_H_MovingAverage';  run;
+
 
 * delete temp datasets not needed *;
 proc datasets library=work NOlist ;
    delete  COPHS_CY21   COPHS_CY21_sort   COPHS_CY21_patient   COPHS_CY21_date   COPHS_CY21_rate   COPHS_CY21_dates  ;
+quit;
 run;
 
 

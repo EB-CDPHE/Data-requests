@@ -11,7 +11,7 @@ Final response was delivered as two CSV files.
 #
 
 ## Code
-#### Rachel S. had a dataset on dphe144 server. The SAS program [Access.TimeSinceVax.sas](../Access.TimeSinceVax.sas) toused to generate the response was [RFI.Cases_by_County.sas](RFI.Cases_by_County.sas). This may also require running [Access.Population](../Access.Populations.sas) to obtain COVID.Population data if not already available.
+Rachel S. had a dataset on dphe144 server named `timesincevax_regression_data`. The SAS program [Access.TimeSinceVax.sas](./Access.TimeSinceVax.sas) was used to read and curate this data table and create the SAS dataset `TimeSinceVax`. The SAS program [RFI.LR_on_Time_Since_Vax.sas](./RFI.LR_on_Time_since_Vax.sas) builds the logistic regression model. The contents of this dataset can be found [here](ProcContents_TimeSinceVax).
 #
 
 **Issues:**

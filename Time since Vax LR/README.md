@@ -18,7 +18,7 @@ Step 2: Univariate analysis.
 Step 3: Logit plots of continuous variables. Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
 
 **Logit plot of Age:**
-![Logit_plot_Age](Logit_plots_Age.pdf)
+![Logit_plot_Age](images/Logit_plots_Age2.png)
 
 **Logit plot of Time since vaccination:**
 

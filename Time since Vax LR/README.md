@@ -14,13 +14,33 @@ Step 2: Univariate analysis.
 **Result of univariate analysis of variables with discrete values:**
 
 ![UniVarAnaly](images/Univariate_analysis.png)
-
+##
 Step 3: Logit plots of continuous variables. Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
 
 **Logit plot of Age:**
 ![Logit_plot_Age](images/Logit_plots_Age2.png)
 
+**Logit plot of Follow-up Time:**
+![Logit_plot_FollowUp](images/Logit_plots_Followup_Time2.png)
+
 **Logit plot of Time since vaccination:**
+![Logit_plot_TimeSinceVax](images/Logit_plots_Time_Since_Vax2.png)
+
+Findings:
+````diff
++/*----------------------------------------------------------------------+-----------------*
++| 1. Age_Group should be put on the CLASS statment since it is non-linear in logit
++|    So it will NOT be treated as an ordinal variable.
++| 2. Follow-up time is linear in logit so it goes in the model as a continuous variable.
++| 3. Time since vaccination is linear in logit so it goes in model as a continuous variable.
++| 4. Age is NOT linear in the logit; several transformations were tested.
++|    Age squared resulted in the lowest AIC.
++*---------------------------------------------------------------------------------------*/
+````
+##
+Step 4: Univariate analysis.  
+
+
 
 **Issues:**
 * Need access to or input from a biostatistician. 

@@ -38,10 +38,41 @@ Findings:
 +*---------------------------------------------------------------------------------------*/
 ````
 ##
-Step 4: Univariate analysis.  
+Step 4: Use forward selection to find significant interaction terms.  
 
+Here is the code:
+
+![Forward selection code](images/Forward_Selection2.png)
+
+Here are the findings:
+
+````diff
++/*--------------------------------------------------------------*
++|FINDINGS: Four 2-way interaction terms are significant:
++| 1. Followup_Time  *  Time_Since_Vax
++| 2. Time_Since_Vax  *  Age
++| 3. Time_Since_Vax  *  Vaccination_Code
++| 4. Followup_Time  *  Vaccination_Code
++| AND one 3-way interaction term was significant:
++| 5. Followup_Time  *  Time_Since_Vax  *  Vaccination_Code
++*--------------------------------------------------------------*/
+````
+
+##
+Step 5: Use best subsets to find best model.  
+
+Here is the code:
+
+![Best subsets code](images/Best_subsets_code2.png)
+
+Here are the subsets by SC score:
+![SC scores](images/Best_subsets_SC2.png)
+
+And by AIC score:
+![AIC scores](images/Best_subsets_AIC2.png)
 
 
 **Issues:**
 * Need access to or input from a biostatistician. 
+* Should split the dataset and build model on half and then do prediction on other half.
 

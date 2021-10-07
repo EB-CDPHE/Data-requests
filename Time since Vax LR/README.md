@@ -90,6 +90,20 @@ Step 5: Comparison of competing models.
 
 I wanted to compare this best model with other models. Specifically the full model, with and without significant interaction terms. A competing model with Age variable added in, with and without associated interaction term. And then the best model with the associated interaction term added.
 
+| |Model name|DF|AIC|Model|
+|-|----------|--|---|-----|
+|1|[Full model without interaction terms](Full_model_mains_only.pdf)|8|9549|VB = X1_G + X2_V + X3_F + X4_T + X5_A|
+|2|Full model with interaction terms|16|6460|VB = X1_G + X2_V + X3_F + X4_T + X5_A + (interactions)|
+|3|Competing model without interactions|4|9680|VB = X3_F + X4_T + X5_A|
+|4|Competing model with 2 interaction terms|6|6617|VB = X3_F + X4_T + X5_A + () + ()|
+|5|Best model without interaction term|2|9888|VB = X3_F + X4_T|
+|6|Best model with 1 interaction term|3|6777|VB = X3_F + X4_T + ()|
+
+![Term list](images/List_of_terms2.png)
+
+
+
+
 
 **Issues:**
 * Need access to or input from a biostatistician. 

@@ -13,15 +13,13 @@ Rachel S. had a dataset on dphe144 server named `timesincevax_regression_data`. 
 Step 1: Variable reduction. Not needed in this case since variables pre-selected.
 
 **Step 2: Univariate analysis.**
-######
-**__________________________** 
-
+##
 **Result of univariate analysis of variables with discrete values:**
 
 ![UniVarAnalysis](images/Univariate_analysis.png)
 ##
 **Step 3: Logit plots of continuous variables.**
-**__________________________________________** 
+##
 
 Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
 
@@ -47,7 +45,7 @@ Findings:
 ````
 ##
 **Step 4: Use forward selection to find significant interaction terms.**
-**____________________________________________________________**  
+##
 
 Here is the code:
 
@@ -69,7 +67,7 @@ Here are the findings:
 
 ##
 **Step 5: Model building using Best Subsets selection.**  
-**_________________________________________________** 
+##
 
 Here is the code:
 
@@ -94,7 +92,7 @@ Here are the findings:
 
 ##
 **Step 6: Comparison of competing models.**
-**_____________________________________**   
+##
 
 I wanted to compare this best model with other models. Specifically the full model, with and without significant interaction terms. A competing model with Age variable added in, with and without associated interaction term. And then the best model with the associated interaction term added.
 
@@ -111,7 +109,7 @@ I wanted to compare this best model with other models. Specifically the full mod
 
 ##
 **Step 7: Assessment of final model**
-**_______________________________** 
+##
 
 The SAS output for predictive power and goodness-of-it can be found [here](Final_Model_Goodness_of_Fit.pdf)
 

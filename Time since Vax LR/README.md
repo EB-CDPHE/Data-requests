@@ -20,8 +20,6 @@ Step 2: Univariate analysis.
 ##
 Step 3: Logit plots of continuous variables. Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
 
-![Logit_plots](images/Logit_plots.jpg)
-
 **Logit plot of Age:**
 ![Logit_plot_Age](images/Logit_plots_Age2.png)
 
@@ -94,16 +92,36 @@ I wanted to compare this best model with other models. Specifically the full mod
 
 | |Model name|DF|AIC|Model|
 |-|----------|--|---|-----|
-|1|[Full model without interaction terms](Full_model_mains_only.pdf)|8|9549|VB = X1_G + X2_V + X3_F + X4_T + X5_A|
-|2|[Full model with interaction terms](Full_model_w_interactions.pdf)|16|6460|VB = X1_G + X2_V + X3_F + X4_T + X5_A + (interactions)|
-|3|[Competing model without interactions](Competing_model_NO_interactions.pdf)|4|9680|VB = X3_F + X4_T + X5_A|
-|4|[Competing model with 2 interaction terms](Competing_model_2_interactions.pdf)|6|6617|VB = X3_F + X4_T + X5_A + () + ()|
+|1|[Full model without interaction terms](Full_model_mains_only.pdf)|8|9549|VB = x1_G + x2_V + x3_F + x4_T + x5_A|
+|2|[Full model with interaction terms](Full_model_w_interactions.pdf)|16|6460|VB = x1_G + x2_V + x3_F + x4_T + x5_A + (interactions)|
+|3|[Competing model without interactions](Competing_model_NO_interactions.pdf)|4|9680|VB = x3_F + x4_T + x5_A|
+|4|[Competing model with 2 interaction terms](Competing_model_2_interactions.pdf)|6|6617|VB = x3_F + x4_T + x5_A + (x3_F * x4_T) + (x4T * x5_A)|
 |5|[Best model without interaction term](Best_model_NO_interactions.pdf)|2|9888|VB = X3_F + X4_T|
-|6|[Best model with 1 interaction term](Best_model_1_interaction_term.pdf)|3|6777|VB = X3_F + X4_T + ()|
+|6|[Best model with 1 interaction term](Best_model_1_interaction_term.pdf)|3|6777|VB = X3_F + X4_T + (x3_F * x4_T)|
 
 ![Term list](images/List_of_terms2.png)
 
+##
+Step 6: Goodness of Fit
 
+The output can be found [here](Final_Model_Goodness_of_Fit.pdf)
+
+Here are the findings:
+````diff
++/*-----------------------------------------------------------------------------------*
++ |FINDINGS:
++ | The number of distanct obs is 12,972.
++ | The p-value for Deviance and Pearson chi-sq differ so there may be a data issue.
++ | (want these values to be large - Deviance is but Pearson is small)
++ | Re: predictive power of the model:
++ |    a) Generalized R2 = 
++ |    b) Max-rescaled R2 = 0.9808 (out of 1)
++ | Re: goodness of fit, the Hosmer-Lemeshow Goodness-of-Fit test is significant.
++ |    This means there is evidence of lack of fit. 
++ |    BUT could this be from large sample size??
++ |    OR is this because three of the expected cells are <5??
++ *-----------------------------------------------------------------------------------*/
+````
 
 
 

@@ -10,15 +10,13 @@ OUTPUT:
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 /*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
-
 options pageno=1;
 
 **  PROC contents of starting dataset  **;
    PROC contents data= TimeSinceVax  varnum ; title1 'TimeSinceVax'; run;
 
 
-
-*** STEP 2 -  Univariate analysis  ***;
+*** STEP 2:  Univariate analysis  ***;
 ***--------------------------------***;
 
    PROC freq data= TimeSinceVax;
@@ -28,9 +26,10 @@ title2 'Univariate analysis of selected predictor variables';
 run;
 
 
-** STEP 3 -  Logit plots of continuous and ordinal variables  **;
-**------------------------------------------------------------**;
+*** STEP 3:  Logit plots of continuous and ordinal variables  ***;
+***------------------------------------------------------------***;
 
+** change char var to numeric var for proc means **;
 DATA TSV; set TimeSinceVax;
    AgeGrp=0;
    If Age_Group = '18-29' then AgeGrp=1;
@@ -92,8 +91,7 @@ run;  quit;
 %BinC(TimeSinceVax, Breakthrough, Time_Since_Vax)
 
 
-**  Adding quadratic term for Age  **;
-   PROC univariate data=TSV plot normal; var AgeGrp;  run;
+**  Assessing transformation options for Age var  **;
 
 DATA TSV_age; set TSV;
    Age_neg = -1*Age;
@@ -117,7 +115,7 @@ run;
 run;
 
 
-/*----------------------------------------------------------------------------------------*
+/*---------------------------------------------------------------------------------------*
  |FINDINGS:
  | Age_Group should be put on the CLASS statment since it is non-linear in logit
  | So it will NOT be treated as an ordinal variable.
@@ -125,49 +123,19 @@ run;
  | Time since vaccination is linear in logit so can keep as a continuous variable.
  | Age is NOT linear in the logit; several transformations were tested.
  | Age squared resulted in the lowest AIC.
- *----------------------------------------------------------------------------------------*/
+ *---------------------------------------------------------------------------------------*/
 
 
 
-/*ods trace on / listing;*/
-ods listing close;
-ods output nobs=denom  bestsubsets=score;
-  proc logistic desc data=TSV ;
-/*    class Gender_Code  Vaccination_Code / param=ref;*/
-    model  Breakthrough = Gender  VxType  Followup_Time   Time_Since_Vax  Age Age*Age
-     / selection =score best=3  ;
-    title4 'Model selection - best subsets';
-run;
-/*ods trace off;*/
-ods listing;
-/*proc print data= denom;  proc print data= score;  run;*/
-data denom; set denom;
-	if label='Number of Observations Used';
-	call symput('obs', N);
-data subset; set score;
-	sc = -scorechisq + log(&obs) * (numberofvariables+1);
-	aic = -scorechisq+2 * (numberofvariables+1);
-
-proc sort data=subset;   by sc;
-proc print data=subset;  var sc  variablesinmodel ;
-proc sort data=subset;   by aic;
-proc print data=subset;  var  aic variablesinmodel ;
-run;
-
-
-
-
-
-
-***  STEP 5  Model building  (TAKE 2)  ***;
-***------------------------------------------***;
+***  STEP 4:  Use forward selection to find significant interaction terms  ***;
+***------------------------------------------------------------------------***;
 
   proc logistic desc data=TimeSinceVax ;
     class  Gender_Code  Vaccination_Code  / param=ref;
     model  Breakthrough =  Gender_Code  Vaccination_Code  Followup_Time  Time_Since_Vax  Age  Age*Age
                            Gender_Code | Vaccination_Code | Followup_Time | Time_Since_Vax | Age  @3
-           / selection =forward slentry=.001 hierarchy=single include=6 ;
-    title4 'Model selection - forward (single) ';
+           / selection =forward slentry=.0001 hierarchy=single include=6 ;
+    title2 'Model selection - Forward selection on Full model with 2 and 3 way interactions';
 run;
 
 
@@ -181,69 +149,177 @@ run;
  | 5. Followup_Time  *  Time_Since_Vax  *  Vaccination_Code
  *--------------------------------------------------------------*/
 
-title;  options pageno=1;
-  proc logistic desc data=TimeSinceVax ;
-    class Gender_Code  Vaccination_Code / param=ref;
-    model Breakthrough =  Gender_Code  Vaccination_Code  Followup_Time  Time_Since_Vax  Age Age*Age
-     / clodds=pl  ;
-    title2 'Full model - main terms only ';
+
+
+***  STEP 5:  Model building using Best Subsets selection  ***;
+***-------------------------------------------------------***;
+
+** Code for Best subsets on Full model with main terms only  **;
+  proc logistic desc data=TSV ;
+    model  Breakthrough = Gender  VxType  Followup_Time   Time_Since_Vax  Age Age*Age
+     / selection=score best=3  ;
+    title2 'Model selection - best subsets on full model with main terms only';
 run;
 
-options pageno=1;
-  proc logistic desc data=TimeSinceVax ;
-    class Gender_Code  Vaccination_Code / param=ref;
-    model Breakthrough = Followup_Time  Time_Since_Vax  Age Age*Age
-     / clodds=pl  ;
-    title2 'Best model - no interaction terms ';
-run;
 
-options pageno=1;
-  proc logistic desc data=TimeSinceVax ;
-    class Gender_Code  Vaccination_Code / param=ref;
-    model Breakthrough = Followup_Time  Time_Since_Vax  Age Age*Age  Vaccination_Code
+** Code for Best subsets on Full model with ALL significant interactions  **;
+  proc logistic desc data=TSV ;
+    model  Breakthrough = Gender  VxType  Followup_Time   Time_Since_Vax  Age Age*Age
                         Followup_Time*Time_Since_Vax
                         Time_Since_Vax  *  Age
-                        Time_Since_Vax  *  Vaccination_Code
-                        Followup_Time  *  Vaccination_Code
-                        Followup_Time * Time_Since_Vax * Vaccination_Code
-         / clodds=pl  ;
-    title2 'Best model - main terms and 2 and 3 way interactions ';
+                        Time_Since_Vax  *  VxType
+                        Followup_Time  *  VxType
+                        Followup_Time * Time_Since_Vax * VxType
+     /selection =score best=3  include=6  ;
+    title2 'Model selection - best subsets on full model with significant interactions';
 run;
 
-***  STEP 6:  Assessment of best models  ***;
+
+** Insert above "Best Subsets" code into ODS code below for SC and AIC by subset **;
+ods trace on / listing;
+ods output nobs=denom  bestsubsets=score;
+
+options pageno=1;
+  proc logistic desc data=TSV ;
+    model  Breakthrough = Gender  VxType  Followup_Time   Time_Since_Vax  Age Age*Age
+     / selection=score best=3  ;
+    title2 'Model selection - best subsets on full model with main terms only';
+run;
+
+ods trace off;
+
+data denom; set denom;
+	if label='Number of Observations Used';
+	call symput('obs', N);
+data subset; set score;
+	sc = -scorechisq + log(&obs) * (numberofvariables+1);
+	aic = -scorechisq+2 * (numberofvariables+1);
+run;
+
+   proc sort data=subset;   by numberofvariables sc;
+   PROC print data=subset;  var numberofvariables sc  variablesinmodel ;
+run;
+
+   proc sort data=subset;   by aic;
+   PROC print data=subset;  var  aic variablesinmodel ;
+run;
+
+
+/*----------------------------------------------------------------------------*
+ |FINDINGS:
+ | Best subsets on full model shows 3 models for each model size (# of vars)
+ | SC scores drop sharpy starting with a 2 var model. 
+ | AIC for best subset models had 11 models with extremely low scores.
+ | Best model per SC and AIC is VB = Follow-up + Time_Since_Vax
+ *----------------------------------------------------------------------------*/
+
+
+
+***  STEP 6:  Comparison of competing models  ***;
+***-------------------------------------------***;
+
+title;  options pageno=1;
+
+**  Model 1: Full model - main effects only  **;
+   PROC Logistic desc data=TimeSinceVax ;
+      class Gender_Code  Vaccination_Code  / param=ref;
+      model Breakthrough = Gender_Code  Vaccination_Code  Followup_Time   Time_Since_Vax  Age Age*Age
+     / clodds=pl  ;
+    title2 'Full model - main effects only';
+run;
+
+**  Model 2: Full model - with ALL significant interactions  **;
+   PROC Logistic desc data=TimeSinceVax ;
+      class Gender_Code  Vaccination_Code  / param=ref;
+      model Breakthrough = Gender_Code  Vaccination_Code  Followup_Time  Time_Since_Vax  Age Age*Age 
+                           Followup_Time * Time_Since_Vax
+                           Time_Since_Vax * Age
+                           Time_Since_Vax * Vaccination_Code
+                           Followup_Time * Vaccination_Code
+                           Followup_Time * Time_Since_Vax * Vaccination_Code
+      / clodds=pl  ;
+    title2 'Full model - with ALL significant interactions';
+run;
+
+
+**  Model 3: Competing model (best w age) - main effects only  **;
+   PROC Logistic desc data=TimeSinceVax ;
+      model Breakthrough =  Followup_Time  Time_Since_Vax   Age Age*Age
+      / clodds=pl  ;
+   title2 'Competing model (best w age) - main effects only';
+run;
+
+**  Model 4: Competing model (best w age) - 2 interaction terms  **;
+   PROC Logistic desc data=TimeSinceVax ;
+      model Breakthrough =  Followup_Time  Time_Since_Vax  Age Age*Age
+                           Followup_Time*Time_Since_Vax
+                           Time_Since_Vax  *  Age
+      / clodds=pl  ;
+   title2 'Competing model (best w age) - 2 interaction terms';
+run;
+
+
+**  Model 5: Best subsets ideal model - main effects only  **;
+   PROC Logistic desc data=TimeSinceVax ;
+      model Breakthrough = Followup_Time  Time_Since_Vax  
+      / clodds=pl  ;
+      oddsratio Followup_Time  ;
+      oddsratio Time_Since_Vax;
+   title2 'Best subsets ideal model - main effects only';
+run;
+
+**  Model 6: Best subsets ideal model - with related interaction term  **;
+   PROC Logistic desc data=TimeSinceVax ;
+      model Breakthrough = Followup_Time  Time_Since_Vax  
+                           Followup_Time*Time_Since_Vax
+      / clodds=pl  ;
+      oddsratio Followup_Time  ;
+      oddsratio Time_Since_Vax;
+title2 'Best subsets ideal model - w interaction term';
+run;
+
+
+
+***  STEP 7:  Assessment of final model  ***;
 ***--------------------------------------***;
 
  title;  options pageno=1;
-  proc logistic desc data=TimeSinceVax ;
-    class   Vaccination_Code / param=ref;
-    model  Breakthrough = Followup_Time  Time_Since_Vax  Age Age*Age  Vaccination_Code
-                        Followup_Time*Time_Since_Vax
-                        Time_Since_Vax  *  Age
-                        Time_Since_Vax  *  Vaccination_Code
-                        Followup_Time  *  Vaccination_Code
-                        Followup_Time * Time_Since_Vax * Vaccination_Code  /  aggregate scale=none lackfit rsq  ;
+   PROC Logistic desc data=TimeSinceVax ;
+      model Breakthrough = Followup_Time  Time_Since_Vax  
+                           Followup_Time*Time_Since_Vax  /  aggregate scale=none lackfit rsq  ;
     title2 'Final Model - goodness of fit and predictive ability';
 run;
 
+/*-----------------------------------------------------------------------------------*
+ |FINDINGS:
+ | The number of distanct obs is 12,972.
+ | The p-value for Deviance and Pearson chi-sq differ so there may be a data issue.
+ | (want these values to be large - Deviance is but Pearson is small)
+ | Re: predictive power of the model:
+ |    a) Generalized R2 = 
+ |    b) Max-rescaled R2 = 0.9808 (out of 1)
+ | Re: goodness of fit, the Hosmer-Lemeshow Goodness-of-Fit test is significant.
+ |    This means there is evidence of lack of fit. 
+ |    BUT could this be from large sample size??
+ |    OR is this because three of the expected cells are <5??
+ *-----------------------------------------------------------------------------------*/
 
 
-***  STEP 7:  Model diagnostics  ***;
+
+***  STEP 8:  Model diagnostics  ***;
 ***------------------------------***;
 
-title3 'Model diagnostics';  title4;  options pageno=1;
+title;  options pageno=1;
   proc logistic desc data=TimeSinceVax ;
-    model  Breakthrough = Followup_Time  Time_Since_Vax  Age Age*Age / influence iplots ;
-    title4 'Final Model - diagnostics';
+    model  Breakthrough = Followup_Time  Time_Since_Vax  Followup_Time*Time_Since_Vax / influence iplots ;
+    title2 'Final Model - diagnostics';
 run;
 
-  proc logistic desc data=pmwsrisk noprint;
-    model  Breakthrough = Followup_Time  Time_Since_Vax  Age Age*Age / influence iplots ;
-    output out=predict p=pred difdev=difdev ;
-run;
 
-  proc gplot data=predict;
-    plot difdev*pred / vref=4;
-    symbol i=none v=star;
-    axis1 label=(a=-90 r=90);
-    title4 'Difference in deviance by predicted probabilities';
-run;
+
+/*  proc gplot data=predict;*/
+/*    plot difdev*pred / vref=4;*/
+/*    symbol i=none v=star;*/
+/*    axis1 label=(a=-90 r=90);*/
+/*    title4 'Difference in deviance by predicted probabilities';*/
+/*run;*/

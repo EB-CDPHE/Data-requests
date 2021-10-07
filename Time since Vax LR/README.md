@@ -93,11 +93,11 @@ I wanted to compare this best model with other models. Specifically the full mod
 | |Model name|DF|AIC|Model|
 |-|----------|--|---|-----|
 |1|[Full model without interaction terms](Full_model_mains_only.pdf)|8|9549|VB = X1_G + X2_V + X3_F + X4_T + X5_A|
-|2|Full model with interaction terms|16|6460|VB = X1_G + X2_V + X3_F + X4_T + X5_A + (interactions)|
-|3|Competing model without interactions|4|9680|VB = X3_F + X4_T + X5_A|
-|4|Competing model with 2 interaction terms|6|6617|VB = X3_F + X4_T + X5_A + () + ()|
-|5|Best model without interaction term|2|9888|VB = X3_F + X4_T|
-|6|Best model with 1 interaction term|3|6777|VB = X3_F + X4_T + ()|
+|2|[Full model with interaction terms](Full_model_w_interactions.pdf)|16|6460|VB = X1_G + X2_V + X3_F + X4_T + X5_A + (interactions)|
+|3|[Competing model without interactions](Competing_model_NO_interactions.pdf)|4|9680|VB = X3_F + X4_T + X5_A|
+|4|[Competing model with 2 interaction terms](Competing_model_2_interactions.pdf)|6|6617|VB = X3_F + X4_T + X5_A + () + ()|
+|5|[Best model without interaction term](Best_model_NO_interactions.pdf)|2|9888|VB = X3_F + X4_T|
+|6|[Best model with 1 interaction term](Best_model_1_interaction_term.pdf)|3|6777|VB = X3_F + X4_T + ()|
 
 ![Term list](images/List_of_terms2.png)
 

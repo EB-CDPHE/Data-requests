@@ -16,9 +16,11 @@ Step 2: Univariate analysis.
 
 **Result of univariate analysis of variables with discrete values:**
 
-![UniVarAnaly](images/Univariate_analysis.png)
+![UniVarAnalysis](images/Univariate_analysis.png)
 ##
 Step 3: Logit plots of continuous variables. Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
+
+![Logit_plots](images/Logit_plots.jpg)
 
 **Logit plot of Age:**
 ![Logit_plot_Age](images/Logit_plots_Age2.png)

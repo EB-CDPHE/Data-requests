@@ -18,7 +18,9 @@ Step 2: Univariate analysis.
 
 ![UniVarAnalysis](images/Univariate_analysis.png)
 ##
-Step 3: Logit plots of continuous variables. Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
+Step 3: Logit plots of continuous variables. 
+
+Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
 
 **Logit plot of Age:**
 ![Logit_plot_Age](images/Logit_plots_Age2.png)
@@ -86,7 +88,7 @@ Here are the findings:
 ````
 
 ##
-Step 5: Comparison of competing models.  
+Step 6: Comparison of competing models.  
 
 I wanted to compare this best model with other models. Specifically the full model, with and without significant interaction terms. A competing model with Age variable added in, with and without associated interaction term. And then the best model with the associated interaction term added.
 
@@ -102,9 +104,9 @@ I wanted to compare this best model with other models. Specifically the full mod
 ![Term list](images/List_of_terms2.png)
 
 ##
-Step 6: Goodness of Fit
+Step 7: Assessment of final model
 
-The output can be found [here](Final_Model_Goodness_of_Fit.pdf)
+The SAS output for predictive power and goodness-of-it can be found [here](Final_Model_Goodness_of_Fit.pdf)
 
 Here are the findings:
 ````diff

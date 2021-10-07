@@ -13,13 +13,13 @@ Rachel S. had a dataset on dphe144 server named `timesincevax_regression_data`. 
 Step 1: Variable reduction. Not needed in this case since variables pre-selected.
 
 ## **Step 2: Univariate analysis.**
-##
+
 **Result of univariate analysis of variables with discrete values:**
 
 ![UniVarAnalysis](images/Univariate_analysis.png)
 ##
 ## **Step 3: Logit plots of continuous variables.**
-##
+
 
 Assumption is that there is a linear relationship between continuous (or ordinal) independent variables and the logit of the outcome variable. These plots check that assumption.
 

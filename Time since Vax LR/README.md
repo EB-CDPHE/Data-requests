@@ -45,7 +45,6 @@ Findings:
 ````
 ##
 ## **Step 4: Use forward selection to find significant interaction terms.**
-##
 
 Here is the code:
 
@@ -67,7 +66,6 @@ Here are the findings:
 
 ##
 ## **Step 5: Model building using Best Subsets selection.**  
-##
 
 Here is the code:
 
@@ -92,7 +90,6 @@ Here are the findings:
 
 ##
 ## **Step 6: Comparison of competing models.**
-##
 
 I wanted to compare this best model with other models. Specifically the full model, with and without significant interaction terms. A competing model with Age variable added in, with and without associated interaction term. And then the best model with the associated interaction term added.
 
@@ -109,7 +106,6 @@ I wanted to compare this best model with other models. Specifically the full mod
 
 ##
 ## **Step 7: Assessment of final model**
-##
 
 The SAS output for predictive power and goodness-of-it can be found [here](Final_Model_Goodness_of_Fit.pdf)
 

@@ -62,17 +62,33 @@ Here are the findings:
 ````
 
 ##
-Step 5: Use best subsets to find best model.  
+Step 5: Model building using Best Subsets selection.  
 
 Here is the code:
 
-![Best subsets code](images/Best_subsets_code2.png)
+![Best subsets code](images/Best_subsets_code3.png)
 
 Here are the subsets by SC score:
 ![SC scores](images/Best_subsets_SC2.png)
 
 And by AIC score:
 ![AIC scores](images/Best_subsets_AIC2.png)
+
+Here are the findings:
+````diff
++/*----------------------------------------------------------------------------*
++ |FINDINGS:
++ | Best subsets on full model shows 3 models for each model size (# of vars)
++ | SC scores drop sharpy starting with a 2 var model. 
++ | AIC for best subset models had 11 models with extremely low scores.
++ | Best model per SC and AIC is VB = Follow-up + Time_Since_Vax
++ *----------------------------------------------------------------------------*/
+````
+
+##
+Step 5: Comparison of competing models.  
+
+I wanted to compare this best model with other models. Specifically the full model, with and without significant interaction terms. A competing model with Age variable added in, with and without associated interaction term. And then the best model with the associated interaction term added.
 
 
 **Issues:**

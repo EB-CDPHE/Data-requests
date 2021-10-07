@@ -13,6 +13,7 @@ Rachel S. had a dataset on dphe144 server named `timesincevax_regression_data`. 
 Step 1: Variable reduction. Not needed in this case since variables pre-selected.
 
 **Step 2: Univariate analysis.**
+######
 **__________________________** 
 
 **Result of univariate analysis of variables with discrete values:**

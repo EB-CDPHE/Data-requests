@@ -1,9 +1,9 @@
 /**********************************************************************************************
-PROGRAM: Access.CEDRS_view
-AUTHOR:  Eric Bush
-CREATED: July 14, 2021
-MODIFIED:	
-PURPOSE:	A single program to read CEDRS view
+PROGRAM:  Access.CEDRS_view
+AUTHOR:   Eric Bush
+CREATED:  July 14, 2021
+MODIFIED: 101321: Add code to convert VAX fields from char to date var	
+PURPOSE:	 A single program to read CEDRS view
 INPUT:		dbo144.CEDRS_view
 OUTPUT:		       CEDRS_view_read
 ***********************************************************************************************/
@@ -47,14 +47,18 @@ PROC contents data=dbo144.CEDRS_view  varnum ;  run;
 DATA CEDRS_view_temp; 
    set dbo144.CEDRS_view(rename=
                  (ID=tmp_ID   ProfileID=tmp_ProfileID   EventID=tmp_EventID
-                  OnsetDate=tmp_OnsetDate  
-                  OnsetDate_proxy_dist=tmp_OnsetDate_proxy_dist 
-                  ReportedDate=tmp_ReportedDate 
-                  CollectionDate=tmp_CollectionDate  
-                  DeathDate=tmp_DeathDate
-                  Earliest_CollectionDate=tmp_Earliest_CollectionDate   
-                  Data_pulled_as_of=tmp_Data_pulled_as_of
-                  Refreshed_on=tmp_refreshed_on  
+                  OnsetDate = tmp_OnsetDate  
+                  OnsetDate_proxy_dist = tmp_OnsetDate_proxy_dist 
+                  ReportedDate = tmp_ReportedDate 
+                  CollectionDate = tmp_CollectionDate  
+                  DeathDate = tmp_DeathDate
+                  Earliest_CollectionDate = tmp_Earliest_CollectionDate   
+                  Data_pulled_as_of = tmp_Data_pulled_as_of
+                  Refreshed_on = tmp_refreshed_on  
+                  Vax_UTD = tmp_Vax_UTD
+                  Vax_FirstDose = tmp_Vax_FirstDose
+                  COPHS_AdmissionDate = tmp_cophs_admissiondate
+                  DateVSDeceased = tmp_datevsdeceased
                   )); 
  
 * Convert temporary numeric ID variable character ID var using the CATS function *;
@@ -69,7 +73,12 @@ DATA CEDRS_view_temp;
    CollectionDate       = input(tmp_CollectionDate, yymmdd10.);       format CollectionDate yymmdd10.;
    DeathDate            = input(tmp_DeathDate, yymmdd10.);            format DeathDate yymmdd10.;
    Earliest_CollectionDate = input(tmp_Earliest_CollectionDate, yymmdd10.); format Earliest_CollectionDate yymmdd10.;
-   Data_pulled_as_of     = input(tmp_Data_pulled_as_of, yymmdd10.);   format Data_pulled_as_of yymmdd10.;
+   Data_pulled_as_of    = input(tmp_Data_pulled_as_of, yymmdd10.);    format Data_pulled_as_of yymmdd10.;
+   Vax_UTD              = input(tmp_Vax_UTD, yymmdd10.);              format Vax_UTD yymmdd10.;
+   Vax_FirstDose        = input(tmp_Vax_FirstDose, yymmdd10.);        format Vax_FirstDose yymmdd10.;
+   COPHS_AdmissionDate  = input(tmp_COPHS_AdmissionDate, yymmdd10.);  format COPHS_AdmissionDate yymmdd10.;
+   DateVSDeceased       = input(tmp_DateVSDeceased, yymmdd10.);       format DateVSDeceased yymmdd10.;
+
 
 * Extract date part of a datetime variable  *;
    Refreshed_on = datepart(tmp_refreshed_on);   format Refreshed_on yymmdd10.;

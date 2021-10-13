@@ -14,12 +14,12 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 *** Create local copy of CEDRS data for selected variables  ***;
 ***---------------------------------------------------------***;
 
-DATA CEDRS_fix;  set COVID.CEDRS_view_fix;
-   if CountyAssigned = "MOFFAT";
+DATA CEDRS_MOFFAT_RFI;  set COVID.CEDRS_view_fix;
+   if CountyAssigned ^= 'INTERNATIONAL' ;
    Keep EventID CountyAssigned  ReportedDate  CaseStatus  Outcome;
 run;
 
-   PROC contents data=CEDRS_fix  varnum; title1 'CEDRS_fix'; run;
+   PROC contents data=CEDRS_MOFFAT_RFI  varnum; title1 'CEDRS_MOFFAT_RFI'; run;
 
 
 
@@ -39,7 +39,7 @@ title1 'COVID.CEDRS_view_fix';
 title2 'CountyAssigned = "MOFFAT"';
 
 title3 'ALL dates';
-   PROC freq data= CEDRS_fix noprint;
+   PROC freq data= CEDRS_MOFFAT_RFI noprint;
       where CountyAssigned = "MOFFAT";
       tables Outcome / out=Moffat_Sum1;
 run;
@@ -51,7 +51,7 @@ run;
 
 
 title3 "ReportedDate ge '01JUN21'd";
-   PROC freq data= CEDRS_fix noprint;
+   PROC freq data= CEDRS_MOFFAT_RFI noprint;
       where CountyAssigned = "MOFFAT"  AND  ReportedDate ge '01JUN21'd;
       tables Outcome /out=Moffat_Sum2;
 run;
@@ -78,7 +78,7 @@ title1 'COVID.CEDRS_view_fix';
 title2 'CountyAssigned = "ALL"';
 
 title3 'ALL dates';
-   PROC freq data= CEDRS_fix noprint;
+   PROC freq data= CEDRS_MOFFAT_RFI noprint;
       tables Outcome /out=CO_Sum1;
 run;
 DATA CO_ALL  ; set CO_Sum1;
@@ -89,7 +89,7 @@ run;
 
 
 title3 "ReportedDate ge '01JUN21'd";
-   PROC freq data= CEDRS_fix noprint;
+   PROC freq data= CEDRS_MOFFAT_RFI noprint;
       where ReportedDate ge '01JUN21'd;
       tables Outcome /out=CO_Sum2;
 run;

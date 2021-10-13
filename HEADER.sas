@@ -17,7 +17,7 @@ title;  options pageno=1;
 ***---------------------------------------------------***;
 
 DATA CEDRS_fix;  set COVID.CEDRS_view_fix;
-/*   if CountyAssigned = "MOFFAT";*/
+   if CountyAssigned ^= 'INTERNATIONAL' ;
    Keep EventID CountyAssigned  ReportedDate  CaseStatus  Outcome;
 run;
 

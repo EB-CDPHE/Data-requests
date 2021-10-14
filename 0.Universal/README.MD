@@ -1,1 +1,1 @@
-This is the folder to place the files that are "universal" to all of the other folders in Data Request repo. The SAS CODE folder contains the Access.*.sas, Check.*.sas, and Fix.*.sas programs for example.
+This is the folder to place the files that are "universal" to all of the other folders in Data Request repo. The SAS CODE folder contains the Access.X.sas, Check.X.sas, and Fix.X.sas programs for example.

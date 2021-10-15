@@ -6,7 +6,7 @@ MODIFIED:
 ***********************************************************************************************/
 
    PROC format;
-      value $ genderfmt
+      value $ GenderFmt
          'Female' = 'Female'
          'Male' = 'Male'
          other = 'Other' ;

@@ -42,7 +42,7 @@ proc print data= MMWRweek;  run;
 ***---------------------------------------------------***;
 
 DATA NNDSS_data;  set COVID.CEDRS_view_fix;
-   if CountyAssigned ^= 'INTERNATIONAL' ;
+   if CountyAssigned ^= 'INTERNATIONAL'  AND  ('29DEC19'd le ReportedDate le '02JAN21'd);
    Keep ProfileID EventID  CountyAssigned County  ReportedDate  CaseStatus  Outcome  
         Gender race ethnicity  Age_at_Reported  ;
 run;
@@ -132,5 +132,7 @@ run;
 
 
 proc freq data=NNDSS_dates; 
-tables MMWR_week_2020 * ReportedDate / list; 
+/*tables MMWR_week_2020 * ReportedDate / list; */
+tables MMWR_week_2020 ; 
+format MMWR_week_2020 MMWR_Month.;
 run;

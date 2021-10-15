@@ -19,12 +19,12 @@ MODIFIED:
 
       value Age8cat
          0-<1 = '< 1 year'
-         1-<5 = '20-39 years'
-         5-<15 = '40-59 years'
-         15-<25 = '40-59 years'
-         25-<40 = '40-59 years'
-         40-<45 = '40-59 years'
-         45-<55 = '40-59 years'
-         55-<65 = '40-59 years' ;
+         1-<5 = '1-4 years'
+         5-<15 = '5-14 years'
+         15-<25 = '15-24 years'
+         25-<40 = '25-39 years'
+         40-<65 = '40-64 years'
+         65-high = '40-59 years'
+         ., 121 = 'Unknown' ;
 run;
 

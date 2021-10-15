@@ -18,8 +18,9 @@ title;  options pageno=1;
 
 DATA CEDRS_fix;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  AND  ReportedDate ge '01JAN21'd ;
-   Keep ProfileID EventID CountyAssigned  ReportedDate  CaseStatus  Outcome Age_Group  Age_at_Reported Age_Years  
-      Vax_UTD Vax_FirstDose Vaccine_Received Hospitalized BreakThrough Gender County;
+   Keep  ProfileID EventID  CountyAssigned  County  CaseStatus  Hospitalized  Outcome Gender 
+         Age_Group  Age_at_Reported  Vax_UTD  Vax_FirstDose  Vaccine_Received  BreakThrough  
+         ReportedDate ;  
 run;
 
    PROC contents data=CEDRS_fix  varnum; title1 'CEDRS_CY21'; run;
@@ -155,5 +156,132 @@ DATA CountyPop_est ;
 run;
    PROC print data= CountyPop_est; run;
 
+
+
+***  Create Age-specific dataset  ***;
+***-------------------------------***;
+
+%LET AgeLB = 0;   * will select obs GE than this number;
+%LET AgeUB = 5;   * will select obs < than this number;
+
+
+**  Create age specific dataset and sort by date  **;
+ Data CEDRS_AG; set CEDRS_fix;
+    if &AgeLB le  Age_at_Reported  < &AgeUB;
+run;
+   PROC sort data= CEDRS_AG  
+              out= CEDRS_AG_sort; 
+      by ReportedDate;
+run;
+
+
+**  Reduce dataset from patient level to date level (one obs per date reported)  **;
+Data CEDRS_AG_rate; set CEDRS_AG_sort;
+   by ReportedDate;
+
+   * set accumulator vars to 0 for first ReportedDate in group *;
+   if first.ReportedDate then DO;  
+      NumCases_VxY=0;  NumHosp_VxY=0;  NumDeaths_VxY=0;  
+      NumCases_VxN=0;  NumHosp_VxN=0;  NumDeaths_VxN=0;  
+   END;
+
+   * count daily cases (i.e. sum within ReportedDate group) *;
+   if CaseStatus in('confirmed', 'probable') then do; if Vax_UTD ne . then NumCases_VxY+1; else NumCases_VxN+1;  end; 
+   if hospitalized = 1 then do;  if Vax_UTD ne . then NumHosp_VxY+1; else NumHosp_VxN+1; end;
+   if outcome = 'Patient died' then do;  if Vax_UTD ne . then NumDeaths_VxY+1;  else NumDeaths_VxN+1;  end; 
+
+   * keep last ReportedDate in group (with daily totals) *;
+   if last.ReportedDate then output;
+
+   * drop patient level variables  *;
+   keep ReportedDate  NumCases_VxY  NumCases_VxN  NumHosp_VxY  NumHosp_VxN  NumDeaths_VxY  NumDeaths_VxN ;
+
+run;
+
+
+** add ALL reported dates for populations with sparse data **;
+Data CEDRS_AG_dates;  length AgeGroup $ 9 ;  merge Timeline  CEDRS_AG_rate;
+   by ReportedDate;
+
+   * backfill missing with 0 and add vars to describe population *;
+   if NumCases_VxY=. then NumCases_VxY=0 ; 
+   if NumCases_VxN=. then NumCases_VxN=0 ; 
+
+   if NumHosp_VxY=.  then NumHosp_VxY=0 ; 
+   if NumHosp_VxN=.  then NumHosp_VxN=0 ; 
+
+   if NumDeaths_VxY=. then NumDeaths_VxY=0 ; 
+   if NumDeaths_VxN=. then NumDeaths_VxN=0 ; 
+
+   * create total vars *;
+/*   TotalCases = NumProbable + NumConfirmed ;*/
+/*   TotalDead = NumProbDead + NumConfDead ;*/
+
+*add vars to describe population *;
+   AgeGroup="&AgeGrp";  format AgeGroup $9.;
+
+run;
+
+
+
+%Macro AgeGrpStats(AgeGrp, AgeLB, AgeUB);
+
+** Create macro variable for age specific county population data **;
+data _null_; set CountyPop_est; where County = "&COcnty" ;
+   call symputx("agepopulation", &AgeGrp);    * <-- put number from county population into macro variable;
+run;
+
+**  Create age specific dataset and sort by date  **;
+ Data &County_Name; set CEDRS_&County_Name;
+    if &AgeLB le  Age_at_Reported  < &AgeUB;
+run;
+   PROC sort data= &County_Name  
+              out= &County_Name._sort; 
+      by ReportedDate;
+run;
+
+**  Reduce dataset from patient level to date level (one obs per date reported)  **;
+Data &County_Name._rate; set &County_Name._sort;
+   by ReportedDate;
+
+* count cases per reported date *;
+   if first.ReportedDate then NumCases=0;
+   NumCases+1;
+* calculate case rate  *;
+   if last.ReportedDate then do;
+      CaseRate= NumCases / (&agepopulation/100000);
+      output;
+   end;
+* drop patient level variables  *;
+   drop ProfileID  EventID  Age_at_Reported  County;
+run;
+
+** add ALL reported dates for populations with sparse data **;
+Data &County_Name._dates; length Ages $ 9  County $ 13  ;  merge Timeline  &County_Name._rate;
+   by ReportedDate;
+
+* backfill missing with 0 *; 
+   if NumCases=. then NumCases=0 ; 
+   if CaseRate=. then CaseRate=0 ; 
+
+*add vars to describe population *;
+   County="&COcnty";  
+   Ages="&AgeGrp";  format Ages $9.;
+
+run;
+
+**  Calculate 7-day moving averages  **;
+   PROC expand data=&County_Name._dates   out=&County_Name._&AgeGrp  method=none;
+      id ReportedDate;
+      convert NumCases=Cases7dAv / transformout=(movave 7);
+      convert CaseRate=Rates7dAv / transformout=(movave 7);
+run;
+
+* delete temp datasets not needed *;
+proc datasets library=work NOlist ;
+   delete &COcnty   &COcnty._rate   &COcnty._sort   &COcnty._dates  ;
+run;
+
+%mend;
 
 

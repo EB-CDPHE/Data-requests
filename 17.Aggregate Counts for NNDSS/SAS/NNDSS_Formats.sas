@@ -26,5 +26,20 @@ MODIFIED:
          40-<65 = '40-64 years'
          65-high = '40-59 years'
          ., 121 = 'Unknown' ;
+
+      value MMWR_Month
+         1-4 = 'January'
+         5-9 = 'February'
+         10-13 = 'March'
+         14-17 = 'April'
+         18-22 = 'May'
+         23-26 = 'June'
+         27-30 = 'July'
+         31-35 = 'August'
+         36-39 = 'September'
+         40-44 = 'October'
+         45-48 = 'November'
+         49-53 = 'December' ;
+
 run;
 

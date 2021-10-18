@@ -27,8 +27,7 @@ Here is the table of total aggregated cases by age:
 
 ##
 Here is the table of total aggregated cases by gender:
-
-![Gender_table](./images/Gender2.jpg)
+![gendertable](Images/Gender2.jpg)
 
 The table of aggregated cases by Race and Ethnicity are not shown here but can be found, with all of the aggregated data, in the complete [template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx).
 

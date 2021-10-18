@@ -31,9 +31,8 @@ Here is the table of total aggregated cases by gender:
 
 The table of aggregated cases by Race and Ethnicity are not shown here but can be found, with all of the aggregated data, in the complete [template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx).
 
-##
 ## Response
-Final response was delivered snippet of SAS output placed in chat to Eduardo. Aggregated data has been placed in [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx) per request.
+Final aggregated case counts have been placed in [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx) provided by NNDSS.
 #
 
 

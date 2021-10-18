@@ -19,16 +19,16 @@ Here is the table of total aggregated cases by Case Status:
 ##
 Here is the table of total aggregated cases by MMWR month:
 
-![Total Cases](./Images/MMWR_month2.png)
+![MMWR_Month](./Images/MMWR_month2.png)
 ##
 Here is the table of total aggregated cases by age:
 
-![Total Cases](./images/Age_group2.png)
+![Age_Group](./images/Age_group2.png)
 
 ##
 Here is the table of total aggregated cases by gender:
 
-![Total Cases](./images/Gender2.png)
+![Gender](./images/Gender2.png)
 
 The table of aggregated cases by Race and Ethnicity are not shown here but can be found, with all of the aggregated data, in the complete [template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx).
 

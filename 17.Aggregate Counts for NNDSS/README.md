@@ -28,7 +28,7 @@ Here is the table of total aggregated cases by age:
 ##
 Here is the table of total aggregated cases by gender:
 
-![Gender](./images/Gender2.png)
+![Gender](./images/Gender2.jpg)
 
 The table of aggregated cases by Race and Ethnicity are not shown here but can be found, with all of the aggregated data, in the complete [template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx).
 
@@ -43,6 +43,4 @@ Final aggregated case counts have been placed in [Excel spreadsheet template](./
 ###### Code for creating MMWR Week for 2020:
  ![code](./Images/Code_for_MMWR_week.png)
 
-This links the calculated MMWR week value with each reported date.
-
-
+This code links the calculated MMWR week value with each reported date.

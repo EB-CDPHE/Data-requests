@@ -19,7 +19,6 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 ***  Create MMWR weeks for 2020  ***;
 ***------------------------------***;
 
-
 DATA MMWRweek;
    ReportedDate='29DEC19'd;
    MMWR_20week = 1;
@@ -32,9 +31,7 @@ DATA MMWRweek;
    format ReportedDate mmddyy10.;
    drop m ;
 run;
-proc print data= MMWRweek;  run;
-
-
+/*proc print data= MMWRweek;  run;*/
 
 
 
@@ -56,70 +53,6 @@ run;
  *-------------------------------------------*/
 
 
-***  Check data  ***;
-***--------------***;
-
-*  How many distinct counties? (should be 64) *;
-   PROC SQL;
-      select count(distinct CountyAssigned) as NumCountyAssigned,
-             count(distinct County) as NumCounty
-      from NNDSS_data ;
-run;
- 
- *  How many distinct counties? (should be 64) *;
-  PROC freq data= NNDSS_data  ;
-      tables CountyAssigned  County  ;
-      tables CountyAssigned * County / list ;
-run;
-
-* Case Status *;
-  PROC freq data= NNDSS_data ;  tables CaseStatus ;  run;
-
-* Outcome *;
-  PROC freq data= NNDSS_data ;  tables Outcome ;  run;
-
-* Gender *;
-  PROC freq data= NNDSS_data ;  tables Gender ;  run;
-  PROC freq data= NNDSS_data ;  tables Gender ; format Gender $GenderFmt. ;  run;
-
-* Age *;
-   PROC means data= NNDSS_data  n nmiss ;
-      var Age_at_Reported ;
-run;
-
-   PROC univariate data= NNDSS_data ;  var Age_at_Reported ; run;
-
-   PROC freq data= NNDSS_data ;  tables Age_at_Reported ; format Age_at_Reported $Age8Cat. ;  run;
-
-* Reported Date *;
-   PROC means data= NNDSS_data  n nmiss ;
-      var ReportedDate ;
-run;
-
-   PROC freq data= NNDSS_data ;
-      tables ReportedDate ;
-      format ReportedDate WeekU5. ;
-run;
-
-/*----------------------------------------------------------------------------*
- |FINDINGS:
- | Though the WeekU format begins on Sunday and ends on Saturday, 
- | it does not align with prescribed dates for MMWR weeks.
- |FIX: Create MMWR_20week variable to define weeks based on ReportedDate,
- | then apply MMWR_Month format to group into MMWR months per request.
- *----------------------------------------------------------------------------*/
-
-/* Data DateCheck; set NNDSS_data;*/
-/*   Day_of_week = put(ReportedDate, DOWname9.);*/
-/*   Week_of_year = put(ReportedDate, WeekU5.);*/
-/*   YYweek = put(ReportedDate, YYWeekU5.);*/
-/*run;*/
-/*proc freq data=datecheck; tables Day_of_week; run;*/
-/*proc freq data=datecheck; */
-/*tables WeekW_of_year * Day_of_week * ReportedDate / list; */
-/*run;*/
-
-
 
 ***  Merge MMWR_20week variable to NNDSS_data by ReportedDate  ***;
 ***------------------------------------------------------------***;
@@ -136,17 +69,9 @@ Data NNDSS_dates;  merge MMWRweek  NNDSS_data_sort(in=x);
 run;
 
 
-proc freq data=NNDSS_dates; 
-/*tables MMWR_20week * ReportedDate / list;       *  <-- to check that MMWR_20week is defined correctly *;*/
-tables MMWR_20week ; 
-format MMWR_20week MMWR_Month.;
-run;
-
-
 
 ***  Requested Aggregated Data  ***;
 ***-----------------------------***;
-
 
 /*--------------------------------------------------------------------------------*
  | TOTAL CASES:
@@ -213,7 +138,7 @@ run;
 
 
 
-/*--------------------------------------------------------------------------------*
+/*----------------------------------------------------------------------------------------------*
  | AGE GROUP:
  | "For confirmed and probable COVID-19 cases, enter the total number of 2020 COVID-19 cases
  |  among U.S. residents, by the specified age groups, including the number of cases where 
@@ -228,7 +153,7 @@ run;
  | 40-64 years
  | >=65 years
  | Age unknown or missing 
- *--------------------------------------------------------------------------------*/
+ *----------------------------------------------------------------------------------------------*/
 
     PROC format;
      value Age8cat
@@ -250,3 +175,72 @@ title2 'Age Group';
 run;
 
 
+
+/*------------------------------------------------------------------------------------------*
+ | SEX (Gender):
+ | "For confirmed and probable COVID-19 cases individually, 
+ |  enter the total number of 2020 COVID-19 cases among U.S. residents 
+ |  for the specified sex categories, including the number of cases where sex is unknown."
+ |
+ | Gender = 
+ |   Female
+ |   Male
+ |   Sex unknown or missing
+*------------------------------------------------------------------------------------------*/
+
+   PROC format;
+      value $ GenderFmt
+         'Female' = 'Female'
+         'Male' = 'Male'
+         other = 'Other' ;
+run;
+
+title1 'Data source: CEDRS_view --> NNDSS_dates';
+title2 'Sex (Gender)';
+   PROC freq data=NNDSS_dates ;
+      table  CaseStatus * Gender / missing missprint nopercent norow nocol;
+      format Gender $GenderFmt. ; 
+run;
+
+
+
+/*---------------------------------------------------------------------------------------------*
+ | RACE and ETHNICITY:
+ | "For confirmed and probable COVID-19 cases, enter the total number of 2020 COVID-19 cases
+ |  among U.S. residents for the specified race/ethnicity categories listed below, 
+ |  including the number of cases where race/ethnicity is unknown or missing."
+ |
+ | Race and Ethnicity combinations are: 
+ |   Hispanic/Latino and (Native American or Alaska Native)
+ |   Hispanic/Latino and (Black or African American)
+ |   Hispanic/Latino and White
+ |   Hispanic/Latino and Asian
+ |   Hispanic/Latino and (Native Hawaiian or other Pacific Islander)
+ |   Hispanic/Latino and (Other or multi-race)
+ |   Hispanic/Latino and unknown/missing race 
+ |
+ |   Non-Hispanic/Latino and (Native American or Alaska Native)
+ |   Non-Hispanic/Latino and (Black or African American)
+ |   Non-Hispanic/Latino and White
+ |   Non-Hispanic/Latino and Asian
+ |   Non-Hispanic/Latino and (Native Hawaiian or other Pacific Islander)
+ |   Non-Hispanic/Latino and (Other or multi-race)
+ |   Non-Hispanic/Latino and unknown/missing race
+ *-------------------------------------------------------------------------------------------*/
+
+title1 'Data source: CEDRS_view --> NNDSS_dates';
+title2 'Race and Ethnicity';
+
+   PROC freq data= NNDSS_data   ;
+      where CaseStatus = 'confirmed';
+      table Ethnicity * Race   / list missing missprint ;
+title3 "CaseStatus = 'confirmed'";
+run;
+
+   PROC freq data= NNDSS_data   ;
+      where CaseStatus = 'probable';
+      table Ethnicity * Race   / list missing missprint ;
+title3 "CaseStatus = 'probable'";
+run;
+
+title;

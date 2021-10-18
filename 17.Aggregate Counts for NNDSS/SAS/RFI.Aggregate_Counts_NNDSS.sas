@@ -1,8 +1,8 @@
 /**********************************************************************************************
 PROGRAM:  RFI.Aggregate_Counts_NNDSS.sas
 AUTHOR:   Eric Bush
-CREATED:  October 22, 2021
-MODIFIED:	
+CREATED:  October 15, 2021
+MODIFIED: 101821: Finished / finalized work. 
 PURPOSE:	 Create summary output for NNDSS spreadsheet for requested aggregated data
 INPUT:	 	  
 OUTPUT:		

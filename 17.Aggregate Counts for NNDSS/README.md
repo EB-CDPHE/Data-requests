@@ -19,7 +19,7 @@ Here is the table of total aggregated cases by Case Status:
 ##
 Here is the table of total aggregated cases by MMWR month:
 
-![Total Cases](./images/MMWR_month2.png)
+![Total Cases](./Images/MMWR_month2.png)
 ##
 Here is the table of total aggregated cases by age:
 

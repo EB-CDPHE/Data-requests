@@ -33,15 +33,16 @@ Here is the table of total aggregated cases by gender:
 The table of aggregated cases by Race and Ethnicity are not shown here but can be found, with all of the aggregated data, in the completed [template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx).
 
 ## Response
-Final aggregated case counts have been placed in [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx) provided by NNDSS.
+Final aggregated case counts have been placed in [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx) provided by CDC.
 #
 
 
 **Issues:**
-* CDC NNDSS has specific date requirements based on MMWR weeks. MMWSR week 1 of 2020 is from December 29, 2019 to January 4, 2020 (Sunday - Saturday). The SAS date format WEEKU is supposed to define weeks of the year based on Sunday being the first day. However, when I checked the ReportedDate values with WEEKU format it didin't seem to align with MMWR week. Therefore, I used the following code to create a MMWR week number linked to ReportedDate.
-####
-###### Code for creating MMWR Week for 2020:
+* CDC NNDSS has specific date requirements based on MMWR weeks. MMWR week 1 of 2020 is from Sunday, December 29, 2019 to Saturday, January 4, 2020. The SAS date format WEEKU is supposed to define weeks of the year based on Sunday being the first day. However, when I checked the ReportedDate values with WEEKU format it didin't seem to align with MMWR week defined by CDC. Therefore, I used the following code to create a MMWR week number linked to ReportedDate.
 
- ![code](./Images/Code_for_MMWR_week.png)
+##
+Code for creating MMWR Week for 2020:
+
+ ![MMWR_code](./Images/Code_for_MMWR_week.png)
 
 This code links the calculated MMWR week value with each reported date.

@@ -1,7 +1,7 @@
 /**********************************************************************************************
 PROGRAM:  Check.Aggregate_Counts_NNDSS.sas
 AUTHOR:   Eric Bush
-CREATED:  October 22, 2021
+CREATED:  October 18, 2021
 MODIFIED:	
 PURPOSE:	 Create summary output for NNDSS spreadsheet for requested aggregated data
 INPUT:	 	  
@@ -121,4 +121,27 @@ run;
 /*proc freq data=datecheck; */
 /*tables WeekW_of_year * Day_of_week * ReportedDate / list; */
 /*run;*/
+
+
+
+***  Merge MMWR_20week variable to NNDSS_data by ReportedDate  ***;
+***------------------------------------------------------------***;
+
+**  Create age specific dataset and sort by date  **;
+  PROC sort data=NNDSS_data  
+             out= NNDSS_data_sort; 
+      by ReportedDate;
+run;
+
+Data NNDSS_dates;  merge MMWRweek  NNDSS_data_sort(in=x);
+   by ReportedDate;
+   if x;
+run;
+
+
+proc freq data=NNDSS_dates; 
+/*tables MMWR_20week * ReportedDate / list;       *  <-- to check that MMWR_20week is defined correctly *;*/
+tables MMWR_20week ; 
+format MMWR_20week MMWR_Month.;
+run;
 

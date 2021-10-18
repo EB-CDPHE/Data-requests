@@ -24,6 +24,7 @@ Here is the table of total aggregated cases by MMWR month:
 Here is the table of total aggregated cases by age:
 
 ![Total Cases](./images/Age_group2.png)
+
 ##
 Here is the table of total aggregated cases by gender:
 

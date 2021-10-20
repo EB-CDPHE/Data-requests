@@ -8,12 +8,11 @@ INPUT:	      B6172_read
 OUTPUT:	COVID.B6172_fix
 ***********************************************************************************************/
 
-/*-----------------------------------------------------------------------------------------------------------*
+/*------------------------------------------------------------------------------------------------------*
  | Fixes made in this code:
  | 1. Remove dup records by keeping record with latest ResultDate 
  | 2. Create County variable from County_Assigned that only includes county name (not ", CO" too)
- | 
- *-----------------------------------------------------------------------------------------------------------*/
+ *------------------------------------------------------------------------------------------------------*/
 
 ** Access the final SAS dataset that was created in the Access.* program and validated with the Check.* programn **;
 

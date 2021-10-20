@@ -26,7 +26,7 @@ OUTPUT:	 COVID.CEDRS_view_fix
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 
    PROC contents data=CEDRS_view_read varnum; run;
-   PROC contents data=zDSI_Events_fix varnum; run;
+/*   PROC contents data=zDSI_Events_fix varnum; run;*/
 
 
 /*____________________________________________________________________________________________________________________*
@@ -41,33 +41,23 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 ***  Make edits to CEDRS_view_read and create COVID.CEDRS_view_fix  ***;
 ***-----------------------------------------------------------------***;
 
-   proc sort data=zDSI_Events_fix  out=AgeVar(keep=ProfileID EventID Age_Years )  ; by ProfileID EventID ;
-   proc sort data=CEDRS_view_read  out=CEDRS_NoAge   ; by ProfileID EventID ;
-DATA COVID.CEDRS_view_fix; 
-   merge CEDRS_NoAge(in=c) AgeVar ; 
-   by ProfileID EventID ;
-   if c;
-
+DATA COVID.CEDRS_view_fix ;  set CEDRS_view_read ;
 ** 1) new county variable  **;
    County = upcase(scan(CountyAssigned,1,',')); 
- 
-** 2) impute missing values of Age_at_Reported  **;
-/*   if Age=. AND Age_Years=. then Age_Years = Age_at_Reported;*/
-   if Age_at_Reported = . then Age_at_Reported = Age_Years;
-   if Age_Years > 115 then Age_Years = . ;
-   if Age_at_Reported > 115 then Age_at_Reported = . ;
-
 run;
 
 
-**  3. Contents of final SAS dataset  **;
+**  2. Contents of final SAS dataset  **;
 
-   PROC contents data=COVID.CEDRS_view_fix varnum;  title1 'COVID.CEDRS_view_fix'; run;
+   PROC contents data=COVID.CEDRS_view_fix varnum;  title1 'COVID.CEDRS_view_fix'; 
+run;
 
 
 
 
-*** 4.  Post-edit checks ***;
+
+
+*** 3.  Post-edit checks ***;
 ***----------------------***;
    PROC means data= COVID.CEDRS_view_fix n nmiss;
       var ReportedDate    Age_at_Reported   Age_Years;

@@ -87,6 +87,7 @@ title1 'Data source: CEDRS_view --> NNDSS_dates';
 title2 'Total Cases';
    PROC freq data=NNDSS_dates ;
       table CaseStatus;
+      label CaseStatus = 'Case Status';
 run;
 
 
@@ -130,10 +131,12 @@ run;
 run;
 
 title1 'Data source: CEDRS_view --> NNDSS_dates';
-title2 'Month';
+title2 'MMWR Month';
    PROC freq data=NNDSS_dates ;
       table CaseStatus * MMWR_20week /nopercent norow nocol ;
       format MMWR_20week MMWR_Month.;
+      label CaseStatus  = 'Case Status'
+            MMWR_20week = 'MMWR weeks grouped by month' ;
 run;
 
 
@@ -157,13 +160,13 @@ run;
 
     PROC format;
      value Age8cat
-           0-<1  = '< 1 year'
-           1-<5  = '1-4 years'
-          5-<15  = '5-14 years'
-         15-<25  = '15-24 years'
-         25-<40  = '25-39 years'
-         40-<65  = '40-64 years'
-         65-<121 = '65-120 years'
+           0-<1  = '< 1 '
+           1-<5  = '1-4 '
+          5-<15  = '5-14 '
+         15-<25  = '15-24 '
+         25-<40  = '25-39 '
+         40-<65  = '40-64 '
+         65-<121 = '65-120 '
          ., 121  = 'Unknown' ;
 run;
 
@@ -172,6 +175,8 @@ title2 'Age Group';
    PROC freq data=NNDSS_dates ;
       table  CaseStatus * Age_at_Reported / missing missprint nopercent norow nocol;
       format Age_at_Reported Age8Cat. ; 
+      label CaseStatus  = 'Case Status'
+            Age_at_Reported = 'Age in years' ;
 run;
 
 
@@ -197,9 +202,11 @@ run;
 
 title1 'Data source: CEDRS_view --> NNDSS_dates';
 title2 'Sex (Gender)';
-   PROC freq data=NNDSS_dates ;
+   PROC freq data=NNDSS_dates order=freq;
       table  CaseStatus * Gender / missing missprint nopercent norow nocol;
       format Gender $GenderFmt. ; 
+      label CaseStatus  = 'Case Status'
+            Gender = 'Gender' ;
 run;
 
 

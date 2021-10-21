@@ -15,7 +15,7 @@ Total observations in filtered dataset = 353,960
 
 Here is the table of total aggregated cases by Case Status:
 
-![Total Cases](./Images/Total_cases2.png)
+![Total Cases](./Images/Totalcases2.png)
 ##
 Here is the table of total aggregated cases by MMWR month:
 

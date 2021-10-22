@@ -115,10 +115,13 @@ Data Colorado_rate; set CEDRS_view_sort;
       MortRate= NumDead / (&CntyPop/100000);
       output;
    end;
+
 * drop patient level variables  *;
-   drop ProfileID  EventID  Age_at_Reported  hospitalized  hospitalized_cophs   ;
+/*   drop ProfileID  EventID  Age_at_Reported  hospitalized  hospitalized_cophs   ;*/
 
-
+* keep only date level variables since Patient-level variables no longer have meaning  *;
+   keep  NumCases  NumHosp   NumCOPHS   NumDied   NumDead
+         CaseRate  HospRate  COPHSRate  DiedRate  MortRate  ReportedDate ;
 run;
 /*   proc print data= Colorado_rate ;  ID ReportedDate ;  run;*/
 

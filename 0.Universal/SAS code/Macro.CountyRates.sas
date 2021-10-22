@@ -87,12 +87,13 @@ MODIFIED: 102221:  Add 14d moving average calculation
         MortRate= NumDead / (&CntyPop/100000);
         output;
      end;
+
    * drop patient level variables  *;
-   drop ProfileID  EventID  Age_at_Reported  hospitalized  hospitalized_cophs   ;
+/*   drop ProfileID  EventID  Age_at_Reported  hospitalized  hospitalized_cophs   ;*/
 
-   * keep only day level variables  *;
-/*   keep ;*/
-
+   * keep only date level variables since Patient-level variables no longer have meaning  *;
+   keep  NumCases  NumHosp   NumCOPHS   NumDied   NumDead
+         CaseRate  HospRate  COPHSRate  DiedRate  MortRate  ReportedDate ;
    run;
 
 ** add ALL reported dates for populations with sparse data **;

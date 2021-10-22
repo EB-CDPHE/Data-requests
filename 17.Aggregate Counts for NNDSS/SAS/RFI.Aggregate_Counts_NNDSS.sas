@@ -2,7 +2,8 @@
 PROGRAM:  RFI.Aggregate_Counts_NNDSS.sas
 AUTHOR:   Eric Bush
 CREATED:  October 15, 2021
-MODIFIED: 101821: Finished / finalized work. 
+MODIFIED: 102221: Added Race format to combine "Multiple" and "Other"
+          101821: Finished / finalized work. 
 PURPOSE:	 Create summary output for NNDSS spreadsheet for requested aggregated data
 INPUT:	 	  
 OUTPUT:		
@@ -235,18 +236,25 @@ run;
  |   Non-Hispanic/Latino and unknown/missing race
  *-------------------------------------------------------------------------------------------*/
 
+   PROC format;
+      value $ RaceFmt
+         'Multiple','Other' = 'Multiple/Other' ;
+run;
+
 title1 'Data source: CEDRS_view --> NNDSS_dates';
 title2 'Race and Ethnicity';
 
    PROC freq data= NNDSS_data   ;
       where CaseStatus = 'confirmed';
       table Ethnicity * Race   / list missing missprint ;
+      format Race $RaceFmt. ;
 title3 "CaseStatus = 'confirmed'";
 run;
 
    PROC freq data= NNDSS_data   ;
       where CaseStatus = 'probable';
       table Ethnicity * Race   / list missing missprint ;
+      format Race $RaceFmt. ;
 title3 "CaseStatus = 'probable'";
 run;
 

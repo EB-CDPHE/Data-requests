@@ -51,7 +51,7 @@ OPTIONS pageno=1;
 DATA timeline;
    ReportedDate='01MAR20'd;
    output;
-   do t = 1 to 570;
+   do t = 1 to 600;
       ReportedDate+1;
       output;
    end;

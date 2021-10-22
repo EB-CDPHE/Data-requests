@@ -70,16 +70,19 @@ MODIFIED:
      by ReportedDate;
 
    * count cases per reported date *;
-      if first.ReportedDate then DO;  NumCases=0;  NumHosp=0;  NumCOPHS=0;  END;
+      if first.ReportedDate then DO;  NumCases=0;  NumHosp=0;  NumCOPHS=0; NumDead=0;  END;
       NumCases+1;
       NumHosp+hospitalized;
       NumCOPHS+hospitalized_cophs;
+      if outcome = 'Patient died' then NumDead+1;
 
    * calculate case rate  *;
      if last.ReportedDate then do;
         CaseRate= NumCases / (&CntyPop/100000);
         HospRate= NumHosp / (&CntyPop/100000);
         COPHSRate= NumCOPHS / (&CntyPop/100000);
+        MortRate= NumDead / (&CntyPop/100000);
+
         output;
      end;
    * drop patient level variables  *;
@@ -94,9 +97,12 @@ Data &County_Name._dates; length  County $ 13  ;  merge Timeline  &County_Name._
    if NumCases=. then NumCases=0 ; 
    if NumHosp=. then NumHosp=0 ; 
    if NumCOPHS=. then NumCOPHS=0 ; 
+   if NumDead=. then NumDead=0 ; 
+
    if CaseRate=. then CaseRate=0 ; 
    if HospRate=. then HospRate=0 ; 
    if COPHSRate=. then COPHSRate=0 ; 
+   if MortRate=. then MortRate=0 ; 
 
 *add vars to describe population (will be missing for obs from Timeline only) *;
    County="&CountyName";  
@@ -110,7 +116,16 @@ run;
       convert CaseRate=Rates7dAv / transformout=(movave 7);
       convert HospRate=Hosp7dAv / transformout=(movave 7);
       convert COPHSRate=COPHS7dAv / transformout=(movave 7);
+      convert MortRate=Mort7dAv / transformout=(movave 7);
 
+**  Calculate 14-day moving averages  **;
+   PROC expand data=&County_Name._dates   out=&County_Name._movavg  method=none;
+      id ReportedDate;
+      convert NumCases=Cases14dAv / transformout=(movave 14);
+      convert CaseRate=Rates14dAv / transformout=(movave 14);
+      convert HospRate=Hosp14dAv / transformout=(movave 14);
+      convert COPHSRate=COPHS14dAv / transformout=(movave 14);
+      convert MortRate=Mort14dAv / transformout=(movave 14);
 run;
 
 * delete temp datasets not needed *;

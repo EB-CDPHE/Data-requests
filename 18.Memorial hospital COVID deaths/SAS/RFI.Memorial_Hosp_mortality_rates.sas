@@ -14,16 +14,34 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 **  PROC contents of starting dataset  **;
    PROC contents data= COVID.CEDRS_view_fix  varnum ; title1 'COVID.CEDRS_view_fix'; run;
 
+DATA CEDRS_view_fix;  set COVID.CEDRS_view_fix; run;
 
 *** Create local copy of CEDRS data for selected variables  ***;
 ***---------------------------------------------------------***;
 
-DATA CEDRS_MOFFAT_RFI;  set COVID.CEDRS_view_fix;
-   if CountyAssigned ^= 'INTERNATIONAL' ;
-   Keep EventID CountyAssigned  ReportedDate  CaseStatus  Outcome;
+DATA Memorial;  set COVID.CEDRS_view_fix;
+/*   if CountyAssigned ^= 'INTERNATIONAL' ;*/
+   if CountyAssigned in ('EL PASO', 'PUEBLO') ;
+  Keep EventID CountyAssigned  ReportedDate  CaseStatus  Outcome
+ICU LiveInInstitution gender homeless race ethnicity reinfection 
+age_at_reported breakthrough outbreak_associated 
+hospitalized hospitalized_cophs hospdueto_cophs_icd10 deathdueto_vs_u071 DeathDate
+COPHS_AdmissionDate DateVSDeceased ;
 run;
 
-   PROC contents data=CEDRS_MOFFAT_RFI  varnum; title1 'CEDRS_MOFFAT_RFI'; run;
+   PROC contents data=Memorial  varnum; title1 'Memorial'; run;
+
+
+/*----------------------------------------------------------------------------*
+ | Ended up NOT using this code. 
+ |  Instead, ran Get.County_Rates.sas (which calls Macro.CountyRates.sas)
+ |  for El Paso county. Used Tableau to analyze patterns.
+ *----------------------------------------------------------------------------*/
+
+
+
+
+
 
 
 
@@ -31,74 +49,27 @@ run;
 ***------------------------------------------***;
 
    PROC means data= COVID.County_Population sum  maxdec=0;
-      where county = 'MOFFAT';
+      where county in ('EL PASO', 'PUEBLO') ;
       var population;
-run;
-
-
-*** Calculate mortality rate (per 100K) for Moffat county  ***;
-***--------------------------------------------------------***;
-
-title1 'COVID.CEDRS_view_fix';
-title2 'CountyAssigned = "MOFFAT"';
-
-title3 'ALL dates';
-   PROC freq data= CEDRS_MOFFAT_RFI noprint;
-      where CountyAssigned = "MOFFAT";
-      tables Outcome / out=Moffat_Sum1;
-run;
-DATA Moffat_ALL  ; set Moffat_Sum1;
-      Mortality_Rate_ALL = COUNT / (13252 / 100000) ; 
-run;
-   PROC print data= Moffat_ALL; 
-run;
-
-
-title3 "ReportedDate ge '01JUN21'd";
-   PROC freq data= CEDRS_MOFFAT_RFI noprint;
-      where CountyAssigned = "MOFFAT"  AND  ReportedDate ge '01JUN21'd;
-      tables Outcome /out=Moffat_Sum2;
-run;
-DATA Moffat_June ; set Moffat_Sum2;
-      Mortality_Rate_June = COUNT / (13252 / 100000) ; 
-run;
-   PROC print data= Moffat_June; 
+      class county;
 run;
 
 
 
-***  Get population count for Colorado  ***;
-***-------------------------------------***;
+*** MOVE to Tableau dashboard site ***;
+***--------------------------------***;
 
-   PROC means data= COVID.County_Population sum  maxdec=0;
-      var population;
+libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data'; run;
+
+DATA MyGIT.Memorial; set Memorial;
+DATA MyGIT.County_Population; set COVID.County_Population; 
+      where county in ('EL PASO', 'PUEBLO') ;
 run;
 
 
-*** Calculate mortality rate (per 100K) for Colorado  ***;
-***---------------------------------------------------***;
+   PROC contents data= EL_PASO_movavg  varnum ; run; title1 'EL_PASO_movavg';
 
-title1 'COVID.CEDRS_view_fix';
-title2 'CountyAssigned = "ALL"';
-
-title3 'ALL dates';
-   PROC freq data= CEDRS_MOFFAT_RFI noprint;
-      tables Outcome /out=CO_Sum1;
-run;
-DATA CO_ALL  ; set CO_Sum1;
-      Mortality_Rate_ALL = COUNT / (5763976 / 100000) ; 
-run;
-   PROC print data= CO_ALL; 
+   proc freq data= EL_PASO_movavg;
+      tables ReportedDate * NumDead / list ;
 run;
 
-
-title3 "ReportedDate ge '01JUN21'd";
-   PROC freq data= CEDRS_MOFFAT_RFI noprint;
-      where ReportedDate ge '01JUN21'd;
-      tables Outcome /out=CO_Sum2;
-run;
-DATA CO_June  ; set CO_Sum2;
-      Mortality_Rate_June = COUNT / (5763976 / 100000) ; 
-run;
-   PROC print data= CO_June; 
-run;

@@ -1,5 +1,5 @@
 ## Background 
-On October 5, 2021 Rachel Herlihy received an [email](./Documents/Email_request.pdf) CDC requesting aggregated data to be included in the National Notifiable Diseases Surveillance System (NNDSS). On October 12, 2021 Eduardo asked me to respond to this data request. The CDC email contained an [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx) with instructions. 
+On October 5, 2021 Rachel Herlihy received an [email](./Documents/Email_request.pdf) CDC requesting aggregated data to be included in the National Notifiable Diseases Surveillance System (NNDSS). On October 12, 2021 Eduardo asked me to respond to this data request. The CDC email contained an [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data2.xlsx) with instructions. 
 
 **Population**:  Confirmed and probable cases reported to CEDRS for Colorado residents during the 12 "MMWR" months of 2020.  **Groups**: Case status (confirmed and probable) by MMWR Month, Age Group, Sex, and Race and Ethnicity combined.  **Data requested**: Aggregated case counts for confirmed and probable cases. 
 
@@ -32,10 +32,10 @@ Here is the table of total aggregated cases by gender:
 
 ![gendertable](Images/Genders2.png)
 
-The table of aggregated cases by Race and Ethnicity are not shown here but can be found, with all of the aggregated data, in the completed [template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx).
+The table of aggregated cases by Race and Ethnicity are not shown here but can be found, with all of the aggregated data, in the completed [template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data2.xlsx).
 
 ## Response
-Final aggregated case counts have been placed in [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data.xlsx) provided by CDC.
+Final aggregated case counts have been placed in [Excel spreadsheet template](./Documents/Worksheet_2020_Aggregate_COVID-19_Data2.xlsx) provided by CDC.
 #
 
 

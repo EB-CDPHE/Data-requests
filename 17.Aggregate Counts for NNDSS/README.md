@@ -11,7 +11,7 @@ The dataset to be aggregated comes from CEDRS_View with following filters applie
 * Reported Date is between 12/19/19 and 1/2/21
 * County is NOT = "INTERNATIONAL"
 
-Total observations in filtered dataset = 353,960
+Total observations in filtered dataset = 353,958
 
 Here is the table of total aggregated cases by Case Status:
 

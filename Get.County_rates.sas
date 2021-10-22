@@ -2,7 +2,7 @@
 PROGRAM:  Get.County_rates.sas
 AUTHOR:   Eric Bush
 CREATED:  September 20, 2021
-MODIFIED:	
+MODIFIED: 102221:  Updated this macro template to match Macro.CountyRates.sas	
 PURPOSE:	 RFI on creating chart that compares case rate (7d mov avg) for NOCO vs CO
 INPUT:	 COVID.County_Population   COVID.CEDRS_view_fix	
 OUTPUT:		
@@ -99,19 +99,26 @@ Data Colorado_rate; set CEDRS_view_sort;
    by ReportedDate;
 
 * count cases per reported date *;
-   if first.ReportedDate then DO;  NumCases=0;  NumHosp=0;  NumCOPHS=0;  END;
+   if first.ReportedDate then DO;  NumCases=0;  NumHosp=0;  NumCOPHS=0;  NumDied=0; NumDead=0;  END;
       NumCases+1;
       NumHosp+hospitalized;
       NumCOPHS+hospitalized_cophs;
+      if outcome='Patient died' then NumDied+1;
+      if DeathDueTo_vs_u071 = 1 then NumDead+1;
+
 * calculate case rate  *;
    if last.ReportedDate then do;
       CaseRate=  NumCases / (&ColoPop/100000);
       HospRate=  NumHosp  / (&ColoPop/100000);
       COPHSRate= NumCOPHS / (&ColoPop/100000);
+      DiedRate= NumDied / (&CntyPop/100000);
+      MortRate= NumDead / (&CntyPop/100000);
       output;
    end;
 * drop patient level variables  *;
    drop ProfileID  EventID  Age_at_Reported  hospitalized  hospitalized_cophs   ;
+
+
 run;
 /*   proc print data= Colorado_rate ;  ID ReportedDate ;  run;*/
 
@@ -123,10 +130,14 @@ Data Colorado_dates;  merge Timeline  Colorado_rate;
    if NumCases=. then NumCases=0 ; 
    if NumHosp=. then NumHosp=0 ; 
    if NumCOPHS=. then NumCOPHS=0 ; 
+   if NumDied=. then NumDied=0 ; 
+   if NumDead=. then NumDead=0 ; 
 
    if CaseRate=. then CaseRate=0 ; 
    if HospRate=. then HospRate=0 ; 
    if COPHSRate=. then COPHSRate=0 ; 
+   if DiedRate=. then DiedRate=0 ; 
+   if MortRate=. then MortRate=0 ; 
 
 *add vars to describe population (will be missing for obs from Timeline only) *;
    County="COLORADO";  
@@ -138,8 +149,21 @@ run;
       id ReportedDate;
       convert NumCases=Cases7dAv / transformout=(movave 7);
       convert CaseRate=Rates7dAv / transformout=(movave 7);
-      convert HospRate=Hosp7dAv / transformout=(movave 7);
-      convert COPHSRate=COPHS7dAv / transformout=(movave 7);
+      convert HospRate=Hosp7dAv  / transformout=(movave 7);
+      convert COPHSRate=COPHS7dAv/ transformout=(movave 7);
+      convert DiedRate=Died7dAv  / transformout=(movave 7);
+      convert MortRate=Mort7dAv  / transformout=(movave 7);
+
+**  Calculate 14-day moving averages  **;
+   PROC expand data=Colorado_dates   out=Colorado_MovingAverage  method=none;
+      id ReportedDate;
+      convert NumCases=Cases14dAv / transformout=(movave 14);
+      convert CaseRate=Rates14dAv / transformout=(movave 14);
+      convert HospRate=Hosp14dAv  / transformout=(movave 14);
+      convert COPHSRate=COPHS14dAv/ transformout=(movave 14);
+      convert DiedRate=Died14dAv  / transformout=(movave 14);
+      convert MortRate=Mort14dAv  / transformout=(movave 14);
+
 run;
 
 
@@ -149,8 +173,9 @@ run;
 
 ** Run macro **;
 
-/*%inc 'C:\Users\eabush\Documents\My SAS Files\Code\macro.CountyRates.sas' ;*/
+%include "C:\Users\eabush\Documents\My SAS Files\Code\macro.CountyRates.sas" ;
 
+%inc 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\SAS code\Macro.CountyRates.sas';
 
 ** Selected County  **;
 
@@ -207,7 +232,7 @@ run;
 
 libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 
-DATA DASH.All_County_movavg ;  set All_County_movavg; 
+DATA DASH.EL_PASO_movavg ;  set EL_PASO_movavg; 
 run;
 
 DATA DASH.CO_County_movavg; set  Colorado_MovingAverage   All_County_movavg;

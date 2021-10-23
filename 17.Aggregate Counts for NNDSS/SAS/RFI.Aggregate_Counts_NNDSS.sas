@@ -2,7 +2,8 @@
 PROGRAM:  RFI.Aggregate_Counts_NNDSS.sas
 AUTHOR:   Eric Bush
 CREATED:  October 15, 2021
-MODIFIED: 102221: Added Race format to combine "Multiple" and "Other"
+MODIFIED: 102321: Put copy of dataset used to generate aggregate numbers into RFI folder
+          102221: Added Race format to combine "Multiple" and "Other"
           101821: Finished / finalized work. 
 PURPOSE:	 Create summary output for NNDSS spreadsheet for requested aggregated data
 INPUT:	 	  
@@ -259,3 +260,12 @@ title3 "CaseStatus = 'probable'";
 run;
 
 title;
+
+
+***  Store dataset that generated FINAL numbers  ***;
+***----------------------------------------------***;
+
+libname RFI 'C:\Users\eabush\Documents\GitHub\Data-requests\17.Aggregate Counts for NNDSS\Output data'; run;
+
+DATA RFI.NNDSS_data; set NNDSS_data;
+run;

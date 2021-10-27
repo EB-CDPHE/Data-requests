@@ -44,6 +44,13 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 DATA COVID.CEDRS_view_fix ;  set CEDRS_view_read ;
 ** 1) new county variable  **;
    County = upcase(scan(CountyAssigned,1,',')); 
+
+** 2) bad age values **;
+   if EventID= 1260717 then Age_at_Reported=63;
+   if EventID= 1294530 then Age_at_Reported=46;
+   if EventID= 1392304 then Age_at_Reported=42;
+
+
 run;
 
 

@@ -20,7 +20,7 @@ OUTPUT:	printed output
  *--------------------------------------------------------------------*/
 
 
-%LET ChkDSN = 'CEDRS_view_read';       * <-- ENTER name of CEDRS dataset to run data checks against;
+%LET ChkDSN = CEDRS_view_read;       * <-- ENTER name of CEDRS dataset to run data checks against;
 
 
 ***  Access CEDRS.view using ODBC  ***;
@@ -69,9 +69,9 @@ run;
 
 * 2.1) Records where Age_at_Reported > 105;
    PROC print data= &ChkDSN;
-      where Age_at_Reported > 105 ;
+      where Age_at_Reported = 121 ;
       id ProfileID;
-      var EventID Age_Group Age_at_Reported ;
+      var EventID ReportedDate Age_at_Reported ;
 run;
 
 /*___________________________________________________________*
@@ -117,6 +117,11 @@ run;
  |                                                                            |
  | FIX: create and apply ICU_fmt that combines "Unknown" with "NO" values.    |
  *____________________________________________________________________________*/
+
+   PROC freq data= &ChkDSN ;
+      tables hospitalized_cophs * hospdueto_cophs_icd10 /list;
+run;
+
 
 
 

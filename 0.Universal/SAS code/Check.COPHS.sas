@@ -18,9 +18,17 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
  | 1. Duplicate records (per MR_Number)
  |    1.1) Records with 4 or more admissions
  |    1.2) Duplicate records with same Hospital admission date
- | 2. Missing positive test dates
- | 3. Check that Grand county records are in Colorado and NOT Utah
- | 4. Invalid values for County_of_Residence variable
+ | 2. List of records with missing First name
+ | 3. List of records with missing Last name
+ | 4. Gender data
+ | 5. City data
+ | 6. Zip code data
+ | 7. Check that Grand county records are in Colorado and NOT Utah
+ | 8. Invalid values for County_of_Residence variable
+ | 9. DOB
+ | 10. Missing positive test dates
+
+
  | -->  HOSPITAL level variables  <--
  | 5. Invalid Hospital admission dates
  | 6. Race
@@ -160,6 +168,10 @@ run;
  *_____________________________________________________________________________________________________________________*/
 
 
+
+***  2. First name  ***;
+***------------------***;
+
 ** First name **;
    PROC freq data= COPHS_read;
       tables First_Name / missing missprint;
@@ -202,7 +214,9 @@ run;
  *________________________________________________________________________________________*/
 
 
-** Last name **;
+***  3. Last name  ***;
+***------------------***;
+
    PROC freq data= COPHS_read;
       tables Last_Name / missing missprint;
 run;
@@ -240,6 +254,9 @@ run;
  *____________________________________________________________________________________*/
 
 
+***  4. Gender data  ***;
+***------------------***;
+
 ** Gender **;
    PROC freq data= COPHS_read;
       tables Gender / missing missprint;
@@ -260,6 +277,9 @@ run;
       title2 'bad values for Gender';
 run;
 
+
+***  5. City  ***;
+***-----------***;
 
 ** City **;
    PROC freq data= COPHS_read;
@@ -330,7 +350,7 @@ run;
 
 
 
-***  x. Invalid zip codes  ***;
+***  6. Invalid zip codes  ***;
 ***------------------------***;
 **  Check range of zip codes  **;
    PROC freq data= COPHS_read ;
@@ -429,14 +449,13 @@ run;
 
 
 
-***  3. Check that all Grand county records are in Colorado and NOT in Grand county, Utah  ***;
+***  7. Check that all Grand county records are in Colorado and NOT in Grand county, Utah  ***;
 ***----------------------------------------------------------------------------------------***;
 
    PROC freq data= COPHS_read;
       where upcase(County_of_Residence) = 'GRAND';
       tables  CO * County_of_Residence * City * Zip_Code / list;
 run;
-
 
 /*______________________________________________________________________________________________________________*
  | FINDINGS:
@@ -448,8 +467,7 @@ run;
  *______________________________________________________________________________________________________________*/
 
 
-
-***  4. Check county variable  ***;
+***  8. Check county variable  ***;
 ***----------------------------***;
 
 * Proc format to define valid Colorado county names;
@@ -536,9 +554,8 @@ DATA ChkHospCounty; set COPHS_read;
 run;
 
 
-*** DOB ***;
-***-----***;
-
+***  9. DOB  ***;
+***----------***;
 
 **  How many COPHS records are there?  **;
    PROC means data= COPHS_read n nmiss ;
@@ -584,11 +601,7 @@ run;
 
 
 
-
-
-
-
-***  x. Missing positive test dates - are they mostly recent admissions?  ***;
+***  10. Missing positive test dates - are they mostly recent admissions?  ***;
 ***-----------------------------------------------------------------------***;
 
 /*

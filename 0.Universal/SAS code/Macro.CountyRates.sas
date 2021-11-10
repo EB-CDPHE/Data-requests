@@ -127,6 +127,9 @@ run;
       convert COPHSRate=COPHS7dAv / transformout=(movave 7);
       convert DiedRate=Died7dAv / transformout=(movave 7);
       convert MortRate=Mort7dAv / transformout=(movave 7);
+run;
+
+** CAN ONLY DO 7d OR 14d as written. **;
 
 **  Calculate 14-day moving averages  **;
 /*   PROC expand data=&County_Name._dates   out=&County_Name._movavg  method=none;*/
@@ -137,7 +140,7 @@ run;
 /*      convert COPHSRate=COPHS14dAv / transformout=(movave 14);*/
 /*      convert DiedRate=Died14dAv / transformout=(movave 14);*/
 /*      convert MortRate=Mort14dAv / transformout=(movave 14);*/
-/*run;*/
+run;
 
 * delete temp datasets not needed *;
 proc datasets library=work NOlist ;

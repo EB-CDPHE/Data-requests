@@ -8,7 +8,7 @@ INPUT:
 OUTPUT:		
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
-options ps=50 ls=150 ;     * Landscape pagesize settings *;
+/*options ps=50 ls=150 ;     * Landscape pagesize settings *;*/
 
 title;  options pageno=1;
 
@@ -21,15 +21,18 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
    PROC contents data=COVID.CEDRS_view_fix varnum;  title1 'COVID.CEDRS_view_fix'; 
 run;
 
-proc freq data=COVID.CEDRS_view_fix  ; tables CountyAssigned *County /list; run;
+/*proc freq data=COVID.CEDRS_view_fix  ; tables CountyAssigned ; run;*/
 
 
 DATA DASH.CEDRS;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL' ;
    Keep ProfileID EventID CountyAssigned  ReportedDate  CaseStatus  Outcome  Gender  Race  Ethnicity  Age_at_Reported 
-        Hospitalized  hospitalized_cophs  deathdueto_vs_u071  Reinfection  Breakthrough Vax_UTD  County AgeGroup;
+        Hospitalized  hospitalized_cophs  deathdueto_vs_u071  Reinfection  Breakthrough  outbreak_associated
+        Vax_UTD  County AgeGrp  Days_since_Vax_UTD;
 
    County = propcase(CountyAssigned);
+
+   Days_since_Vax_UTD = Age_at_Reported  -  Vax_UTD ;
 
    if 0 le Age_at_Reported   < 5 then AgeGrp='1' ;
    else if 5 le Age_at_Reported  < 10 then AgeGrp='2' ;
@@ -51,6 +54,7 @@ DATA DASH.CEDRS;  set COVID.CEDRS_view_fix;
    else if 85 le Age_at_Reported < 90 then AgeGrp='18';
    else if 90 le Age_at_Reported < 95 then AgeGrp='19';
    else if 95 le Age_at_Reported <120 then AgeGrp='20';
+   else AgeGrp='0';  * for missing and unknown values;
 
 run;
 

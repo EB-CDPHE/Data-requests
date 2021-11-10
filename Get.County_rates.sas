@@ -51,7 +51,7 @@ OPTIONS pageno=1;
 DATA timeline;
    ReportedDate='01MAR20'd;
    output;
-   do t = 1 to 600;
+   do t = 1 to 630;
       ReportedDate+1;
       output;
    end;
@@ -67,7 +67,8 @@ proc print data= timeline;  run;
 
 DATA CEDRS_view_fix;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL' ;
-   keep ProfileID  EventID  ReportedDate  Age_at_Reported  County  hospitalized  hospitalized_cophs ;
+   keep ProfileID  EventID  ReportedDate  Age_at_Reported  County  hospitalized  hospitalized_cophs  
+        Outcome   DeathDueTo_vs_u071 ;
 run;
 
    PROC contents data=CEDRS_view_fix varnum ;  title1 'CEDRS_view_fix';  run;
@@ -111,8 +112,8 @@ Data Colorado_rate; set CEDRS_view_sort;
       CaseRate=  NumCases / (&ColoPop/100000);
       HospRate=  NumHosp  / (&ColoPop/100000);
       COPHSRate= NumCOPHS / (&ColoPop/100000);
-      DiedRate= NumDied / (&CntyPop/100000);
-      MortRate= NumDead / (&CntyPop/100000);
+      DiedRate= NumDied / (&ColoPop/100000);
+      MortRate= NumDead / (&ColoPop/100000);
       output;
    end;
 
@@ -158,14 +159,14 @@ run;
       convert MortRate=Mort7dAv  / transformout=(movave 7);
 
 **  Calculate 14-day moving averages  **;
-   PROC expand data=Colorado_dates   out=Colorado_MovingAverage  method=none;
-      id ReportedDate;
-      convert NumCases=Cases14dAv / transformout=(movave 14);
-      convert CaseRate=Rates14dAv / transformout=(movave 14);
-      convert HospRate=Hosp14dAv  / transformout=(movave 14);
-      convert COPHSRate=COPHS14dAv/ transformout=(movave 14);
-      convert DiedRate=Died14dAv  / transformout=(movave 14);
-      convert MortRate=Mort14dAv  / transformout=(movave 14);
+/*   PROC expand data=Colorado_dates   out=Colorado_MovingAverage  method=none;*/
+/*      id ReportedDate;*/
+/*      convert NumCases=Cases14dAv / transformout=(movave 14);*/
+/*      convert CaseRate=Rates14dAv / transformout=(movave 14);*/
+/*      convert HospRate=Hosp14dAv  / transformout=(movave 14);*/
+/*      convert COPHSRate=COPHS14dAv/ transformout=(movave 14);*/
+/*      convert DiedRate=Died14dAv  / transformout=(movave 14);*/
+/*      convert MortRate=Mort14dAv  / transformout=(movave 14);*/
 
 run;
 
@@ -235,8 +236,8 @@ run;
 
 libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 
-DATA DASH.EL_PASO_movavg ;  set EL_PASO_movavg; 
-run;
+/*DATA DASH.EL_PASO_movavg ;  set EL_PASO_movavg; */
+/*run;*/
 
 DATA DASH.CO_County_movavg; set  Colorado_MovingAverage   All_County_movavg;
 run;

@@ -32,7 +32,7 @@ DATA DASH.CEDRS;  set COVID.CEDRS_view_fix;
 
    County = propcase(CountyAssigned);
 
-   Days_since_Vax_UTD = Age_at_Reported  -  Vax_UTD ;
+   If (Vax_UTD ne .) AND (Age_at_Reported > '01DEC20'd ) then Days_since_Vax_UTD = Vax_UTD - Age_at_Reported  ;
 
    if 0 le Age_at_Reported   < 5 then AgeGrp='1' ;
    else if 5 le Age_at_Reported  < 10 then AgeGrp='2' ;

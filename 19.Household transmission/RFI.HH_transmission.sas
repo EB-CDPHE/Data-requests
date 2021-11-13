@@ -21,16 +21,35 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 *** Check filter variables ***;
 ***------------------------***;
 
+* Completeness of ReportedDate *;
    PROC means data= COVID.CEDRS_view_fix  n nmiss;  var ReportedDate;  run;
-   PROC freq data= COVID.CEDRS_view_fix;  tables LiveInInstitution ;  run;
+
+  * Number of records in time reference period *;
+  PROC means data= COVID.CEDRS_view_fix  n nmiss;  
+   where ('01SEP20'd le  ReportedDate  le '01NOV20'd ) OR ('01SEP21'd le  ReportedDate  le '01NOV21'd) ;
+   var ReportedDate;  
+run;
+
+  * Number of records where CountyAssigned = 'INTERNATIONAL' *;
+  PROC freq data= COVID.CEDRS_view_fix ;  
+   where CountyAssigned = 'INTERNATIONAL' ;
+   tables CountyAssigned;  
+run;
+
+ * Number of records where LiveInInstitution NE 'Yes' *;
+  PROC freq data= COVID.CEDRS_view_fix;  tables LiveInInstitution ;  run;
+
+
 
 
 *** Create local copy of data for selected variables  ***;
 ***---------------------------------------------------***;
 
-DATA CEDRS_fix;  set COVID.CEDRS_view_fix;
+DATA CEDRS_HH;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  AND
-   (  ('01SEP20'd le  ReportedDate  le '01NOV20'd ) OR ('01SEP21'd le  ReportedDate  le '01NOV21'd)  ) ;
+   (  ('01SEP20'd le  ReportedDate  le '01NOV20'd ) OR ('01SEP21'd le  ReportedDate  le '01NOV21'd)  ) 
+      AND LiveInInstitution ne 'Yes';
+
    Keep  ProfileID EventID CountyAssigned  ReportedDate  CaseStatus  Outcome   Age_at_Reported AgeGrp
          Transmission_Type  LiveInInstitution  ExposureFacilityName  ExposureFacilityType 
          Gender  Homeless  Race  Ethnicity  Outbreak_Associated  Symptomatic  OnsetDate
@@ -58,10 +77,9 @@ DATA CEDRS_fix;  set COVID.CEDRS_view_fix;
    else if 95 le Age_at_Reported <120 then AgeGrp='20';
    else AgeGrp='0';  * for missing and unknown values;
 
-
 run;
 
-   PROC contents data=CEDRS_fix  varnum; title1 'CEDRS_fix'; run;
+   PROC contents data=CEDRS_HH  varnum; title1 'CEDRS_HH'; run;
 
 
 

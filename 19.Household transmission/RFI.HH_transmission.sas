@@ -70,7 +70,7 @@ DATA CEDRS_HH;  set CEDRS_view_fix;
    if ProfileID= '1805723' then Address_City='CANON CITY';
    if ProfileID= '863619' then DO; Address_City='ALAMOSA'; Address_State='CO';  Address_zipcode='81101'; END;
    if ProfileID= '1810320' then Address_City='DENVER';
-   if ProfileID= '' then Address_City='';
+   if ProfileID= '997479' then Address_City='CANON CITY';
    if ProfileID= '' then Address_City='';
    if ProfileID= '' then Address_City='';
    if ProfileID= '' then Address_City='';

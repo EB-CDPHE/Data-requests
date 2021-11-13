@@ -50,36 +50,41 @@ DATA CEDRS_HH;  set COVID.CEDRS_view_fix;
    (  ('01SEP20'd le  ReportedDate  le '01NOV20'd ) OR ('01SEP21'd le  ReportedDate  le '01NOV21'd)  ) 
       AND LiveInInstitution ne 'Yes';
 
-   Keep  ProfileID EventID CountyAssigned  ReportedDate  CaseStatus  Outcome   Age_at_Reported AgeGrp
+   Keep  ProfileID EventID CountyAssigned  ReportedDate  CaseStatus  Outcome   Age_at_Reported 
          Transmission_Type  LiveInInstitution  ExposureFacilityName  ExposureFacilityType 
          Gender  Homeless  Race  Ethnicity  Outbreak_Associated  Symptomatic  OnsetDate
          Address:  ;
 
-   if 0 le Age_at_Reported   < 5 then AgeGrp='1' ;
-   else if 5 le Age_at_Reported  < 10 then AgeGrp='2' ;
-   else if 10 le Age_at_Reported < 15 then AgeGrp='3' ;
-   else if 15 le Age_at_Reported < 20 then AgeGrp='4' ;
-   else if 20 le Age_at_Reported < 25 then AgeGrp='5' ;
-   else if 25 le Age_at_Reported < 30 then AgeGrp='6' ;
-   else if 30 le Age_at_Reported < 35 then AgeGrp='7' ;
-   else if 35 le Age_at_Reported < 40 then AgeGrp='8' ;
-   else if 40 le Age_at_Reported < 45 then AgeGrp='9' ;
-   else if 45 le Age_at_Reported < 50 then AgeGrp='10';
-   else if 50 le Age_at_Reported < 55 then AgeGrp='11';
-   else if 55 le Age_at_Reported < 60 then AgeGrp='12';
-   else if 60 le Age_at_Reported < 65 then AgeGrp='13';
-   else if 65 le Age_at_Reported < 70 then AgeGrp='14';
-   else if 70 le Age_at_Reported < 75 then AgeGrp='15';
-   else if 75 le Age_at_Reported < 80 then AgeGrp='16';
-   else if 80 le Age_at_Reported < 85 then AgeGrp='17';
-   else if 85 le Age_at_Reported < 90 then AgeGrp='18';
-   else if 90 le Age_at_Reported < 95 then AgeGrp='19';
-   else if 95 le Age_at_Reported <120 then AgeGrp='20';
-   else AgeGrp='0';  * for missing and unknown values;
-
 run;
 
    PROC contents data=CEDRS_HH  varnum; title1 'CEDRS_HH'; run;
+
+   PROC format;
+      value AgeFmt
+         0-<5='0-4 yo'
+         5-<12='5-11 yo'
+         12-<18='12-17 yo'
+         18-115='Adult' ;
+
+***  Size of sub-population groups  ***;
+   PROC freq data= CEDRS_HH ;
+      tables ReportedDate  Age_at_Reported ;
+      format ReportedDate  monyy.  Age_at_Reported  AgeFmt. ;
+run;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

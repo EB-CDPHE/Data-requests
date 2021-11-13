@@ -65,6 +65,27 @@ DATA CEDRS_HH;  set CEDRS_view_fix;
 
    If Address_City=''  AND  Address2 in ('LOVELAND','WELLINGTON')  then Address_City=Address2; 
 
+   * Fix missing city values *;
+   if ProfileID= '1790803' then Address_City='GRAND JUNCTION';
+   if ProfileID= '1805723' then Address_City='CANON CITY';
+   if ProfileID= '863619' then DO; Address_City='ALAMOSA'; Address_State='CO';  Address_zipcode='81101'; END;
+   if ProfileID= '1810320' then Address_City='DENVER';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+   if ProfileID= '' then Address_City='';
+
 run;
 
    PROC contents data=CEDRS_HH  varnum; title1 'CEDRS_HH'; run;
@@ -75,6 +96,11 @@ run;
          5-<12='5-11 yo'
          12-<18='12-17 yo'
          18-115='Adult' ;
+
+      value $AnyDataFmt
+         ' '='Missing data'
+         other='Has data' ;       
+
 run;
 
 
@@ -92,6 +118,7 @@ run;
 *** Check address data for grouping cases into HH ***;
 ***-----------------------------------------------***;
 
+* Address *;
    PROC freq data= CEDRS_HH ;
       where Address1 = '';
       tables Address1 Address2 AddressActual / missing missprint;
@@ -104,7 +131,7 @@ run;
  | FIX:  If Address1='' and Address2^='' then Address1=Address2;
  *--------------------------------------------------------------------*/
 
-
+* City *;
    PROC freq data= CEDRS_HH ;
       where Address_City = '';
       tables Address1 Address2 AddressActual  Address_City Address_CityActual / missing missprint;
@@ -113,17 +140,38 @@ run;
 /*--------------------------------------------------------------------*
  |FINDINGS:
  | n=465 obs missing data for Address_City, Address_CityActual, and AddressActual
- | N=52 obs where Address1='' and Address2 contains data. THEREFORE:
- | FIX:  If Address1='' and Address2^='' then Address1=Address2;
  *--------------------------------------------------------------------*/
 
+* Lat / Long *;
+   PROC freq data= CEDRS_HH ;
+      where Address_Latitude = ''  OR  Address_Longitude = '';
+      tables Address_Latitude * Address_Longitude  / missing missprint;
+run;
+
+/*--------------------------------------------------------------------*
+ |FINDINGS:
+ | n=7177 obs missing data Address_Latitude and Address_Longitude
+ *--------------------------------------------------------------------*/
+
+ 
+   PROC freq data= CEDRS_HH  order=freq;
+      tables Address1 * Address2 * Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1  Address2  Address_City  Address_State  Address_Zipcode $AnyDataFmt.;
+run;
+
+   PROC freq data= CEDRS_HH  order=freq;
+      tables Address1 *  Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1   Address_City  Address_State  Address_Zipcode $AnyDataFmt.;
+run;
 
 
-
-
-
-
-
+*** Print out obs that have address1 data but missing city ***;
+   PROC print data= CEDRS_HH;
+      where Address1 ^= '' AND  Address_City='';
+      id ProfileID;
+      var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
+      format Address1 $35.  Address_City  $10. ;
+run;
 
 
 

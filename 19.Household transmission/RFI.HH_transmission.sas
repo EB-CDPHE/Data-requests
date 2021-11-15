@@ -71,6 +71,13 @@ DATA CEDRS_HH;  set CEDRS_view_fix;
    if ProfileID= '863619' then DO; Address_City='ALAMOSA'; Address_State='CO';  Address_zipcode='81101'; END;
    if ProfileID= '1810320' then Address_City='DENVER';
    if ProfileID= '997479' then Address_City='CANON CITY';
+   if ProfileID= '1829366' then Address_City='PUEBLO';
+   if ProfileID= '1829683' then Address_City='ELIZABETH';
+   if ProfileID= '1830842' then Address_City='ALAMOSA';
+   if ProfileID= '1841660' then Address_City='CANON CITY';
+   if ProfileID= '1843376' then Address_City='CANON CITY';
+   if ProfileID= '1274716.1' then DO;  Address_City='CENTENNIAL';  Address_zipcode='80112';  END; *Arapahoe County Detention Center;
+   if ProfileID= '1859049' then Address_City='CANON CITY';
    if ProfileID= '' then Address_City='';
    if ProfileID= '' then Address_City='';
    if ProfileID= '' then Address_City='';
@@ -78,13 +85,9 @@ DATA CEDRS_HH;  set CEDRS_view_fix;
    if ProfileID= '' then Address_City='';
    if ProfileID= '' then Address_City='';
    if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
+
+   if (Address_Zipcode in '' AND  Address_State='');
+   if then Full_Address=1;
 
 run;
 
@@ -142,6 +145,7 @@ run;
  | n=465 obs missing data for Address_City, Address_CityActual, and AddressActual
  *--------------------------------------------------------------------*/
 
+
 * Lat / Long *;
    PROC freq data= CEDRS_HH ;
       where Address_Latitude = ''  OR  Address_Longitude = '';
@@ -153,7 +157,20 @@ run;
  | n=7177 obs missing data Address_Latitude and Address_Longitude
  *--------------------------------------------------------------------*/
 
- 
+
+* Zipcode *;
+   PROC freq data= CEDRS_HH ;
+      tables Address_Zipcode / missing missprint;
+run;
+
+/*-------------------------------------------------------------------------*
+ |FINDINGS:
+ | For zipcode with 9 digits need to insert '-'.
+ | Then need to create numeric zipcode from first 'word' 
+ | Then can use zipcode range (80000 - 81700) to fill in missing State
+ *-------------------------------------------------------------------------*/
+
+ * Records with full address *;
    PROC freq data= CEDRS_HH  order=freq;
       tables Address1 * Address2 * Address_City * Address_State * Address_Zipcode / list missing missprint;
       format Address1  Address2  Address_City  Address_State  Address_Zipcode $AnyDataFmt.;
@@ -164,6 +181,10 @@ run;
       format Address1   Address_City  Address_State  Address_Zipcode $AnyDataFmt.;
 run;
 
+/*-------------------------------------------------*
+ |FINDINGS:
+ | n=178,110 (98%) of records have full address
+ *-------------------------------------------------*/
 
 *** Print out obs that have address1 data but missing city ***;
    PROC print data= CEDRS_HH;
@@ -172,6 +193,37 @@ run;
       var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
       format Address1 $35.  Address_City  $10. ;
 run;
+
+*** Print out obs that have Zipcode data but missing State ***;
+   PROC print data= CEDRS_HH;
+      where Address_Zipcode ^= '' AND  Address_State='';
+      id ProfileID;
+      var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
+      format Address1 $35.  Address_City  $20. ;
+run;
+
+
+
+*** PRINT records with complete address ***;
+***-------------------------------------***;
+
+   proc sort data=CEDRS_HH
+               out=HH_address;
+      by CountyAssigned  Address_City  address1 ;
+run;
+
+   PROC print data= HH_address(obs=10000);
+      where address1 ne '';
+      ID ProfileID;
+      var CountyAssigned  Address_City  address1 ;
+run;
+
+
+DATA HH_address ;  set HH_define ;
+   by address1 ;
+
+
+
 
 
 

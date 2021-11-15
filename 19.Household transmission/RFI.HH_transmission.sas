@@ -218,10 +218,30 @@ run;
       var CountyAssigned  Address_City  address1 ;
 run;
 
+   proc freq data= HH_address noprint;
+      where address1 ^= '';
+      tables address1 / out=HHcount;
+run;
+   proc freq data=HHcount; tables count; run;
+proc print data=HHcount; where count>1; run;
 
-DATA HH_address ;  set HH_define ;
-   by address1 ;
 
+DATA HH_define ;  set  HH_address;
+      by CountyAssigned  Address_City  address1 ;
+   if first.Address1 then do;  Num_HH=0; Num_Minors=0;  end;
+   Num_HH+1;
+   if 0 < Age_at_reported < 18 then Num_Minors+1;
+   if last.Address1 then output;
+run;
+
+proc freq data= HH_define; 
+tables Num_HH  Num_Minors; 
+run;
+
+proc freq data= HH_define; 
+   where 1 le Num_HH le 20;
+tables Num_HH * Num_Minors /missing missprint   ; 
+run;
 
 
 

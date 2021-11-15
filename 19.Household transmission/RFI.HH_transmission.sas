@@ -40,15 +40,11 @@ run;
   PROC freq data= COVID.CEDRS_view_fix;  tables LiveInInstitution ;  run;
 
 
-DATA CEDRS_view_fix;  set COVID.CEDRS_view_fix;
-   if CollectionDate = . then CollectionDate = ReportedDate;
-run;
 
+*** Filter data  ***;
+***------------***;
 
-*** Create local copy of data for selected variables  ***;
-***---------------------------------------------------***;
-
-DATA CEDRS_HH;  set CEDRS_view_fix;
+DATA CEDRS_filtered;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  AND
    (  ('01SEP20'd le  ReportedDate  le '01NOV20'd ) OR ('01SEP21'd le  ReportedDate  le '01NOV21'd)  ) 
       AND LiveInInstitution ne 'Yes';
@@ -57,15 +53,117 @@ DATA CEDRS_HH;  set CEDRS_view_fix;
          Transmission_Type  LiveInInstitution  ExposureFacilityName  ExposureFacilityType 
          Gender  Homeless  Race  Ethnicity  Outbreak_Associated  Symptomatic  OnsetDate
          CollectionDate   Address:  ;
+run;
 
-   If Address1='' and Address2^='' then Address1=Address2; else
-   If Address1='' and AddressActual^='' then Address1=AddressActual;
 
-   IF Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN') then Address1='';
+
+*** Check completeness of address data ***;
+***------------------------------------***;
+
+* Address1 missing *;
+   PROC freq data= CEDRS_filtered ;
+      where Address1 = '';
+      tables Address1 Address2 AddressActual / missing missprint;
+run;
+/*--------------------------------------------------------------------*
+ |FINDINGS:
+ | n=729 obs missing data for Address1 and Address2
+ | N=52 obs where Address1='' and Address2 contains data. THEREFORE:
+ | FIX:  If Address1='' and Address2^='' then Address1=Address2;
+ *--------------------------------------------------------------------*/
+
+
+* City missing *;
+   PROC freq data= CEDRS_filtered ;
+      where Address_City = '';
+      tables Address1 Address2 AddressActual  Address_City Address_CityActual / missing missprint;
+run;
+/*----------------------------------------------------------------------------------*
+ |FINDINGS:
+ | n=465 obs missing data for Address_City, Address_CityActual, and AddressActual
+ *----------------------------------------------------------------------------------*/
+
+
+* County *;
+   PROC freq data= CEDRS_filtered ;
+      where CountyAssigned = '';
+      tables Address1 Address2 AddressActual  Address_City  Address_CityActual  CountyAssigned / missing missprint;
+run;
+/*---------------------------------------------------*
+ |FINDINGS:
+ | NO obs have missing data for CountyAssigned
+ *--------------------------------------------------*/
+
+
+* Lat / Long *;
+   PROC freq data= CEDRS_filtered ;
+      where Address_Latitude = ''  OR  Address_Longitude = '';
+      tables Address_Latitude * Address_Longitude  / missing missprint;
+run;
+
+/*--------------------------------------------------------------------*
+ |FINDINGS:
+ | n=7177 obs missing data Address_Latitude and Address_Longitude
+ *--------------------------------------------------------------------*/
+
+
+* Zipcode *;
+   PROC freq data= CEDRS_filtered ;
+      tables Address_Zipcode / missing missprint;
+run;
+
+/*-------------------------------------------------------------------------*
+ |FINDINGS:
+ | For zipcode with 9 digits need to insert '-'.
+ | Then need to create numeric zipcode from first 'word' 
+ | Then can use zipcode range (80000 - 81700) to fill in missing State
+ *-------------------------------------------------------------------------*/
+
+
+
+*** Records by completeness of components of a complete address ***;
+***-------------------------------------------------------------***;
+
+   PROC format;
+      value $AnyDataFmt
+         ' '='Missing data'
+         other='Has data' ;       
+run;
+
+ * Records with full address *;
+   PROC freq data= CEDRS_filtered  order=freq;
+      tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1   Address_City   Address_State   Address_Zipcode $AnyDataFmt.;
+run;
+/*---------------------------------------------------------------------------------------*
+ |FINDINGS:
+ | n=178,110 (98%) of records have full address
+ | n= 53 obs with address1 data but missing City and 40 of those have State and Zip
+ |    Easy fix: Google these street addresses to find City.
+ | n= 2703 that have street address and city, but missing State.
+ |    Don't use State then for defining Households.
+ | Define HH by dup of Address1, City, County fields.
+ *---------------------------------------------------------------------------------------*/
+
+
+
+*** Edit data  ***;
+***------------***;
+
+DATA CEDRS_filtered2;  set CEDRS_filtered;
+
+* impute missing collectiondates *;
+   if CollectionDate = . then CollectionDate = ReportedDate;
+
+* clean up Address1 data *;
+   if Address1='' and Address2^='' then Address1=Address2; 
+   else if Address1='' and AddressActual^='' then Address1=AddressActual;
+
+   if Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN') then Address1='';
 
    If Address_City=''  AND  Address2 in ('LOVELAND','WELLINGTON')  then Address_City=Address2; 
 
-   * Fix missing city values *;
+* clean up missing city values *;
    if ProfileID= '1790803' then Address_City='GRAND JUNCTION';
    if ProfileID= '1805723' then Address_City='CANON CITY';
    if ProfileID= '863619' then DO; Address_City='ALAMOSA'; Address_State='CO';  Address_zipcode='81101'; END;
@@ -78,20 +176,34 @@ DATA CEDRS_HH;  set CEDRS_view_fix;
    if ProfileID= '1843376' then Address_City='CANON CITY';
    if ProfileID= '1274716.1' then DO;  Address_City='CENTENNIAL';  Address_zipcode='80112';  END; *Arapahoe County Detention Center;
    if ProfileID= '1859049' then Address_City='CANON CITY';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
-   if ProfileID= '' then Address_City='';
+/*   if ProfileID= '' then Address_City='';*/
+/*   if ProfileID= '' then Address_City='';*/
+/*   if ProfileID= '' then Address_City='';*/
+/*   if ProfileID= '' then Address_City='';*/
+/*   if ProfileID= '' then Address_City='';*/
+/*   if ProfileID= '' then Address_City='';*/
+/*   if ProfileID= '' then Address_City='';*/
 
-   if (Address_Zipcode in '' AND  Address_State='');
-   if then Full_Address=1;
+/*   if (Address_Zipcode in '' AND  Address_State='');*/
+/*   if then Full_Address=1;*/
 
 run;
 
-   PROC contents data=CEDRS_HH  varnum; title1 'CEDRS_HH'; run;
+   PROC contents data=CEDRS_filtered2  varnum; title1 'CEDRS_filtered2'; run;
+
+
+
+*** Print out records that have address1 data but missing city ***;
+   PROC print data= CEDRS_filtered2;
+      where Address1 ^= '' AND  Address_City='';
+      id ProfileID;
+      var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
+      format Address1 $35.  Address_City  $10. ;
+run;
+
+
+
+
 
    PROC format;
       value AgeFmt
@@ -99,11 +211,6 @@ run;
          5-<12='5-11 yo'
          12-<18='12-17 yo'
          18-115='Adult' ;
-
-      value $AnyDataFmt
-         ' '='Missing data'
-         other='Has data' ;       
-
 run;
 
 
@@ -118,81 +225,17 @@ run;
    PROC means data= CEDRS_HH  n nmiss;  var ReportedDate CollectionDate;  run;
 
 
-*** Check address data for grouping cases into HH ***;
-***-----------------------------------------------***;
 
-* Address *;
-   PROC freq data= CEDRS_HH ;
-      where Address1 = '';
-      tables Address1 Address2 AddressActual / missing missprint;
+ * Records with County, City and Address1 *;
+   PROC freq data= CEDRS_filtered2  order=freq;
+      tables Address1 * Address_City * CountyAssigned / list missing missprint;
+      format Address1  Address_City  CountyAssigned $AnyDataFmt.;
 run;
 
-/*--------------------------------------------------------------------*
- |FINDINGS:
- | n=729 obs missing data for Address1 and Address2
- | N=52 obs where Address1='' and Address2 contains data. THEREFORE:
- | FIX:  If Address1='' and Address2^='' then Address1=Address2;
- *--------------------------------------------------------------------*/
-
-* City *;
-   PROC freq data= CEDRS_HH ;
-      where Address_City = '';
-      tables Address1 Address2 AddressActual  Address_City Address_CityActual / missing missprint;
-run;
-
-/*--------------------------------------------------------------------*
- |FINDINGS:
- | n=465 obs missing data for Address_City, Address_CityActual, and AddressActual
- *--------------------------------------------------------------------*/
 
 
-* Lat / Long *;
-   PROC freq data= CEDRS_HH ;
-      where Address_Latitude = ''  OR  Address_Longitude = '';
-      tables Address_Latitude * Address_Longitude  / missing missprint;
-run;
-
-/*--------------------------------------------------------------------*
- |FINDINGS:
- | n=7177 obs missing data Address_Latitude and Address_Longitude
- *--------------------------------------------------------------------*/
 
 
-* Zipcode *;
-   PROC freq data= CEDRS_HH ;
-      tables Address_Zipcode / missing missprint;
-run;
-
-/*-------------------------------------------------------------------------*
- |FINDINGS:
- | For zipcode with 9 digits need to insert '-'.
- | Then need to create numeric zipcode from first 'word' 
- | Then can use zipcode range (80000 - 81700) to fill in missing State
- *-------------------------------------------------------------------------*/
-
- * Records with full address *;
-   PROC freq data= CEDRS_HH  order=freq;
-      tables Address1 * Address2 * Address_City * Address_State * Address_Zipcode / list missing missprint;
-      format Address1  Address2  Address_City  Address_State  Address_Zipcode $AnyDataFmt.;
-run;
-
-   PROC freq data= CEDRS_HH  order=freq;
-      tables Address1 *  Address_City * Address_State * Address_Zipcode / list missing missprint;
-      format Address1   Address_City  Address_State  Address_Zipcode $AnyDataFmt.;
-run;
-
-/*-------------------------------------------------*
- |FINDINGS:
- | n=178,110 (98%) of records have full address
- *-------------------------------------------------*/
-
-*** Print out obs that have address1 data but missing city ***;
-   PROC print data= CEDRS_HH;
-      where Address1 ^= '' AND  Address_City='';
-      id ProfileID;
-      var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
-      format Address1 $35.  Address_City  $10. ;
-run;
 
 *** Print out obs that have Zipcode data but missing State ***;
    PROC print data= CEDRS_HH;
@@ -212,18 +255,11 @@ run;
       by CountyAssigned  Address_City  address1 ;
 run;
 
-   PROC print data= HH_address(obs=10000);
-      where address1 ne '';
-      ID ProfileID;
-      var CountyAssigned  Address_City  address1 ;
-run;
-
-   proc freq data= HH_address noprint;
-      where address1 ^= '';
-      tables address1 / out=HHcount;
-run;
-   proc freq data=HHcount; tables count; run;
-proc print data=HHcount; where count>1; run;
+/*   PROC print data= HH_address(obs=10000);*/
+/*      where address1 ne '';*/
+/*      ID ProfileID;*/
+/*      var CountyAssigned  Address_City  address1 ;*/
+/*run;*/
 
 
 DATA HH_define ;  set  HH_address;

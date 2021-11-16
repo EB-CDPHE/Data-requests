@@ -72,6 +72,16 @@ run;
  | FIX:  If Address1='' and Address2^='' then Address1=Address2;
  *--------------------------------------------------------------------*/
 
+   PROC freq data= CEDRS_filtered ;
+      where Address1 = '0';
+      tables Address1 Address2 AddressActual / missing missprint;
+run;
+/*---------------------------------------------------------------*
+ |FINDINGS:
+ | n=46 obs where Address1 = '0' (and Address2 = missing)
+ | FIX:  If Address1='0' then Address1=' ';
+ *---------------------------------------------------------------*/
+
 
 * City missing *;
    PROC freq data= CEDRS_filtered ;
@@ -159,7 +169,7 @@ DATA CEDRS_filtered2;  set CEDRS_filtered;
    if Address1='' and Address2^='' then Address1=Address2; 
    else if Address1='' and AddressActual^='' then Address1=AddressActual;
 
-   if Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN') then Address1='';
+   if Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN', '0') then Address1='';
 
    If Address_City=''  AND  Address2 in ('LOVELAND','WELLINGTON')  then Address_City=Address2; 
 
@@ -185,7 +195,7 @@ DATA CEDRS_filtered2;  set CEDRS_filtered;
 /*   if ProfileID= '' then Address_City='';*/
 
 /*   if (Address_Zipcode in '' AND  Address_State='');*/
-/*   if then Full_Address=1;*/
+/*   if    then Full_Address=1;*/
 
 run;
 
@@ -193,18 +203,90 @@ run;
 
 
 
-*** Print out records that have address1 data but missing city ***;
+*** Imputation of missing address data ***;
+***------------------------------------***;
+
+** Print out records that have address1 data but missing city **;
    PROC print data= CEDRS_filtered2;
       where Address1 ^= '' AND  Address_City='';
       id ProfileID;
       var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
       format Address1 $35.  Address_City  $10. ;
 run;
+/*-----------------------------------------------------------*
+ | FINDINGS:
+ | n= 41 obs with address1 data but missing City.
+ | FIX: Google these street addresses to find City.
+ *-----------------------------------------------------------*/
+
+
+** Print out obs that have Zipcode data but missing State **;
+   PROC print data= CEDRS_filtered2;
+      where Address_Zipcode ^= '' AND  Address_State='';
+      id ProfileID;
+      var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
+      format Address1 $35.  Address_City  $20. ;
+run;
+/*----------------------------------------------------------------*
+ | FINDINGS:
+ | n= 2706 obs with address1 and ZIP code but missing State.
+ |    Could use numeric 5 digit zip code to impute State.
+ |    i.e. if Zip code between 80000 and 80700 then State = CO
+ |    BUT Zip code data is messy; needs to be cleaned first.
+ *----------------------------------------------------------------*/
 
 
 
+***  Creation of Household (HH) level dataset  ***;
+***--------------------------------------------***;
+
+/*---------------------------------------------------------------------*
+ | Use Address1 (street address) to group cases into Household.
+ | Use City and County to provde context to Address1 (to be unique).
+ *---------------------------------------------------------------------*/
+
+** Number of records with County, City and Address1 **;
+   PROC freq data= CEDRS_filtered2  order=freq;
+      tables Address1 * Address_City * CountyAssigned / list missing missprint;
+      format Address1  Address_City  CountyAssigned $AnyDataFmt.;
+run;
+/*-----------------------------------------------------------------*
+ |FINDINGS:
+ |  N=180,991 filtered cases with Address, City, and County data
+ *-----------------------------------------------------------------*/
 
 
+**  Sort filtered cases on address variables to define HH  **;
+   proc sort data=CEDRS_filtered2
+               out=CEDRS_address1;
+      by CountyAssigned  Address_City  address1 ;
+run;
+
+** Preview Address1 data **;
+   PROC print data= CEDRS_address1(obs=10000);
+      where address1 ne '';
+      ID ProfileID;
+      var address1  Address_City   CountyAssigned;
+      format address1 Address_City $25.   ;
+run;
+/*------------------------------------------------------------------------------------------*
+ |FINDINGS:
+ | There are several examples of HH's with slightly different values for Address1
+ |    For example:
+ |    "4037 W 62ND PL"  vs  "4037 W 62ND PL 652563542"
+ |    "4237 62ND PL  vs "4237 W 62ND PL"  vs "4237 WEST 62ND PLACE"
+ |    " 5005 W 61ST DR"  vs  " 5005 W.61ST.DR."
+ |    " 6065 UTICA"  vs  " 6065 UTICA ST"
+ |    "6288 NEWTON COURT"  vs  "6288 NEWTON CT"
+ |    "2320 HANDOVER ST"  vs  "2320 HANOVER ST"
+ |
+ |    ALSO:  150 N 19TH AVE (in BRIGHTON) is Adams County Sheriff's Detention Facility.
+ |    FIX: Set Live_in_Institution = 'Yes'
+ |    Should investigate other addresses that have >10 cases per Address1.
+ *--------------------------------------------------------------------------------------------*/
+
+
+**  Define Age groups  **;
    PROC format;
       value AgeFmt
          0-<5='0-4 yo'
@@ -213,71 +295,73 @@ run;
          18-115='Adult' ;
 run;
 
-
-***  Size of sub-population groups  ***;
-***---------------------------------***;
-
-   PROC freq data= CEDRS_HH ;
-      tables ReportedDate  CollectionDate  Age_at_Reported ;
-      format ReportedDate CollectionDate monyy.  Age_at_Reported  AgeFmt. ;
+   PROC freq data= CEDRS_filtered2  ;
+      tables Age_at_Reported /  missing missprint;
+      format Age_at_Reported AgeFmt.;
 run;
-
-   PROC means data= CEDRS_HH  n nmiss;  var ReportedDate CollectionDate;  run;
-
-
-
- * Records with County, City and Address1 *;
-   PROC freq data= CEDRS_filtered2  order=freq;
-      tables Address1 * Address_City * CountyAssigned / list missing missprint;
-      format Address1  Address_City  CountyAssigned $AnyDataFmt.;
-run;
+/*-----------------------------------------------------------------*
+ |FINDINGS:
+ | n=17 records where Age is missing and n=1 where age = 120.
+ | FIX: Filter records out
+ *-----------------------------------------------------------------*/
 
 
+***  Reduce case-level dataset to HH-level dataset  ***;
+***-------------------------------------------------***;
+DATA CEDRS_HH ;  set CEDRS_address1;
+   by CountyAssigned  Address_City  address1 ;
 
+   if first.Address1 then do;  
+      Num_HH=0;  Num_Minors=0;  Num_Toddlers=0;  Num_Kids=0;  Num_Teens=0;  Num_Adults=0; 
+   end;
 
-
-
-*** Print out obs that have Zipcode data but missing State ***;
-   PROC print data= CEDRS_HH;
-      where Address_Zipcode ^= '' AND  Address_State='';
-      id ProfileID;
-      var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
-      format Address1 $35.  Address_City  $20. ;
-run;
-
-
-
-*** PRINT records with complete address ***;
-***-------------------------------------***;
-
-   proc sort data=CEDRS_HH
-               out=HH_address;
-      by CountyAssigned  Address_City  address1 ;
-run;
-
-/*   PROC print data= HH_address(obs=10000);*/
-/*      where address1 ne '';*/
-/*      ID ProfileID;*/
-/*      var CountyAssigned  Address_City  address1 ;*/
-/*run;*/
-
-
-DATA HH_define ;  set  HH_address;
-      by CountyAssigned  Address_City  address1 ;
-   if first.Address1 then do;  Num_HH=0; Num_Minors=0;  end;
    Num_HH+1;
-   if 0 < Age_at_reported < 18 then Num_Minors+1;
+
+   if 0 le Age_at_reported < 18 then Num_Minors+1;
+
+   if  0 le Age_at_reported <  5 then Num_Toddlers+1;
+   else if  5 le Age_at_reported < 12 then Num_Kids+1;
+   else if 12 le Age_at_reported < 18 then Num_Teens+1;
+   else if 18 le Age_at_reported le 115 then Num_Adults+1;
+
    if last.Address1 then output;
+
+   Label
+      Num_HH = "Number cases in HH"
+      Num_Minors = "Number of cases 0-17 yo"
+      Num_Toddlers = "Number of cases 0-4 yo"
+      Num_Kids = "Number of cases 5-11 yo"
+      Num_Teens = "Number of cases 12-17 yo"
+      Num_Adults = "Number of cases 18-115 yo"  ;
 run;
 
-proc freq data= HH_define; 
-tables Num_HH  Num_Minors; 
+*  Contents of HH level dataset *;
+   PROC contents data=CEDRS_HH  varnum; title1 'CEDRS_HH'; run;
+
+
+
+***  Analyze HH level data  ***;
+***-------------------------***;
+
+*  Counts of cases per HH by Age group  *;
+   PROC freq data= CEDRS_HH ;
+      tables Num_HH  Num_Minors  Num_Toddlers  Num_Kids  Num_Teens  Num_Adults ; 
 run;
+
 
 proc freq data= HH_define; 
    where 1 le Num_HH le 20;
 tables Num_HH * Num_Minors /missing missprint   ; 
 run;
+
+
+
+
+
+
+
+
+
 
 
 

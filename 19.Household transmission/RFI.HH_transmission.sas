@@ -333,11 +333,14 @@ DATA CEDRS_HH ;  set CEDRS_address1;
       Num_Kids = "Number of cases 5-11 yo"
       Num_Teens = "Number of cases 12-17 yo"
       Num_Adults = "Number of cases 18-115 yo"  ;
+
+   DROP  Transmission_type  LiveInInstitution ExposureFacilityName ExposureFacilityType 
+         Outcome  CaseStatus Gender Homeless Race Ethnicity Age_at_reported symptomatic 
+         ProfileID  EventID  outbreak_associated  ;  * Drop case-level variables *;
 run;
 
 *  Contents of HH level dataset *;
    PROC contents data=CEDRS_HH  varnum; title1 'CEDRS_HH'; run;
-
 
 
 ***  Analyze HH level data  ***;
@@ -347,17 +350,32 @@ run;
    PROC freq data= CEDRS_HH ;
       tables Num_HH  Num_Minors  Num_Toddlers  Num_Kids  Num_Teens  Num_Adults ; 
 run;
+/*--------------------------------------*
+ |FINDINGS:
+ | n=127 HH have >10 cases
+ | FIX: filter out HH with >10 cases
+ *--------------------------------------*/
 
-
-proc freq data= HH_define; 
-   where 1 le Num_HH le 20;
+proc freq data= CEDRS_HH; 
+   where 1 le Num_HH le 10;
 tables Num_HH * Num_Minors /missing missprint   ; 
 run;
 
 
+Data HH_cases ;  set CEDRS_HH ;
 
 
 
+
+
+
+
+*** Request 1:  Number of HH with cases in 0-17 yo by two time periods  ***;
+***---------------------------------------------------------------------***;
+   PROC freq data= CEDRS_HH ;
+      tables Age_at_Reported   Num_HH  Num_Minors  Num_Toddlers  Num_Kids  Num_Teens  Num_Adults ; 
+      format Age_at_Reported  AgeFmt. ;
+run;
 
 
 

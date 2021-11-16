@@ -409,51 +409,15 @@ run;
 
 
 
-
-***  Reduce case-level dataset to HH-level dataset  ***;
-***-------------------------------------------------***;
-DATA CEDRS_HH ;  set CEDRS_address1;
-   by CountyAssigned  Address_City  address1 ;
-
-   if first.Address1 then do;  
-      Num_HH=0;  Num_Minors=0;  Num_Toddlers=0;  Num_Kids=0;  Num_Teens=0;  Num_Adults=0; 
-   end;
-
-   Num_HH+1;
-
-   if 0 le Age_at_reported < 18 then Num_Minors+1;
-
-   if  0 le Age_at_reported <  5 then Num_Toddlers+1;
-   else if  5 le Age_at_reported < 12 then Num_Kids+1;
-   else if 12 le Age_at_reported < 18 then Num_Teens+1;
-   else if 18 le Age_at_reported le 115 then Num_Adults+1;
-
-   if last.Address1 then output;
-
-   Label
-      Num_HH = "Number cases in HH"
-      Num_Minors = "Number of cases 0-17 yo"
-      Num_Toddlers = "Number of cases 0-4 yo"
-      Num_Kids = "Number of cases 5-11 yo"
-      Num_Teens = "Number of cases 12-17 yo"
-      Num_Adults = "Number of cases 18-115 yo"  ;
-
-   DROP  Transmission_type  LiveInInstitution ExposureFacilityName ExposureFacilityType 
-         Outcome  CaseStatus Gender Homeless Race Ethnicity Age_at_reported symptomatic 
-         ProfileID  EventID  outbreak_associated  ;  * Drop case-level variables *;
-run;
-
-*  Contents of HH level dataset *;
-   PROC contents data=CEDRS_HH  varnum; title1 'CEDRS_HH'; run;
-
-
 ***  Analyze HH level data  ***;
 ***-------------------------***;
 
 *  Counts of cases per HH by Age group  *;
-   PROC freq data= CEDRS_HH ;
-      tables Num_HH  Num_Minors  Num_Toddlers  Num_Kids  Num_Teens  Num_Adults ; 
+   PROC freq data= HHwide ;
+/*      tables AgeGroup1 * AgeGroup2 * AgeGroup3 * AgeGroup4 * AgeGroup5 * AgeGroup6 * AgeGroup7 * AgeGroup8 * AgeGroup9 * AgeGroup10    /list missing missprint  ; */
+      tables NumCasePerHH  AgeGroup1  /list missing missprint  ; 
 run;
+
 /*--------------------------------------*
  |FINDINGS:
  | n=127 HH have >10 cases

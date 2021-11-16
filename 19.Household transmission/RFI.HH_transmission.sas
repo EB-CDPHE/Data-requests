@@ -49,12 +49,12 @@ DATA CEDRS_filtered;  set COVID.CEDRS_view_fix;
    (  ('01SEP20'd le  ReportedDate  le '01NOV20'd ) OR ('01SEP21'd le  ReportedDate  le '01NOV21'd)  ) 
       AND LiveInInstitution ne 'Yes';
 
-   Keep  ProfileID EventID CountyAssigned  ReportedDate  CaseStatus  Outcome   Age_at_Reported 
-         Transmission_Type  LiveInInstitution  ExposureFacilityName  ExposureFacilityType 
-         Gender  Homeless  Race  Ethnicity  Outbreak_Associated  Symptomatic  OnsetDate
-         CollectionDate   Address:  ;
+   Keep  ProfileID   CountyAssigned   ReportedDate   Age_at_Reported   CollectionDate   
+         LiveInInstitution   Homeless   Outbreak_Associated   Symptomatic  OnsetDate 
+         Address:  ;
 run;
 
+   PROC contents data=CEDRS_filtered  varnum ;  title1 'CEDRS_filtered';  run;
 
 
 *** Check completeness of address data ***;
@@ -147,10 +147,10 @@ run;
 run;
 /*---------------------------------------------------------------------------------------*
  |FINDINGS:
- | n=178,110 (98%) of records have full address
- | n= 53 obs with address1 data but missing City and 40 of those have State and Zip
+ | n= 178,080 (98%) of records have full address
+ | n= 55 obs with address1 data but missing City and 49 of those have State or Zip
  |    Easy fix: Google these street addresses to find City.
- | n= 2703 that have street address and city, but missing State.
+ | n= 2706 that have street address and city, but missing State.
  |    Don't use State then for defining Households.
  | Define HH by dup of Address1, City, County fields.
  *---------------------------------------------------------------------------------------*/
@@ -236,15 +236,6 @@ run;
  *----------------------------------------------------------------*/
 
 
-
-***  Creation of Household (HH) level dataset  ***;
-***--------------------------------------------***;
-
-/*---------------------------------------------------------------------*
- | Use Address1 (street address) to group cases into Household.
- | Use City and County to provde context to Address1 (to be unique).
- *---------------------------------------------------------------------*/
-
 ** Number of records with County, City and Address1 **;
    PROC freq data= CEDRS_filtered2  order=freq;
       tables Address1 * Address_City * CountyAssigned / list missing missprint;
@@ -252,14 +243,66 @@ run;
 run;
 /*-----------------------------------------------------------------*
  |FINDINGS:
- |  N=180,991 filtered cases with Address, City, and County data
+ |  N=180,890 filtered cases with Address, City, and County data
  *-----------------------------------------------------------------*/
+
+/*---------------------------------------------------------------------*
+ | Filter out cases with missing Address1.
+ | Use Address1 (street address) to group cases into Household.
+ | Use City and County to provde context to Address1 (to be unique).
+ *---------------------------------------------------------------------*/
+
+
+*** Create Age Groups ***;
+***-------------------***;
+
+**  Define Age groups  **;
+   PROC format;
+      value AgeFmt
+         0-<5='Toddler'
+         5-<12='Kid'
+         12-<18='Teen'
+         18-115='Adult' ;
+run;
+
+   PROC freq data= CEDRS_filtered2  ;
+      tables Age_at_Reported /  missing missprint;
+      format Age_at_Reported AgeFmt.;
+run;
+/*----------------------------------------*
+ |FINDINGS:
+ | n=14 records where Age is missing.
+ | n=1 record where Age=120.
+ | FIX: Filter records out.
+ *----------------------------------------*/
+
+
+*** Define AgeGroup variable                        ***;
+*** Filter out records with missing address and age ***;
+*** and DROP unnecessary variables                  ***;
+***-------------------------------------------------***;
+DATA CEDRS_filtered3;  set CEDRS_filtered2;
+   where (Address1 ne '')  AND (Address_City ne '')  AND  (Age_at_Reported ^in (.,120) ) ;
+
+   AgeGroup = put(Age_at_Reported, AgeFmt.);
+
+   DROP  LiveInInstitution  Homeless  Address2  Address_CityActual  Address_Zip:
+         Address_Latitude  Address_Longitude  Address_Tract2000  ;
+run;
+/*   proc freq data=CEDRS_filtered3 ; tables AgeGroup; run;*/
+   PROC contents data=CEDRS_filtered3  varnum; title1 'CEDRS_filtered3'; run;
+
+
+
+*** Count Number cases per HH and restrict to HH with 2+ cases ***;
+***------------------------------------------------------------***;
+
 
 
 **  Sort filtered cases on address variables to define HH  **;
-   proc sort data=CEDRS_filtered2
+   proc sort data=CEDRS_filtered3
                out=CEDRS_address1;
-      by CountyAssigned  Address_City  address1 ;
+      by CountyAssigned  Address_City  address1  ReportedDate ;
 run;
 
 ** Preview Address1 data **;
@@ -285,25 +328,86 @@ run;
  |    Should investigate other addresses that have >10 cases per Address1.
  *--------------------------------------------------------------------------------------------*/
 
+DATA CEDRS_HouseHolds 
+      FlagAddress;  
+   set CEDRS_address1;
+   by CountyAssigned  Address_City  Address1 ;
 
-**  Define Age groups  **;
-   PROC format;
-      value AgeFmt
-         0-<5='0-4 yo'
-         5-<12='5-11 yo'
-         12-<18='12-17 yo'
-         18-115='Adult' ;
-run;
+   if first.Address1 then NumCasePerHH=0;
 
-   PROC freq data= CEDRS_filtered2  ;
-      tables Age_at_Reported /  missing missprint;
-      format Age_at_Reported AgeFmt.;
+   NumCasePerHH+1;
+
+  if last.Address1 then do;
+   if NumCasePerHH=1 then delete;
+   if NumCasePerHH>10 then output FlagAddress;
+  end;
+
+  output CEDRS_HouseHolds;
+
 run;
-/*-----------------------------------------------------------------*
- |FINDINGS:
- | n=17 records where Age is missing and n=1 where age = 120.
- | FIX: Filter records out
- *-----------------------------------------------------------------*/
+/*   proc print data=FlagAddress; run;*/
+/*   proc print data= CEDRS_HouseHolds;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+
+
+*** Then remove HH with more than 10 cases ***;
+***----------------------------------------***;
+
+Data CEDRS_HH; merge FlagAddress(in=x)  CEDRS_HouseHolds ;
+   by CountyAssigned  Address_City  Address1 ;
+   if x=1 then delete;
+run;
+/*   proc print data= CEDRS_HH;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+
+
+
+
+*** Transpose data from Case level (tall) to HH level (wide) ***;
+***----------------------------------------------------------***;
+
+* transpose AgeGroup *;
+   PROC transpose data=CEDRS_HH  
+   out=WideDSN1(drop= _NAME_)  
+      prefix=AgeGroup ; 
+      var AgeGroup;        
+      by CountyAssigned  Address_City  Address1 ;
+run;
+/*   proc print data= WideDSN1; run;*/
+
+* transpose ReportedDate *;
+   PROC transpose data=CEDRS_HH  
+   out=WideDSN2(drop= _NAME_)
+      prefix=ReportedDate ; 
+      var ReportedDate;          
+      by CountyAssigned  Address_City  Address1 ;
+run;
+   proc print data= WideDSN2;  run;
+
+
+* pull out final counter of number of cases per HH *;
+Data LastCase(keep=CountyAssigned  Address_City  Address1  NumCasePerHH);  
+   set CEDRS_HH;
+
+   by CountyAssigned  Address_City  Address1 ;
+   if last.Address1;
+run;
+/*   proc print data= LastCase; run;*/
+
+
+***  Creation of Household (HH) level dataset  ***;
+***--------------------------------------------***;
+
+* Merge transposed datasets and final counter together *;
+DATA HHwide; merge WideDSN1 WideDSN2 LastCase;
+   by CountyAssigned  Address_City  Address1 ;
+
+   TimePeriod=year(ReportedDate1);
+run;
+   proc print data=HHwide;  *id address1;    run;
+
+   PROC contents data=HHwide  varnum; title1 'HHwide'; run;
+
+
+
 
 
 ***  Reduce case-level dataset to HH-level dataset  ***;

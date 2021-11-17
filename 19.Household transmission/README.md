@@ -1,11 +1,26 @@
 ## Background 
-This data request came from Ginger Stringer thru Alicia. Memorial Hospital reported to EPCPH that they have had the largest number of COVID deaths in a week, ever. Asked us to look at recent deaths for that facility and determine if there is a particular population impacted, e.g. incarcerated, homeless. 
+This data request came from Rachel Herlihy via Alicia Cronquist. Alicia's [email](Documents/Email_request_111021.pdf) was forwarded to me from Eduardo. 
 
-**Population**:  Confirmed and probable cases in CEDRS with `Outcome='Patient Died'` (Deaths) per 100K population.  **Groups**: El Paso county for "high mortality period" defined as July 1, 2021 - present. Present defined as October 9, 2021 due to lag in surveillance system.  **Data requested**: Outcome variable used was 14 day moving average of "patient died" rate. Evaluated several independent variables such as Age Group, Gender, Ethnicity, Race, etc. 
+They are interested in learning what role kids going back to school have on COVID transmission within the household (HH) in particular, and the community in general. 
+
+
+
+Sadly, there is no HH identifier in CEDRS. 
+
+**Population**:  Confirmed and probable cases in CEDRS with `ReportedDate` during fall season, i.e. September 1 - November 1.  **Groups**: School start for 2020 versus 2021. Age groups were 0-4 year olds, "infants"; 5-11 year olds, "kids"; 12-17 year olds, 'teens'; and 18-115 year olds, 'adults'.  **Data requested**: HH's with 2-10 cases reported in CEDRS. 
+
+The following specific questions were asked:
+1. Among HH that had 2 or more cases, how frequently was the initial case reported in a minor (0-17 years old)?
+2. Proportion of multi-case HH's where minor was first case by Age Group, i.e. infant, kid, teen.
+3. Was this proportion different in Fall 2021 compared to Fall 2020? 
 
 ## Code
-Started writing a SAS program [RFI.Memorial_Hosp_mortality_rates.sas](SAS/RFI.Memorial_Hosp_mortality_rates.sas) to use to respond to this data request, however, I wasn't getting anywhere with it.
-Second approach was to deploy [Get.County_rates.sas](../Get.County_rates.sas) for El Paso county. This program calls [Macro.CountyRates.sas](../0.Universal/SAS%20code/Macro.CountyRates.sas). I modified the macro to add mortality rate and calculate 14 day moving averages.
+Ugh. Where to begin.
+
+Hm. 1. Filter cases by date range, county, and live in institution.Then 2. assess completeness and quality of address components, i.e. address1, address2, city, zip, state, and county.
+And then, hm, how to define HH.
+
+
 
 The macro creates a SAS dataset with rates and rolling averages. Tableau was used to connect to this data, idenity the 'high mortality period', and explore relationships between 14 day moving average for mortality rate and selected variables. 
 
@@ -14,11 +29,9 @@ The macro creates a SAS dataset with rates and rolling averages. Tableau was use
 ## Response
 That's a bummer because I built a beautiful dashboard with highlighted findings.
 
-For what it's worth - here is the dashboard:
-#
-![dashboard](Images/Dashboard1.png)
 
 #
 **Issues:**
-* I wasn't available to respond to second data request for Moffat county which was for the outcome hospitalization rates. 
+# Oh! Where do I begin??!! 
+* maybe here at home
 

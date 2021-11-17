@@ -9,7 +9,7 @@ Final response was delivered snippet of SAS output placed in chat to Eduardo.
 #
 
 ## Code
-The SAS program used to generate the response was [RFI.Cases_by_County.sas](RFI.Cases_by_County.sas). This may also require running [Access.Population](../Access.Populations.sas) to obtain COVID. Population data if not already available.
+The SAS program used to generate the response was [RFI.Cases_by_County.sas](../07.CDE Case counts by County/SAS/RFI.Cases_by_County.sas). This may also require running [Access.Population](../0.Universal/SAS%20code/Access.Populations.sas) to obtain COVID. Population data if not already available.
 #
 
 **Issues:**

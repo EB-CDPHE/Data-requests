@@ -38,16 +38,17 @@ Data HHtest FlagAddress(keep=Address); set CaseSort;
   if first.Address then do; NumCaseperHH=0;  end;
 
   NumCaseperHH+1;
+  NumDays_between_HHcases = CaseDate - lag(CaseDate);
 
   if last.Address then do;
-   if NumCaseperHH=1 then delete;
-   if NumCaseperHH>3 then output FlagAddress;
+    if NumCaseperHH=1 then delete;
+    if NumCaseperHH>3 then output FlagAddress;
   end;
 
   output HHtest;
 run;
 /*   proc print data=FlagAddress; run;*/
-/*   proc print data= HHtest;  id profile;  format CaseDate mmddyy10. ;  run;*/
+   proc print data= HHtest;  id profile;  format CaseDate mmddyy10. ;  run;
 
 
 

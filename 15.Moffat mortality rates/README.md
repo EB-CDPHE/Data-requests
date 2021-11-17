@@ -9,9 +9,11 @@ Final response was delivered snippet of SAS output placed in chat to Eduardo.
 #
 
 ## Code
-The SAS program used to generate the response was [RFI.Cases_by_County.sas](RFI.Cases_by_County.sas). This may also require running [Access.Population](../Access.Populations.sas) to obtain COVID.Population data if not already available.
+The SAS program used to generate the response was [RFI.Cases_by_County.sas](RFI.Cases_by_County.sas). This may also require running [Access.Population](../Access.Populations.sas) to obtain COVID. Population data if not already available.
 #
 
 **Issues:**
 * I wasn't available to respond to second data request for Moffat county which was for the outcome hospitalization rates. 
 
+## Follow-up request
+On 11/15/21 a [request](Documents/Email%20request_111521.pdf) came in for an update to hospital and mortality rates 

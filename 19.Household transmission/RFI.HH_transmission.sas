@@ -259,7 +259,7 @@ run;
 **  Define Age groups  **;
    PROC format;
       value AgeFmt
-         0-<5='Toddler'
+         0-<5='Infant'
          5-<12='Kid'
          12-<18='Teen'
          18-115='Adult' ;
@@ -285,11 +285,12 @@ DATA CEDRS_filtered3;  set CEDRS_filtered2;
    where (Address1 ne '')  AND (Address_City ne '')  AND  (Age_at_Reported ^in (.,120) ) ;
 
    AgeGroup = put(Age_at_Reported, AgeFmt.);
+   AG = put(Age_at_Reported, AgeFmt1.);
 
    DROP  LiveInInstitution  Homeless  Address2  Address_CityActual  Address_Zip:
          Address_Latitude  Address_Longitude  Address_Tract2000  ;
 run;
-/*   proc freq data=CEDRS_filtered3 ; tables AgeGroup; run;*/
+/*   proc freq data=CEDRS_filtered3 ; tables AgeGroup AG; run;*/
    PROC contents data=CEDRS_filtered3  varnum; title1 'CEDRS_filtered3'; run;
 
 
@@ -336,11 +337,13 @@ DATA CEDRS_HouseHolds
    if first.Address1 then NumCasePerHH=0;
 
    NumCasePerHH+1;
+   Days_between_cases = ReportedDate - lag(ReportedDate);
 
-  if last.Address1 then do;
-   if NumCasePerHH=1 then delete;
-   if NumCasePerHH>10 then output FlagAddress;
-  end;
+
+   if last.Address1 then do;
+      if NumCasePerHH=1 then delete;
+      if NumCasePerHH>10 then output FlagAddress;
+   end;
 
   output CEDRS_HouseHolds;
 
@@ -373,6 +376,14 @@ run;
 run;
 /*   proc print data= WideDSN1; run;*/
 
+   PROC transpose data=CEDRS_HH  
+   out=WideDSN1b(drop= _NAME_)  
+      prefix=AG ; 
+      var AG;        
+      by CountyAssigned  Address_City  Address1 ;
+run;
+/*   proc print data= WideDSN1b; run;*/
+
 * transpose ReportedDate *;
    PROC transpose data=CEDRS_HH  
    out=WideDSN2(drop= _NAME_)
@@ -380,8 +391,16 @@ run;
       var ReportedDate;          
       by CountyAssigned  Address_City  Address1 ;
 run;
-   proc print data= WideDSN2;  run;
+/*   proc print data= WideDSN2;  run;*/
 
+* transpose ReportedDate *;
+   PROC transpose data=CEDRS_HH  
+   out=WideDSN3(drop= _NAME_)
+      prefix=DaysBetween ; 
+      var Days_between_cases;          
+      by CountyAssigned  Address_City  Address1 ;
+run;
+   proc print data= WideDSN3;  run;
 
 * pull out final counter of number of cases per HH *;
 Data LastCase(keep=CountyAssigned  Address_City  Address1  NumCasePerHH);  
@@ -397,26 +416,44 @@ run;
 ***--------------------------------------------***;
 
 * Merge transposed datasets and final counter together *;
-DATA HHwide; merge WideDSN1 WideDSN2 LastCase;
+DATA HHwide; merge WideDSN1  WideDSN1b  WideDSN2  WideDSN3  LastCase;
    by CountyAssigned  Address_City  Address1 ;
 
    TimePeriod=year(ReportedDate1);
+   DaysBetween1=.;
+   AG=cat(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);
+   AGtime=cat(AG1,DaysBetween2,AG2,DaysBetween3,AG3,DaysBetween4,AG4,DaysBetween5,AG5,DaysBetween6,
+              AG6,DaysBetween7,AG7,DaysBetween8,AG8,DaysBetween9,AG9,DaysBetween10,AG10);
+
 run;
-   proc print data=HHwide;  *id address1;    run;
+   proc print data=HHwide; var AGtime; *id address1;    run;
 
    PROC contents data=HHwide  varnum; title1 'HHwide'; run;
 
 
 
-
 ***  Analyze HH level data  ***;
 ***-------------------------***;
+   PROC freq data= HHwide ;
+      tables AG / missing missprint  ; 
+/*      tables NumCasePerHH  AgeGroup1  /list missing missprint  ; */
+run;
+
 
 *  Counts of cases per HH by Age group  *;
    PROC freq data= HHwide ;
 /*      tables AgeGroup1 * AgeGroup2 * AgeGroup3 * AgeGroup4 * AgeGroup5 * AgeGroup6 * AgeGroup7 * AgeGroup8 * AgeGroup9 * AgeGroup10    /list missing missprint  ; */
       tables NumCasePerHH  AgeGroup1  /list missing missprint  ; 
 run;
+
+   PROC freq data= HHwide ;
+/*      where AgeGroup1 ne 'Adult';*/
+      tables AgeGroup1 * AgeGroup2 * AgeGroup3 * AgeGroup4 * AgeGroup5     /list missing missprint  ; 
+/*      tables DaysBetween1 * DaysBetween2 * DaysBetween3 * DaysBetween4 * DaysBetween5 / list missing missprint;*/
+/*      tables Age_at_Reported   Num_HH   ; */
+run;
+
+
 
 /*--------------------------------------*
  |FINDINGS:
@@ -433,7 +470,11 @@ run;
 Data HH_cases ;  set CEDRS_HH ;
 
 
-
+   PROC freq data= CEDRS_HH ;
+      where 
+      tables Age_at_Reported   Num_HH  Num_Minors  Num_Toddlers  Num_Kids  Num_Teens  Num_Adults ; 
+      format Age_at_Reported  AgeFmt. ;
+run;
 
 
 

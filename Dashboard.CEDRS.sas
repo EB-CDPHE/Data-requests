@@ -32,7 +32,7 @@ DATA DASH.CEDRS;  set COVID.CEDRS_view_fix;
 
    County = propcase(CountyAssigned);
 
-   If (Vax_UTD ne .) AND (Age_at_Reported > '01DEC20'd ) then Days_since_Vax_UTD = Vax_UTD - Age_at_Reported  ;
+   If (Vax_UTD ne .) AND (ReportedDate > '31DEC20'd ) then Days_since_Vax_UTD = ReportedDate  -  Vax_UTD  ;
 
    if 0 le Age_at_Reported   < 5 then AgeGrp='1' ;
    else if 5 le Age_at_Reported  < 10 then AgeGrp='2' ;
@@ -64,6 +64,16 @@ run;
 
 ***  Access population data  ***;
 ***--------------------------***;
+proc freq data= DASH.CEDRS; 
+tables Vax_UTD * ReportedDate  / list ;  
+tables  Days_since_Vax_UTD ;  
+run;
+
+proc print data= DASH.CEDRS;
+where Days_since_Vax_UTD ne .;
+var Vax_UTD  ReportedDate Days_since_Vax_UTD ;
+run;
+
 
    PROC means data= COVID.County_Population sum  maxdec=0;
 /*      where county = 'MOFFAT';*/

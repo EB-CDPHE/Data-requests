@@ -130,6 +130,16 @@ run;
  *-------------------------------------------------------------------------*/
 
 
+* State *;
+   PROC freq data= CEDRS_filtered ;
+      tables Address_State / missing missprint;
+run;
+/*---------------------------------------------------*
+ |FINDINGS:
+ | Over 98% of records have State=CO
+ | NOTE: Add to Address Filter
+ *--------------------------------------------------*/
+
 
 *** Records by completeness of components of a complete address ***;
 ***-------------------------------------------------------------***;
@@ -140,8 +150,9 @@ run;
          other='Has data' ;       
 run;
 
- * Records with full address *;
+ * Colorado Records with full address (address1, city, state, county) *;
    PROC freq data= CEDRS_filtered  order=freq;
+      where Address_State='CO';
       tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
       format Address1   Address_City   Address_State   Address_Zipcode $AnyDataFmt.;
 run;
@@ -160,7 +171,8 @@ run;
 *** Edit data  ***;
 ***------------***;
 
-DATA CEDRS_filtered2;  set CEDRS_filtered;
+DATA CEDRS_CO;  set CEDRS_filtered;
+      where Address_State='CO';
 
 * impute missing collectiondates *;
    if CollectionDate = . then CollectionDate = ReportedDate;
@@ -199,15 +211,15 @@ DATA CEDRS_filtered2;  set CEDRS_filtered;
 
 run;
 
-   PROC contents data=CEDRS_filtered2  varnum; title1 'CEDRS_filtered2'; run;
+   PROC contents data=CEDRS_CO  varnum; title1 'CEDRS_CO'; run;
 
 
 
 *** Imputation of missing address data ***;
 ***------------------------------------***;
 
-** Print out records that have address1 data but missing city **;
-   PROC print data= CEDRS_filtered2;
+** Print out Colorado records that have address1 data but missing city **;
+   PROC print data= CEDRS_CO;
       where Address1 ^= '' AND  Address_City='';
       id ProfileID;
       var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
@@ -220,8 +232,8 @@ run;
  *-----------------------------------------------------------*/
 
 
-** Print out obs that have Zipcode data but missing State **;
-   PROC print data= CEDRS_filtered2;
+** Print out Colorado records that have Zipcode data but missing State **;
+   PROC print data= CEDRS_CO;
       where Address_Zipcode ^= '' AND  Address_State='';
       id ProfileID;
       var Address1   Address_City  Address_State  Address_Zipcode  CountyAssigned ;
@@ -237,7 +249,7 @@ run;
 
 
 ** Number of records with County, City and Address1 **;
-   PROC freq data= CEDRS_filtered2  order=freq;
+   PROC freq data= CEDRS_CO  order=freq;
       tables Address1 * Address_City * CountyAssigned / list missing missprint;
       format Address1  Address_City  CountyAssigned $AnyDataFmt.;
 run;
@@ -265,14 +277,13 @@ run;
          18-115='Adult' ;
 run;
 
-   PROC freq data= CEDRS_filtered2  ;
+   PROC freq data= CEDRS_CO  ;
       tables Age_at_Reported /  missing missprint;
       format Age_at_Reported AgeFmt.;
 run;
 /*----------------------------------------*
  |FINDINGS:
- | n=14 records where Age is missing.
- | n=1 record where Age=120.
+ | n=17 records where Age is missing.
  | FIX: Filter records out.
  *----------------------------------------*/
 
@@ -281,8 +292,8 @@ run;
 *** Filter out records with missing address and age ***;
 *** and DROP unnecessary variables                  ***;
 ***-------------------------------------------------***;
-DATA CEDRS_filtered3;  set CEDRS_filtered2;
-   where (Address1 ne '')  AND (Address_City ne '')  AND  (Age_at_Reported ^in (.,120) ) ;
+DATA CEDRS_Addresses;  set CEDRS_CO;
+   where (Address1 ne '')  AND (Address_City ne '')  AND  (Age_at_Reported ^in (.) ) ;
 
    AgeGroup = put(Age_at_Reported, AgeFmt.);
    AG = put(Age_at_Reported, AgeFmt1.);
@@ -290,27 +301,24 @@ DATA CEDRS_filtered3;  set CEDRS_filtered2;
    DROP  LiveInInstitution  Homeless  Address2  Address_CityActual  Address_Zip:
          Address_Latitude  Address_Longitude  Address_Tract2000  ;
 run;
-/*   proc freq data=CEDRS_filtered3 ; tables AgeGroup AG; run;*/
-   PROC contents data=CEDRS_filtered3  varnum; title1 'CEDRS_filtered3'; run;
+/*   proc freq data=CEDRS_Addresses ; tables AgeGroup AG; run;*/
+   PROC contents data=CEDRS_Addresses  varnum; title1 'CEDRS_Addresses'; run;
 
 
 
 *** Count Number cases per HH and restrict to HH with 2+ cases ***;
 ***------------------------------------------------------------***;
 
-
-
 **  Sort filtered cases on address variables to define HH  **;
-   proc sort data=CEDRS_filtered3
-               out=CEDRS_address1;
-      by CountyAssigned  Address_City  address1  ReportedDate ;
+   proc sort data=CEDRS_Addresses
+               out=Address1_sort;
+      by CountyAssigned  Address_City  Address1  ReportedDate ;
 run;
 
 ** Preview Address1 data **;
-   PROC print data= CEDRS_address1(obs=10000);
-      where address1 ne '';
+   PROC print data= Address1_sort(obs=10000);
       ID ProfileID;
-      var address1  Address_City   CountyAssigned;
+      var Address1  Address_City   CountyAssigned ;
       format address1 Address_City $25.   ;
 run;
 /*------------------------------------------------------------------------------------------*
@@ -330,15 +338,14 @@ run;
  *--------------------------------------------------------------------------------------------*/
 
 DATA CEDRS_HouseHolds 
-      FlagAddress;  
-   set CEDRS_address1;
+      FlagAddress(keep=CountyAssigned  Address_City  Address1);  
+   set Address1_sort;
    by CountyAssigned  Address_City  Address1 ;
 
    if first.Address1 then NumCasePerHH=0;
-
    NumCasePerHH+1;
-   Days_between_cases = ReportedDate - lag(ReportedDate);
 
+   Days_between_cases = ReportedDate - lag(ReportedDate);
 
    if last.Address1 then do;
       if NumCasePerHH=1 then delete;
@@ -346,7 +353,6 @@ DATA CEDRS_HouseHolds
    end;
 
   output CEDRS_HouseHolds;
-
 run;
 /*   proc print data=FlagAddress; run;*/
 /*   proc print data= CEDRS_HouseHolds;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
@@ -358,31 +364,31 @@ run;
 Data CEDRS_HH; merge FlagAddress(in=x)  CEDRS_HouseHolds ;
    by CountyAssigned  Address_City  Address1 ;
    if x=1 then delete;
+
+   if first.Address1 then Days_between_cases=0;
 run;
 /*   proc print data= CEDRS_HH;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
-
-
 
 
 *** Transpose data from Case level (tall) to HH level (wide) ***;
 ***----------------------------------------------------------***;
 
-* transpose AgeGroup *;
-   PROC transpose data=CEDRS_HH  
-   out=WideDSN1(drop= _NAME_)  
-      prefix=AgeGroup ; 
-      var AgeGroup;        
-      by CountyAssigned  Address_City  Address1 ;
-run;
-/*   proc print data= WideDSN1; run;*/
+* transpose AgeGroup *;                      * <-- NOT USED ANYMORE, AT LEAST AT THIS TIME *;
+/*   PROC transpose data=CEDRS_HH  */
+/*   out=WideDSN1x(drop= _NAME_)  */
+/*      prefix=AgeGroup ; */
+/*      var AgeGroup;        */
+/*      by CountyAssigned  Address_City  Address1 ;*/
+/*run;*/
+/*   proc print data= WideDSN1x; run;*/
 
    PROC transpose data=CEDRS_HH  
-   out=WideDSN1b(drop= _NAME_)  
+   out=WideDSN1(drop= _NAME_)  
       prefix=AG ; 
       var AG;        
       by CountyAssigned  Address_City  Address1 ;
 run;
-/*   proc print data= WideDSN1b; run;*/
+/*   proc print data= WideDSN1; run;*/
 
 * transpose ReportedDate *;
    PROC transpose data=CEDRS_HH  
@@ -400,12 +406,11 @@ run;
       var Days_between_cases;          
       by CountyAssigned  Address_City  Address1 ;
 run;
-   proc print data= WideDSN3;  run;
+/*   proc print data= WideDSN3;  run;*/
 
-* pull out final counter of number of cases per HH *;
+* pull out final counter of number of cases per HH *;          * <-- THIS IS REDUNDANT NOW THAT IT IS CALCULATED BELOW *;
 Data LastCase(keep=CountyAssigned  Address_City  Address1  NumCasePerHH);  
    set CEDRS_HH;
-
    by CountyAssigned  Address_City  Address1 ;
    if last.Address1;
 run;
@@ -416,19 +421,36 @@ run;
 ***--------------------------------------------***;
 
 * Merge transposed datasets and final counter together *;
-DATA HHwide; merge WideDSN1  WideDSN1b  WideDSN2  WideDSN3  LastCase;
+DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  LastCase;
    by CountyAssigned  Address_City  Address1 ;
 
+   ARRAY RptDates{10} ReportedDate1 - ReportedDate10 ;
+   ARRAY AGvars{10} AG1 - AG10 ;
+
+   do i = 1 to 10;
+           if year(RptDates{i}) = 2020 then AGvars{i} = lowcase(AGvars{i}) ;
+      else if year(RptDates{i}) = 2021 then AGvars{i} = upcase(AGvars{i}) ;
+   end;
+
    TimePeriod=year(ReportedDate1);
-   DaysBetween1=.;
-   AG=cat(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);
-   AGtime=cat(AG1,DaysBetween2,AG2,DaysBetween3,AG3,DaysBetween4,AG4,DaysBetween5,AG5,DaysBetween6,
-              AG6,DaysBetween7,AG7,DaysBetween8,AG8,DaysBetween9,AG9,DaysBetween10,AG10);
+
+   AG=cats(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);
+
+   Fall20_AG=compress(AG, 'IKTA');
+   Fall21_AG=compress(AG, 'ikta');
+
+   DROP i  AG1 AG2 AG3 AG4 AG5 AG6 AG7 AG8 AG9 AG10 ;
+
+* ADD variables to analyze *;
+   HHcases2020 = countc(AG, 'ikta');
+   HHcases2021 = countc(AG, 'IKTA');
+   HHcasesTotal = HHcases2020 + HHcases2021 ;
 
 run;
-   proc print data=HHwide; var AGtime; *id address1;    run;
 
-   PROC contents data=HHwide  varnum; title1 'HHwide'; run;
+   PROC contents data=HHcases  varnum; title1 'HHcases'; run;
+
+
 
 
 

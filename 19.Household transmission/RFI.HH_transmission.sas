@@ -152,7 +152,7 @@ run;
 
  * Colorado Records with full address (address1, city, state, county) *;
    PROC freq data= CEDRS_filtered  order=freq;
-      where Address_State='CO';
+/*      where Address_State='CO';*/
       tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
       format Address1   Address_City   Address_State   Address_Zipcode $AnyDataFmt.;
 run;
@@ -432,8 +432,6 @@ DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  LastCase;
       else if year(RptDates{i}) = 2021 then AGvars{i} = upcase(AGvars{i}) ;
    end;
 
-   TimePeriod=year(ReportedDate1);
-
    AG=cats(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);
 
    Fall20_AG=compress(AG, 'IKTA');
@@ -456,6 +454,50 @@ run;
 
 ***  Analyze HH level data  ***;
 ***-------------------------***;
+
+
+** Number of HH with 1+ case in time period 1, 2, and 1&2. **;
+   PROC means data=HHcases n ;  where HHcases2020>0;   var  HHcases2020 ;  run;
+   PROC means data=HHcases n ;  where HHcases2021>0;   var  HHcases2021 ;  run;
+
+** Distribution of the number of cases in a HH for time period 1, 2, and 1&2 (total). **;
+   PROC freq data=HHcases ;
+      tables HHcases2020  HHcases2021  HHcasesTotal/  missing missprint ;
+      tables HHcases2020 * HHcases2021  / list  missing missprint ;
+run;
+
+
+** Distribution of AG's involved in time period 1, 2, and 1&2 **;
+   PROC freq data=HHcases ;
+      tables Fall20_AG   Fall21_AG  /  missing missprint ;
+run;
+
+** Distribution of which AG was first case in time period 1, 2, and 1&2 **;
+   PROC freq data=HHcases ;
+      tables Fall20_AG   Fall21_AG  /  missing missprint ;
+      format Fall20_AG   Fall21_AG $1.;
+run;
+
+** FOR THOSE HH WITH A CASE DURING TP:  Distribution of which AG was first case in time period 1, 2, and 1&2 **;
+   PROC freq data=HHcases ;
+      where HHcases2020>0;
+      tables Fall20_AG   /  missing missprint ;
+      format Fall20_AG   Fall21_AG $1.;
+run;
+   PROC freq data=HHcases ;
+      where HHcases2021>0;
+      tables Fall21_AG   /  missing missprint ;
+      format Fall20_AG   Fall21_AG $1.;
+run;
+
+
+
+
+
+
+
+   *** OLD CODE ***;
+   ***----------****;
    PROC freq data= HHwide ;
       tables AG / missing missprint  ; 
 /*      tables NumCasePerHH  AgeGroup1  /list missing missprint  ; */

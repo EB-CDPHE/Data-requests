@@ -55,20 +55,6 @@ Data HHtest FlagAddress(keep=Address); set CaseSort;
    ClusterCase+1;
    Days_between_cases = CaseDate - lag(CaseDate);
 
-
-/*       if month(CaseDate) in (3,4) then CaseDate1a=CaseDate; */
-/*  else if month(CaseDate) in (7,8) then CaseDate2a=CaseDate; */
-/**/
-/*  NumDays_between_HHcases1 = CaseDate1a - lag(CaseDate1a);*/
-/*  NumDays_between_HHcases2 = CaseDate2a - lag(CaseDate2a);*/
-/**/
-/*           if NumDays_between_HHcases1>3 then CaseDate1b = CaseDate1a;*/
-/*      else if NumDays_between_HHcases2>3 then CaseDate2b = CaseDate2a;*/
-/**/
-/*      NumDays_between_HHcases1b = CaseDate1b - lag(CaseDate1b);*/
-/*      NumDays_between_HHcases2b = CaseDate2b - lag(CaseDate2b);*/
-
-
   if last.Address then do;
     if NumCaseperHH=1 then delete;
     if NumCaseperHH>5 then output FlagAddress;
@@ -77,7 +63,7 @@ Data HHtest FlagAddress(keep=Address); set CaseSort;
   output HHtest;
 run;
 /*   proc print data=FlagAddress; run;*/
-   proc print data= HHtest;  id address; by address;  format CaseDate mmddyy10. ;  run;
+/*   proc print data= HHtest;  id address; by address;  format CaseDate mmddyy10. ;  run;*/
 
 
 *** Then remove HH with more than 10 cases ***;
@@ -87,26 +73,12 @@ Data ExcludeLarge; merge FlagAddress(in=x)  HHtest ;
    if x=1 then delete;
 
    if ClusterCase=1 then Days_between_cases=0;
-
-/*      if (CaseDate1 ne . and NumDays_between_HHcases1=.) then NumDays_between_HHcases1=0; */
-/*      if (CaseDate2 ne . and NumDays_between_HHcases2=.) then NumDays_between_HHcases2=0; */
-/*      NumDays_between_HHcases=sum(NumDays_between_HHcases1, NumDays_between_HHcases2);*/
-
 run;
-   proc print data= ExcludeLarge;  id address; by address; format CaseDate  mmddyy10. ;  run;
+/*   proc print data= ExcludeLarge;  id address; by address; format CaseDate  mmddyy10. ;  run;*/
 
 
 *** Transpose data from Case level (tall) to HH level (wide) ***;
 ***----------------------------------------------------------***;
-
-* transpose AgeGroup *;
-/*   PROC transpose data=ExcludeLarge  */
-/*   out=WideDSN1(drop= _NAME_)  */
-/*      prefix=AgeGroup ; */
-/*      var AgeGroup;        */
-/*      by address;  */
-/*run;*/
-/*   proc print data= WideDSN1; run;*/
 
 * transpose Dates *;
    PROC transpose data=ExcludeLarge  
@@ -126,15 +98,6 @@ run;
 run;
 /*   proc print data= WideDSN2; run;*/
 
-* transpose Cluster *;
-/*   PROC transpose data=ExcludeLarge  */
-/*   out=WideDSN3(drop= _NAME_)  */
-/*      prefix=Cluster ; */
-/*      var Cluster;        */
-/*      by address;  */
-/*run;*/
-/*   proc print data= WideDSN3; run;*/
-
 * transpose DaysBetween *;
    PROC transpose data=ExcludeLarge  
    out=WideDSN4(drop= _NAME_)
@@ -144,12 +107,6 @@ run;
 run;
 /*   proc print data= WideDSN4;  run;*/
 
-* pull out final counter of number of cases per HH *;
-/*Data LastCase(keep=Address  NumCaseperHH); set ExcludeLarge;*/
-/*   by address;*/
-/*   if last.address;*/
-/*run;*/
-/*   proc print data= LastCase; run;*/
 
 * Merge transposed datasets and final counter together *;
 DATA ClusterWide; merge  WideDSN1  WideDSN2    WideDSN4 ;

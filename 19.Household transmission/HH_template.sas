@@ -4,32 +4,32 @@
 ***------------------------***;
 
 DATA Casetest;
-   input Profile Address $  CaseDate  AgeGroup $  AG $ Diff ;
+   input Profile Address $  CaseDate  AgeGroup $  AG $  ;
    datalines;
-   1  A 22000 Adult  A 8
-   2  B 22001 Adult  A 6
-   3  B 22005 Adult  A 2
-   18 B 22115 Teen   T 4
-   4  C 22012 Adult  A 1
-   5  C 22017 Teen   T 3
-   6  D 22025 Kid    K 2
-   7  D 22033 Adult  A 5
-   8  D 22035 Adult  A 7
-   9  E 22100 Infant I 9
-   10 E 22101 Kid    K 8
-   11 E 22102 Teen   T 5
-   12 E 22103 Adult  A 4
-   13 E 22103 Adult  A 6
-   14 F 22022 Adult  A 3
-   15 F 22027 Teen   T 1
-   16 F 22122 Kid    K 2
-   17 F 22127 Adult  A 3
-   19 G 22010 Adult  A 4
-   20 G 22020 Adult  A 5
-   21 G 22030 Adult  A 6
-   22 G 22040 Adult  A 7
-   23 G 22050 Adult  A 8
-   24 G 22060 Adult  A 9
+   1  A 22000 Adult  A
+   2  B 22001 Adult  A
+   3  B 22005 Adult  A
+   18 B 22115 Teen   T
+   4  C 22012 Adult  A
+   5  C 22017 Teen   T
+   6  D 22025 Kid    K
+   7  D 22033 Adult  A
+   8  D 22035 Adult  A
+   9  E 22100 Infant I
+   10 E 22101 Kid    K
+   11 E 22102 Teen   T
+   12 E 22103 Adult  A
+   13 E 22103 Adult  A
+   14 F 22022 Adult  A
+   15 F 22027 Teen   T
+   16 F 22122 Kid    K
+   17 F 22127 Adult  A
+   19 G 22010 Adult  A
+   20 G 22020 Adult  A
+   21 G 22030 Adult  A
+   22 G 22040 Adult  A
+   23 G 22050 Adult  A
+   24 G 22060 Adult  A
 ;
 run;
    proc print data=Casetest; id profile; format CaseDate mmddyy10. ; run;
@@ -108,43 +108,52 @@ run;
 /*run;*/
 /*   proc print data= WideDSN1; run;*/
 
-* transpose AG *;
-   PROC transpose data=ExcludeLarge  
-   out=WideDSN1b(drop= _NAME_)  
-      prefix=AG ; 
-      var AG;        
-      by address;  
-run;
-/*   proc print data= WideDSN1; run;*/
-
 * transpose Dates *;
    PROC transpose data=ExcludeLarge  
-   out=WideDSN2(drop= _NAME_)
+   out=WideDSN1(drop= _NAME_)
       prefix=CaseDate ; 
       var CaseDate;          
-      by address;  
+      by address cluster;  
 run;
-/*   proc print data= WideDSN2; format CaseDate1-CaseDate3 mmddyy10.; run;*/
+/*   proc print data= WideDSN1; format CaseDate1-CaseDate3 mmddyy10.; run;*/
+
+* transpose AG *;
+   PROC transpose data=ExcludeLarge  
+   out=WideDSN2(drop= _NAME_)  
+      prefix=AG ; 
+      var AG;        
+      by address cluster;  
+run;
+/*   proc print data= WideDSN2; run;*/
+
+* transpose Cluster *;
+/*   PROC transpose data=ExcludeLarge  */
+/*   out=WideDSN3(drop= _NAME_)  */
+/*      prefix=Cluster ; */
+/*      var Cluster;        */
+/*      by address;  */
+/*run;*/
+/*   proc print data= WideDSN3; run;*/
 
 * transpose DaysBetween *;
    PROC transpose data=ExcludeLarge  
-   out=WideDSN3(drop= _NAME_)
+   out=WideDSN4(drop= _NAME_)
       prefix=DaysBetween ; 
-      var NumDays_between_HHcases;          
-      by address;  
+      var Days_between_cases;          
+      by address cluster;  
 run;
-/*   proc print data= WideDSN3;  run;*/
+/*   proc print data= WideDSN4;  run;*/
 
 * pull out final counter of number of cases per HH *;
-Data LastCase(keep=Address  NumCaseperHH); set ExcludeLarge;
-   by address;
-   if last.address;
-run;
+/*Data LastCase(keep=Address  NumCaseperHH); set ExcludeLarge;*/
+/*   by address;*/
+/*   if last.address;*/
+/*run;*/
 /*   proc print data= LastCase; run;*/
 
 * Merge transposed datasets and final counter together *;
-DATA HHwideNEW; merge      WideDSN1b  WideDSN2  WideDSN3  LastCase;
-   by address;
+DATA ClusterWide; merge  WideDSN1  WideDSN2    WideDSN4 ;
+   by address cluster;  
 
    array CDs{5} CaseDate1-CaseDate5;
    array AGs{5} AG1-AG5;
@@ -154,20 +163,21 @@ DATA HHwideNEW; merge      WideDSN1b  WideDSN2  WideDSN3  LastCase;
    end;
 
    AG = cats(AG1, AG2, AG3, AG4, AG5);
-   TP1_AG=compress(AG,'IKTA');
-   TP2_AG=compress(AG,'ikta');
+/*   TP1_AG=compress(AG,'IKTA');*/
+/*   TP2_AG=compress(AG,'ikta');*/
 
    DROP AG1-AG5  i ;
 
 * ADD variables to use in analysis *;
-   NumHHcases1=COUNTC(AG,'ikta') ;
-   NumHHcases2=COUNTC(AG,'IKTA') ;
-   NumHHcases = NumHHcases1 + NumHHcases2;
+   NumCases1=COUNTC(AG,'ikta') ;
+   NumCases2=COUNTC(AG,'IKTA') ;
+   NumCases = NumCases1 + NumCases2 ;
+
 run;
-   proc print data=HHwideNEW;  
-      id address;  
-      var DaysBetween1 - DaysBetween5  TP1_AG  TP2_AG  AG  NumHHcases1  NumHHcases2 NumHHcases ;
-/*      format CaseDate1-CaseDate5 monyy5.;  */
+
+   proc print data= ClusterWide; id address ; by address; 
+      var Cluster CaseDate1  CaseDate2 AG  NumCases1 NumCases2  NumCases  DaysBetween1  DaysBetween2  ;
+      format CaseDate1-CaseDate5 monyy5.;  
 run;
 
 
@@ -175,40 +185,84 @@ run;
 *** Analysis ***;
 ***----------***;
 
-
 ** Number of HH with 1+ case in time period 1, 2, and 1&2. **;
-   PROC means data=HHwideNEW n ;  where NumHHcases1>0;   var  NumHHcases1 ;  run;
-   PROC means data=HHwideNEW n ;  where NumHHcases2>0;   var  NumHHcases2 ;  run;
+   PROC SQL;
+      select count(distinct Address) as NumHH20
+      from ClusterWide 
+      where NumCases1>0 ;
+run;
 
-** Distribution of the number of cases in a HH for time period 1, 2, and 1&2 (total). **;
-   PROC freq data=HHwideNEW ;
-      tables NumHHcases1  NumHHcases2  NumHHcases/  missing missprint ;
-      tables NumHHcases1 * NumHHcases2  / list  missing missprint ;
+   PROC SQL;
+      select count(distinct Address) as NumHH21
+      from ClusterWide 
+      where NumCases2>0 ;
+run;
+
+   PROC SQL;
+      select count(distinct Address) as NumHH
+      from ClusterWide ;
 run;
 
 
-** Distribution of AG's involved in time period 1, 2, and 1&2 **;
-   PROC freq data=HHwideNEW ;
-      tables TP1_AG   TP2_AG  /  missing missprint ;
+** Number of clusters by time period **;
+   PROC means data=ClusterWide n ;  where NumCases1>0;   var  Cluster NumCases1 ; run;
+   PROC means data=ClusterWide n ;  where NumCases2>0;   var  Cluster NumCases2;  run;
+   PROC means data=ClusterWide n ;  where NumCases >0;   var  Cluster NumCases ;  run;
+
+
+ ** Number of clusters per HH by time period **;
+   proc freq data=clusterwide noprint ; 
+      where month(CaseDate1) in (3,4);
+      tables Address  / out=ClusterPerHH1;
+/*   proc print data= ClusterPerHH1; run;*/
+   proc freq data= ClusterPerHH1; tables Count; run;
+
+   proc freq data=clusterwide noprint ; 
+      where month(CaseDate1) in (7,8);
+      tables Address  / out=ClusterPerHH2;
+   proc freq data= ClusterPerHH2; tables Count; run;
+
+   proc freq data=clusterwide noprint ; 
+      tables Address  / out=ClusterPerHH;
+   proc freq data= ClusterPerHH; tables Count; run;
+
+
+** Distribution of FULL AG's involved in time period 1, 2, and 1&2 **;
+   PROC freq data=clusterwide ;
+      where month(CaseDate1) in (3,4);  
+      tables AG    /  missing missprint ;
+run;
+   PROC freq data=clusterwide ;
+      where month(CaseDate1) in (7,8);  
+      tables AG    /  missing missprint ;
 run;
 
-** Distribution of which AG was first case in time period 1, 2, and 1&2 **;
-   PROC freq data=HHwideNEW ;
-      tables TP1_AG   TP2_AG  /  missing missprint ;
-      format TP1_AG   TP2_AG $1.;
+
+** Distribution of FIRST CASE per AG's involved in time period 1, 2, and 1&2 **;
+   PROC freq data=clusterwide ;
+      where month(CaseDate1) in (3,4);  
+      tables AG    /  missing missprint ;
+      format AG $1.;
 run;
+   PROC freq data=clusterwide ;
+      where month(CaseDate1) in (7,8);  
+      tables AG    /  missing missprint ;
+      format AG $1.;
+run;
+
 
 ** FOR THOSE HH WITH A CASE DURING TP:  Distribution of which AG was first case in time period 1, 2, and 1&2 **;
-   PROC freq data=HHwideNEW ;
-      where NumHHcases1>0;
-      tables TP1_AG   /  missing missprint ;
-      format TP1_AG   TP2_AG $1.;
+   PROC freq data=clusterwide ;
+      where month(CaseDate1) in (3,4)  AND  NumCases1>0;
+      tables AG   /  missing missprint ;
+      format AG $1.;
 run;
-   PROC freq data=HHwideNEW ;
-      where NumHHcases2>0;
-      tables TP2_AG   /  missing missprint ;
-      format TP1_AG   TP2_AG $1.;
+   PROC freq data=clusterwide ;
+      where month(CaseDate1) in (7,8)  AND  NumCases2>0;
+      tables AG   /  missing missprint ;
+      format AG $1.;
 run;
+
 
 
 

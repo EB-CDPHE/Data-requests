@@ -4,32 +4,32 @@
 ***------------------------***;
 
 DATA Casetest;
-   input Profile Address $  CaseDate  AgeGroup $  AG $ ;
+   input Profile Address $  CaseDate  AgeGroup $  AG $ Diff ;
    datalines;
-   1  A 22000 Adult  A
-   2  B 22001 Adult  A
-   3  B 22005 Adult  A
-   18 B 22115 Teen   T
-   4  C 22012 Adult  A
-   5  C 22017 Teen   T 
-   6  D 22025 Kid    K 
-   7  D 22033 Adult  A
-   8  D 22035 Adult  A
-   9  E 22100 Infant I
-   10 E 22101 Kid    K
-   11 E 22102 Teen   T
-   12 E 22103 Adult  A
-   13 E 22103 Adult  A
-   14 F 22022 Adult  A
-   15 F 22027 Teen   T
-   16 F 22122 Kid    K
-   17 F 22127 Adult  A
-   19 G 22010 Adult  A
-   20 G 22020 Adult  A
-   21 G 22030 Adult  A
-   22 G 22040 Adult  A
-   23 G 22050 Adult  A
-   24 G 22060 Adult  A
+   1  A 22000 Adult  A 8
+   2  B 22001 Adult  A 6
+   3  B 22005 Adult  A 2
+   18 B 22115 Teen   T 4
+   4  C 22012 Adult  A 1
+   5  C 22017 Teen   T 3
+   6  D 22025 Kid    K 2
+   7  D 22033 Adult  A 5
+   8  D 22035 Adult  A 7
+   9  E 22100 Infant I 9
+   10 E 22101 Kid    K 8
+   11 E 22102 Teen   T 5
+   12 E 22103 Adult  A 4
+   13 E 22103 Adult  A 6
+   14 F 22022 Adult  A 3
+   15 F 22027 Teen   T 1
+   16 F 22122 Kid    K 2
+   17 F 22127 Adult  A 3
+   19 G 22010 Adult  A 4
+   20 G 22020 Adult  A 5
+   21 G 22030 Adult  A 6
+   22 G 22040 Adult  A 7
+   23 G 22050 Adult  A 8
+   24 G 22060 Adult  A 9
 ;
 run;
    proc print data=Casetest; id profile; format CaseDate mmddyy10. ; run;
@@ -48,7 +48,12 @@ Data HHtest FlagAddress(keep=Address); set CaseSort;
   if first.Address then do; NumCaseperHH=0;  end;
 
   NumCaseperHH+1;
-  NumDays_between_HHcases = CaseDate - lag(CaseDate);
+
+  if month(CaseDate) in (3,4) then CaseDate1=CaseDate; else
+  if month(CaseDate) in (7,8) then CaseDate2=CaseDate; 
+
+  NumDays_between_HHcases1 = CaseDate1 - lag(CaseDate1);
+  NumDays_between_HHcases2 = CaseDate2 - lag(CaseDate2);
 
   if last.Address then do;
     if NumCaseperHH=1 then delete;
@@ -58,7 +63,7 @@ Data HHtest FlagAddress(keep=Address); set CaseSort;
   output HHtest;
 run;
 /*   proc print data=FlagAddress; run;*/
-/*   proc print data= HHtest;  id profile;  format CaseDate mmddyy10. ;  run;*/
+   proc print data= HHtest;  id profile;  format CaseDate CaseDate1 CaseDate2 mmddyy10. ;  run;
 
 
 *** Then remove HH with more than 10 cases ***;
@@ -67,9 +72,11 @@ Data ExcludeLarge; merge FlagAddress(in=x)  HHtest ;
    by address;
    if x=1 then delete;
 
-   if first.Address then do;  NumDays_between_HHcases=0;  end;
+      if (CaseDate1 ne . and NumDays_between_HHcases1=.) then NumDays_between_HHcases1=0; 
+      if (CaseDate2 ne . and NumDays_between_HHcases2=.) then NumDays_between_HHcases2=0; 
+
 run;
-/*   proc print data= ExcludeLarge;  id profile;  format CaseDate mmddyy10. ;  run;*/
+   proc print data= ExcludeLarge;  id profile;  format CaseDate CaseDate1 CaseDate2 mmddyy10. ;  run;
 
 
 *** Transpose data from Case level (tall) to HH level (wide) ***;

@@ -40,20 +40,34 @@ run;
 ***------------------------------------------------------------***;
    proc sort data= Casetest
                out= CaseSort;
-      by Address;
+      by Address CaseDate;
 
 Data HHtest FlagAddress(keep=Address); set CaseSort;
-  by Address;
+   by Address;
 
-  if first.Address then do; NumCaseperHH=0;  end;
+   if first.Address then do; NumCaseperHH=0;  Cluster=1;  ClusterCase=0;  Days_between_cases=0;  end;
+   else Days_between_cases = CaseDate - lag(CaseDate);
 
-  NumCaseperHH+1;
+   NumCaseperHH+1;
 
-  if month(CaseDate) in (3,4) then CaseDate1=CaseDate; else
-  if month(CaseDate) in (7,8) then CaseDate2=CaseDate; 
+   if Days_between_cases>3 then do;  Cluster+1; ClusterCase=0;  Days_between_cases=0;  end; 
 
-  NumDays_between_HHcases1 = CaseDate1 - lag(CaseDate1);
-  NumDays_between_HHcases2 = CaseDate2 - lag(CaseDate2);
+   ClusterCase+1;
+   Days_between_cases = CaseDate - lag(CaseDate);
+
+
+/*       if month(CaseDate) in (3,4) then CaseDate1a=CaseDate; */
+/*  else if month(CaseDate) in (7,8) then CaseDate2a=CaseDate; */
+/**/
+/*  NumDays_between_HHcases1 = CaseDate1a - lag(CaseDate1a);*/
+/*  NumDays_between_HHcases2 = CaseDate2a - lag(CaseDate2a);*/
+/**/
+/*           if NumDays_between_HHcases1>3 then CaseDate1b = CaseDate1a;*/
+/*      else if NumDays_between_HHcases2>3 then CaseDate2b = CaseDate2a;*/
+/**/
+/*      NumDays_between_HHcases1b = CaseDate1b - lag(CaseDate1b);*/
+/*      NumDays_between_HHcases2b = CaseDate2b - lag(CaseDate2b);*/
+
 
   if last.Address then do;
     if NumCaseperHH=1 then delete;
@@ -63,7 +77,7 @@ Data HHtest FlagAddress(keep=Address); set CaseSort;
   output HHtest;
 run;
 /*   proc print data=FlagAddress; run;*/
-   proc print data= HHtest;  id profile;  format CaseDate CaseDate1 CaseDate2 mmddyy10. ;  run;
+   proc print data= HHtest;  id address; by address;  format CaseDate mmddyy10. ;  run;
 
 
 *** Then remove HH with more than 10 cases ***;
@@ -72,11 +86,14 @@ Data ExcludeLarge; merge FlagAddress(in=x)  HHtest ;
    by address;
    if x=1 then delete;
 
-      if (CaseDate1 ne . and NumDays_between_HHcases1=.) then NumDays_between_HHcases1=0; 
-      if (CaseDate2 ne . and NumDays_between_HHcases2=.) then NumDays_between_HHcases2=0; 
+   if ClusterCase=1 then Days_between_cases=0;
+
+/*      if (CaseDate1 ne . and NumDays_between_HHcases1=.) then NumDays_between_HHcases1=0; */
+/*      if (CaseDate2 ne . and NumDays_between_HHcases2=.) then NumDays_between_HHcases2=0; */
+/*      NumDays_between_HHcases=sum(NumDays_between_HHcases1, NumDays_between_HHcases2);*/
 
 run;
-   proc print data= ExcludeLarge;  id profile;  format CaseDate CaseDate1 CaseDate2 mmddyy10. ;  run;
+   proc print data= ExcludeLarge;  id address; by address; format CaseDate  mmddyy10. ;  run;
 
 
 *** Transpose data from Case level (tall) to HH level (wide) ***;

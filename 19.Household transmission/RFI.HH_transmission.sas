@@ -429,9 +429,9 @@ DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  ;
    DROP i  AG1 AG2 AG3 AG4 AG5 AG6 AG7 AG8 AG9 AG10 ;
 
 * ADD variables to analyze *;
-   HHcases2020 = countc(AG, 'ikta');
-   HHcases2021 = countc(AG, 'IKTA');
-   HHcasesTotal = HHcases2020 + HHcases2021 ;
+   HHcases20 = countc(AG, 'ikta');
+   HHcases21 = countc(AG, 'IKTA');
+   HHcasesTotal = HHcases20 + HHcases21 ;
 
 run;
 
@@ -445,27 +445,67 @@ run;
 
 ** Number of HH with 1+ case in time period 1, 2, and 1&2. **;
    PROC SQL;
-      select count(distinct Address) as NumHH20
-      from HHcases 
-      where NumCases1>0 ;
-run;
+      select count(*) as NumHH20
+      from
+         (select distinct CountyAssigned, Address_City, Address1
+      from HHcases where HHcases20>0 );
+quit;
 
    PROC SQL;
-      select count(distinct Address) as NumHH21
-      from HHcases 
-      where NumCases2>0 ;
-run;
+      select count(*) as NumHH21
+      from
+         (select distinct CountyAssigned, Address_City, Address1
+      from HHcases where HHcases21>0 );
+quit;
 
    PROC SQL;
-      select count(distinct Address) as NumHH
-      from HHcases ;
+      select count(*) as NumHH
+      from
+         (select distinct CountyAssigned, Address_City, Address1
+      from HHcases );
+quit;
+
+
+** Number of clusters by time period **;
+   PROC means data=HHcases n ;  where HHcases20>0;    var  Cluster HHcases20 ;  run;
+   PROC means data=HHcases n ;  where HHcases21>0;    var  Cluster HHcases21 ;  run;
+   PROC means data=HHcases n ;  where HHcasesTotal>0; var  Cluster HHcases21 ;  run;
+
+
+** Number of clusters per HH by time period **;
+   PROC freq data=HHcases noprint ; 
+      where year(ReportedDate1)=2020;
+      tables CountyAssigned * Address_City * Address1  / list out=ClusterPerHH20;
+/*   proc print data= ClusterPerHH20; run;*/
+   PROC freq data= ClusterPerHH20;  tables Count;  run;
+
+
+   PROC freq data=HHcases noprint ; 
+      where year(ReportedDate1)=2021;
+      tables CountyAssigned * Address_City * Address1  / list out=ClusterPerHH21;
+   PROC freq data= ClusterPerHH21; tables Count; run;
+
+
+   PROC freq data=HHcases noprint ; 
+      tables CountyAssigned * Address_City * Address1  / list out=ClusterPerHH;
+   PROC freq data= ClusterPerHH; tables Count; run;
+
+
+
+** Distribution of FULL list of HH cases involved in time period 1 and 2  **;
+   PROC freq data=HHcases ;
+      where year(ReportedDate1)=2020;
+      tables AG    /  missing missprint ;
+run;
+   PROC freq data=HHcases ;
+      where year(ReportedDate1)=2021;
+      tables AG    /  missing missprint ;
 run;
 
 
 
-** Number of HH with 1+ case in time period 1, 2, and 1&2. **;
-   PROC means data=HHcases n ;  where HHcases2020>0;   var  HHcases2020 ;  run;
-   PROC means data=HHcases n ;  where HHcases2021>0;   var  HHcases2021 ;  run;
+
+
 
 ** Distribution of the number of cases in a HH for time period 1, 2, and 1&2 (total). **;
    PROC freq data=HHcases ;

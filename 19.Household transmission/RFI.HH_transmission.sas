@@ -342,14 +342,19 @@ DATA CEDRS_HouseHolds
    set Address1_sort;
    by CountyAssigned  Address_City  Address1 ;
 
-   if first.Address1 then NumCasePerHH=0;
-   NumCasePerHH+1;
+   if first.Address1 then do;  NumCases_HH=0;  Cluster=1;  NumCases_Cluster=0;  Days_since_last_case=0;  end;
+   else Days_since_last_case = ReportedDate - lag(ReportedDate);
 
-   Days_between_cases = ReportedDate - lag(ReportedDate);
+   NumCases_HH+1;
+
+   if Days_since_last_case >30 then do; Cluster+1;  NumCases_Cluster=0;  Days_since_last_case=0;  end;
+
+   NumCases_Cluster+1;
+   Days_since_last_case = ReportedDate - lag(ReportedDate);
 
    if last.Address1 then do;
-      if NumCasePerHH=1 then delete;
-      if NumCasePerHH>10 then output FlagAddress;
+      if NumCases_HH=1 then delete;
+      if NumCases_HH>10 then output FlagAddress;
    end;
 
   output CEDRS_HouseHolds;
@@ -365,7 +370,7 @@ Data CEDRS_HH; merge FlagAddress(in=x)  CEDRS_HouseHolds ;
    by CountyAssigned  Address_City  Address1 ;
    if x=1 then delete;
 
-   if first.Address1 then Days_between_cases=0;
+   if NumCases_Cluster=1 then Days_between_cases=0;
 run;
 /*   proc print data= CEDRS_HH;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
 
@@ -373,59 +378,43 @@ run;
 *** Transpose data from Case level (tall) to HH level (wide) ***;
 ***----------------------------------------------------------***;
 
-* transpose AgeGroup *;                      * <-- NOT USED ANYMORE, AT LEAST AT THIS TIME *;
-/*   PROC transpose data=CEDRS_HH  */
-/*   out=WideDSN1x(drop= _NAME_)  */
-/*      prefix=AgeGroup ; */
-/*      var AgeGroup;        */
-/*      by CountyAssigned  Address_City  Address1 ;*/
-/*run;*/
-/*   proc print data= WideDSN1x; run;*/
-
-   PROC transpose data=CEDRS_HH  
-   out=WideDSN1(drop= _NAME_)  
-      prefix=AG ; 
-      var AG;        
-      by CountyAssigned  Address_City  Address1 ;
-run;
-/*   proc print data= WideDSN1; run;*/
-
 * transpose ReportedDate *;
    PROC transpose data=CEDRS_HH  
-   out=WideDSN2(drop= _NAME_)
+   out=WideDSN1(drop= _NAME_)
       prefix=ReportedDate ; 
       var ReportedDate;          
-      by CountyAssigned  Address_City  Address1 ;
+      by CountyAssigned  Address_City  Address1  Cluster ;
 run;
-/*   proc print data= WideDSN2;  run;*/
+/*   proc print data= WideDSN1;  run;*/
 
-* transpose ReportedDate *;
+* transpose AG *;
+   PROC transpose data=CEDRS_HH  
+   out=WideDSN2(drop= _NAME_)  
+      prefix=AG ; 
+      var AG;        
+      by CountyAssigned  Address_City  Address1 Cluster;
+run;
+/*   proc print data= WideDSN2; run;*/
+
+* transpose Days_since_last_case *;
    PROC transpose data=CEDRS_HH  
    out=WideDSN3(drop= _NAME_)
       prefix=DaysBetween ; 
-      var Days_between_cases;          
-      by CountyAssigned  Address_City  Address1 ;
+      var Days_since_last_case;          
+      by CountyAssigned  Address_City  Address1 Cluster;
 run;
 /*   proc print data= WideDSN3;  run;*/
-
-* pull out final counter of number of cases per HH *;          * <-- THIS IS REDUNDANT NOW THAT IT IS CALCULATED BELOW *;
-Data LastCase(keep=CountyAssigned  Address_City  Address1  NumCasePerHH);  
-   set CEDRS_HH;
-   by CountyAssigned  Address_City  Address1 ;
-   if last.Address1;
-run;
-/*   proc print data= LastCase; run;*/
 
 
 ***  Creation of Household (HH) level dataset  ***;
 ***--------------------------------------------***;
 
 * Merge transposed datasets and final counter together *;
-DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  LastCase;
-   by CountyAssigned  Address_City  Address1 ;
+DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  ;
+   by CountyAssigned  Address_City  Address1  Cluster ;
 
-   ARRAY RptDates{10} ReportedDate1 - ReportedDate10 ;
-   ARRAY AGvars{10} AG1 - AG10 ;
+   ARRAY RptDates{10} ReportedDate1-ReportedDate10 ;
+   ARRAY AGvars{10} AG1-AG10 ;
 
    do i = 1 to 10;
            if year(RptDates{i}) = 2020 then AGvars{i} = lowcase(AGvars{i}) ;
@@ -434,8 +423,8 @@ DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  LastCase;
 
    AG=cats(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);
 
-   Fall20_AG=compress(AG, 'IKTA');
-   Fall21_AG=compress(AG, 'ikta');
+/*   Fall20_AG=compress(AG, 'IKTA');*/
+/*   Fall21_AG=compress(AG, 'ikta');*/
 
    DROP i  AG1 AG2 AG3 AG4 AG5 AG6 AG7 AG8 AG9 AG10 ;
 
@@ -451,9 +440,27 @@ run;
 
 
 
-
 ***  Analyze HH level data  ***;
 ***-------------------------***;
+
+** Number of HH with 1+ case in time period 1, 2, and 1&2. **;
+   PROC SQL;
+      select count(distinct Address) as NumHH20
+      from HHcases 
+      where NumCases1>0 ;
+run;
+
+   PROC SQL;
+      select count(distinct Address) as NumHH21
+      from HHcases 
+      where NumCases2>0 ;
+run;
+
+   PROC SQL;
+      select count(distinct Address) as NumHH
+      from HHcases ;
+run;
+
 
 
 ** Number of HH with 1+ case in time period 1, 2, and 1&2. **;
@@ -500,14 +507,14 @@ run;
    ***----------****;
    PROC freq data= HHwide ;
       tables AG / missing missprint  ; 
-/*      tables NumCasePerHH  AgeGroup1  /list missing missprint  ; */
+/*      tables NumCases_HH  AgeGroup1  /list missing missprint  ; */
 run;
 
 
 *  Counts of cases per HH by Age group  *;
    PROC freq data= HHwide ;
 /*      tables AgeGroup1 * AgeGroup2 * AgeGroup3 * AgeGroup4 * AgeGroup5 * AgeGroup6 * AgeGroup7 * AgeGroup8 * AgeGroup9 * AgeGroup10    /list missing missprint  ; */
-      tables NumCasePerHH  AgeGroup1  /list missing missprint  ; 
+      tables NumCases_HH  AgeGroup1  /list missing missprint  ; 
 run;
 
    PROC freq data= HHwide ;

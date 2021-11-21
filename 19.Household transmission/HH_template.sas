@@ -124,7 +124,7 @@ DATA ClusterWide; merge  WideDSN1  WideDSN2    WideDSN3 ;
    TP2_AG=compress(AG,'ikta');
 
    if findc(TP1_AG,'ikt')>0 then TP1_Kids=1; else if TP1_AG='' then TP1_Kids=.; else TP1_Kids=0;
-   if findc(TP2_AG,'ikt')>0 then TP2_Kids=1; else if TP2_AG='' then TP2_Kids=.; else TP2_Kids=0;
+   if findc(TP2_AG,'IKT')>0 then TP2_Kids=1; else if TP2_AG='' then TP2_Kids=.; else TP2_Kids=0;
 
    DROP AG1-AG5  i ;
 

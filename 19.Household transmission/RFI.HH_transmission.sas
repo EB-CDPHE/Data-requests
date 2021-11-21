@@ -423,8 +423,8 @@ DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  ;
 
    AG=cats(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);
 
-/*   Fall20_AG=compress(AG, 'IKTA');*/
-/*   Fall21_AG=compress(AG, 'ikta');*/
+   Fall20_AG=compress(AG, 'IKTA');
+   Fall21_AG=compress(AG, 'ikta');
 
    DROP i  AG1 AG2 AG3 AG4 AG5 AG6 AG7 AG8 AG9 AG10 ;
 
@@ -491,21 +491,40 @@ quit;
    PROC freq data= ClusterPerHH; tables Count; run;
 
 
-
 ** Distribution of FULL list of HH cases involved in time period 1 and 2  **;
    PROC freq data=HHcases ;
-      where year(ReportedDate1)=2020;
-      tables AG    /  missing missprint ;
+      where Fall20_AG ne '';
+      tables Fall20_AG    /  missing missprint ;
 run;
    PROC freq data=HHcases ;
-      where year(ReportedDate1)=2021;
-      tables AG    /  missing missprint ;
+      where Fall21_AG ne '';
+      tables Fall21_AG    /  missing missprint ;
+run;
+
+
+** Distribution of FIRST CASE per AG's involved in time period 1 and 2  (ALL HH) **;
+   PROC freq data=HHcases ;
+      where Fall20_AG ne '';
+      tables Fall20_AG    /  missing missprint ;
+      format Fall20_AG $1.;
+run;
+   PROC freq data=HHcases ;
+      where Fall21_AG ne '';
+      tables Fall21_AG    /  missing missprint ;
+      format Fall21_AG $1.;
 run;
 
 
 
 
 
+
+
+
+
+
+   *** OLD CODE ***;
+   ***----------****;
 
 ** Distribution of the number of cases in a HH for time period 1, 2, and 1&2 (total). **;
    PROC freq data=HHcases ;
@@ -538,13 +557,6 @@ run;
 run;
 
 
-
-
-
-
-
-   *** OLD CODE ***;
-   ***----------****;
    PROC freq data= HHwide ;
       tables AG / missing missprint  ; 
 /*      tables NumCases_HH  AgeGroup1  /list missing missprint  ; */

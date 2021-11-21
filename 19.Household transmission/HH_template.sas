@@ -27,12 +27,12 @@ DATA Casetest;
    19 G 22010 Adult  A
    20 G 22020 Adult  A
    21 G 22030 Adult  A
-   22 G 22040 Adult  A
-   23 G 22050 Adult  A
-   24 G 22060 Adult  A
+   22 H 22040 Adult  A
+   23 H 22050 Adult  A
+   24 H 22060 Adult  A
 ;
 run;
-   proc print data=Casetest; id profile; format CaseDate mmddyy10. ; run;
+/*   proc print data=Casetest; id profile; format CaseDate mmddyy10. ; run;*/
 
 
 
@@ -100,16 +100,16 @@ run;
 
 * transpose DaysBetween *;
    PROC transpose data=ExcludeLarge  
-   out=WideDSN4(drop= _NAME_)
+   out=WideDSN3(drop= _NAME_)
       prefix=DaysBetween ; 
       var Days_between_cases;          
       by address cluster;  
 run;
-/*   proc print data= WideDSN4;  run;*/
+/*   proc print data= WideDSN3;  run;*/
 
 
 * Merge transposed datasets and final counter together *;
-DATA ClusterWide; merge  WideDSN1  WideDSN2    WideDSN4 ;
+DATA ClusterWide; merge  WideDSN1  WideDSN2    WideDSN3 ;
    by address cluster;  
 
    array CDs{5} CaseDate1-CaseDate5;
@@ -120,8 +120,11 @@ DATA ClusterWide; merge  WideDSN1  WideDSN2    WideDSN4 ;
    end;
 
    AG = cats(AG1, AG2, AG3, AG4, AG5);
-/*   TP1_AG=compress(AG,'IKTA');*/
-/*   TP2_AG=compress(AG,'ikta');*/
+   TP1_AG=compress(AG,'IKTA');
+   TP2_AG=compress(AG,'ikta');
+
+   if findc(TP1_AG,'ikt')>0 then TP1_Kids=1; else if TP1_AG='' then TP1_Kids=.; else TP1_Kids=0;
+   if findc(TP2_AG,'ikt')>0 then TP2_Kids=1; else if TP2_AG='' then TP2_Kids=.; else TP2_Kids=0;
 
    DROP AG1-AG5  i ;
 
@@ -131,6 +134,9 @@ DATA ClusterWide; merge  WideDSN1  WideDSN2    WideDSN4 ;
    NumCases = NumCases1 + NumCases2 ;
 
 run;
+/*   proc print data= ClusterWide; id address ; by address; */
+/*   var AG  TP1_AG   TP1_Kids   TP2_AG   ;*/
+/*run;*/
 
    proc print data= ClusterWide; id address ; by address; 
       var Cluster CaseDate1  CaseDate2 AG  NumCases1 NumCases2  NumCases  DaysBetween1  DaysBetween2  ;

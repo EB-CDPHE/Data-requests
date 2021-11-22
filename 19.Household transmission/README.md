@@ -93,12 +93,12 @@ Findings:
 ````
 These are only a few examples of the types of data issues with Address1. At this time, these data issues have been ignored. For the majority of the cases though, it was deemed that Address1, in the context of County and City, was a sufficient tool for defining HH.
 
-The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to create "Households". Eligible HH were those that had 2-10 cases per HH.
+The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to create "Households". HH with only a sigle case were excluded.
 
-Here is the distribution of cases per HH:
-![Num_Cases_per_HH](Images/Num_Cases_per_HH.png)
+**Here is the distribution of cases per HH:**
+![Num_Cases_per_HH](Images/Num_Cases_per_HH2.png)
 
-
+It was decided to exclude HH with more than ten cases. Thus, eligible HH were those that had 2-10 cases per HH. There was a total of 61,309 cases in the 24,519 eligible HH.
 #
 #
 #

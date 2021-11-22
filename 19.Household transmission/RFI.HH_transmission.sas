@@ -373,7 +373,7 @@ run;
 /*   proc print data=FlagAddress; run;*/
 /*   proc print data= CEDRS_HouseHolds;  id Address1; var NumCases_HH  Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
 /*   proc freq data= CEDRS_HouseHolds noprint; tables CountyAssigned * Address_City * Address1/list out=CountCasesperHH; */
-/*   proc freq data= CountCasesperHH; tables count; run;*/
+/*   proc freq data= CountCasesperHH; tables count; title1 'Number of cases per HH'; run;*/
 
 
 *** Then remove HH with more than 10 cases ***;
@@ -439,8 +439,8 @@ DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  ;
    Fall20_AG=compress(AG, 'IKTA');
    Fall21_AG=compress(AG, 'ikta');
 
-   if findc(Fall20_AG,'ikt')>0 then TP1_Kids=1; else if TP1_AG='' then TP1_Kids=.; else TP1_Kids=0;
-   if findc(Fall21_AG,'IKT')>0 then TP2_Kids=1; else if TP2_AG='' then TP2_Kids=.; else TP2_Kids=0;
+   if findc(Fall20_AG,'ikt')>0 then AnyKids20=1; else if Fall20_AG='' then AnyKids20=.; else AnyKids20=0;
+   if findc(Fall21_AG,'IKT')>0 then AnyKids21=1; else if Fall20_AG='' then AnyKids21=.; else AnyKids21=0;
 
    DROP i  AG1 AG2 AG3 AG4 AG5 AG6 AG7 AG8 AG9 AG10 ;
 
@@ -453,6 +453,9 @@ run;
 
    PROC contents data=HHcases  varnum; title1 'HHcases'; run;
 
+** To get the number of clusters per HH **;
+/*   proc freq data= HHcases noprint; tables CountyAssigned * Address_City * Address1  /list out=CountClustersperHH; */
+/*   proc freq data= CountClustersperHH; tables count; title1 'Number of clusters per HH'; run;*/
 
 
 

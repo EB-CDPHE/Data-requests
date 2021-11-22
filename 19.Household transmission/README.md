@@ -119,7 +119,9 @@ Over a quarter of the HH had two clusters of cases, i.e. cases that were more th
 |t or T|teens|12-17 year olds|
 |a or A|adults|18-15 year olds|
 
-Thus, each cluster has a variable, `AG`, which displays the cases by Age Group in the order in which they were reported. For HH cases in Fall 2020, the AG variable is all lower case letters. Whereas for Fall 2021, the AG variable is all upper case letters. Here is an exerpt of the HH data:
+Thus, each cluster has a variable, `AG`, which displays the cases by Age Group in the order in which they were reported. For HH cases in Fall 2020, the AG variable is all lower case letters. Whereas for Fall 2021, the AG variable is all upper case letters. 
+
+**Here is an exerpt of the HH data:**
 
 ![AG_example](images/AG_example3.png)
 

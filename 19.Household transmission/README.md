@@ -67,6 +67,38 @@ A lot more data cleaning could be done, particularly with ZipCode data and missi
 ## Section 3:
 **3. Filter dataset again based on complete address components**
 The CEDRS_Filtered dataset is filtered again, keeping only those records with complete address components (Address1, City, and County). Also, the 17 records where `Age_at_Reported=.` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
+
+## Section 4:
+**4. Eligible Households
+
+The primary definition of a HH is based on Address1. County and City provide the context for this field to ensure Address1 is unique. CEDRS_Addresses was sorted by County, City, and Address1. A preview of the data was skimmed. Several data issues were noted with Address1. Here are the findings:
+
+Findings:
+````diff
++/*------------------------------------------------------------------------------------------*
++ |FINDINGS:
++ | There are several examples of HH's with slightly different values for Address1
++ |    For example:
++ |    "4037 W 62ND PL"  vs  "4037 W 62ND PL 652563542"
++ |    "4237 62ND PL  vs "4237 W 62ND PL"  vs "4237 WEST 62ND PLACE"
++ |    " 5005 W 61ST DR"  vs  " 5005 W.61ST.DR."
++ |    " 6065 UTICA"  vs  " 6065 UTICA ST"
++ |    "6288 NEWTON COURT"  vs  "6288 NEWTON CT"
++ |    "2320 HANDOVER ST"  vs  "2320 HANOVER ST"
++ |
++ |    ALSO:  150 N 19TH AVE (in BRIGHTON) is Adams County Sheriff's Detention Facility.
++ |    FIX: Set Live_in_Institution = 'Yes'
++ |    Should investigate other addresses that have >10 cases per Address1.
++ *--------------------------------------------------------------------------------------------*/
+````
+These are only a few examples of the types of data issues with Address1. At this time, these data issues have been ignored. For the majority of the cases though, it was deemed that Address1, in the context of County and City, was a sufficient tool for defining HH.
+
+The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to create "Households". Eligible HH were those that had 2-10 cases per HH.
+
+Here is the distribution of cases per HH:
+![Num_Cases_per_HH](Images/Num_Cases_per_HH.png)
+
+
 #
 #
 #

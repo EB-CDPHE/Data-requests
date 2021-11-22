@@ -62,12 +62,12 @@ run;
 
 * Address1 missing *;
    PROC freq data= CEDRS_filtered ;
-      where Address1 = '';
+/*      where Address1 = '';*/
       tables Address1 Address2 AddressActual / missing missprint;
 run;
 /*--------------------------------------------------------------------*
  |FINDINGS:
- | n=729 obs missing data for Address1 and Address2
+ | n=776 obs missing data for Address1 and Address2
  | N=52 obs where Address1='' and Address2 contains data. THEREFORE:
  | FIX:  If Address1='' and Address2^='' then Address1=Address2;
  *--------------------------------------------------------------------*/
@@ -82,6 +82,11 @@ run;
  | FIX:  If Address1='0' then Address1=' ';
  *---------------------------------------------------------------*/
 
+   PROC freq data= CEDRS_filtered ;
+      where Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN');
+      tables Address1 Address2 AddressActual / missing missprint;
+run;
+
 
 * City missing *;
    PROC freq data= CEDRS_filtered ;
@@ -92,6 +97,36 @@ run;
  |FINDINGS:
  | n=465 obs missing data for Address_City, Address_CityActual, and AddressActual
  *----------------------------------------------------------------------------------*/
+
+   PROC freq data= CEDRS_filtered ;
+      where Address_CityActual = '';
+      tables Address1 Address2 AddressActual  Address_City Address_CityActual / missing missprint;
+run;
+
+
+* State *;
+   PROC freq data= CEDRS_filtered ;
+      tables Address_State / missing missprint;
+run;
+/*----------------------------------------------*
+ |FINDINGS:
+ | Over 98% of records have State=CO
+ | NOTE: Add to Address Filter
+ | N=2992 records where State = missing
+ *----------------------------------------------*/
+
+
+* Zipcode *;
+   PROC freq data= CEDRS_filtered ;
+      tables Address_Zipcode / missing missprint;
+run;
+
+/*-------------------------------------------------------------------------*
+ |FINDINGS:
+ | For zipcode with 9 digits need to insert '-'.
+ | Then need to create numeric zipcode from first 'word' 
+ | Then can use zipcode range (80000 - 81700) to fill in missing State
+ *-------------------------------------------------------------------------*/
 
 
 * County *;
@@ -117,28 +152,7 @@ run;
  *--------------------------------------------------------------------*/
 
 
-* Zipcode *;
-   PROC freq data= CEDRS_filtered ;
-      tables Address_Zipcode / missing missprint;
-run;
 
-/*-------------------------------------------------------------------------*
- |FINDINGS:
- | For zipcode with 9 digits need to insert '-'.
- | Then need to create numeric zipcode from first 'word' 
- | Then can use zipcode range (80000 - 81700) to fill in missing State
- *-------------------------------------------------------------------------*/
-
-
-* State *;
-   PROC freq data= CEDRS_filtered ;
-      tables Address_State / missing missprint;
-run;
-/*---------------------------------------------------*
- |FINDINGS:
- | Over 98% of records have State=CO
- | NOTE: Add to Address Filter
- *--------------------------------------------------*/
 
 
 *** Records by completeness of components of a complete address ***;

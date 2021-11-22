@@ -99,6 +99,11 @@ The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to
 ![Num_Cases_per_HH](Images/Num_Cases_per_HH2.png)
 
 It was decided to exclude HH with more than ten cases. Thus, eligible HH were those that had 2-10 cases per HH. There was a total of 61,309 cases in the 24,519 eligible HH.
+
+Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". 
+
+**Here is the distribution of clusters per HH:**
+![Num_Clusters_per_HH](Images/Num_Clusters_per_HH2.png)
 #
 #
 #

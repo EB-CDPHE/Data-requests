@@ -51,16 +51,25 @@ Either address or lat/long could be used to group cases into "Households". Addre
 |Address_Latitude|Lat Long|7200|
 |Address_Longitude|Lat Long|7200|
 
+Over 7000 records are missing Lat / Long so it was decided to define HH based on address components. Here is a summary of completeness of the various address components:
 
-DATA EDITS:
+![Address_components](images/Completeness_of_Address_components.png)
+
+Almost 98% of the records have data for all address components. Zipcode will not be used to define HH and only cases where State=CO will be used. **Therefore, HH is defined by unique value for Address1, City, and County.**
+
+Some minor data edits were made. Specifically:
 1. If Address1='' and Address2^='' then Address1=Address2;
 2. If Address1='0' then Address1='';
 3. if Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN') then Address1='';
 
+A lot more data cleaning could be done, particularly with ZipCode data and missing State values. Some easy fixes would be to focus on the handful of records missing City but have Address and State or Zipcode data. The city can be easily obtained by googling the street address. 
 
-The macro creates a SAS dataset with rates and rolling averages. Tableau was used to connect to this data, idenity the 'high mortality period', and explore relationships between 14 day moving average for mortality rate and selected variables. 
-
-**NOW that I think about it though, this was NOT a valid approach. SAS dataset collapses patient-level CEDRS dataset into a DATE-level dataset to calculate daily rates by group-processing and keeping last observation in group (ReportedDate). Thus, any patient-level data, such as age, is from the last obs in the group only.**
+## Section 3:
+**3. Filter dataset again based on complete address components**
+The CEDRS_Filtered dataset is filtered again, keeping only those records with complete address components (Address1, City, and County). Also, the 17 records where `Age_at_Reported=.` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
+#
+#
+#
 
 ## Response
 That's a bummer because I built a beautiful dashboard with highlighted findings.

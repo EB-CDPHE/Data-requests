@@ -30,12 +30,32 @@ Sections of the HH.sas code
 
 Cases in CEDRDS_fix dataset need to be filtered by `ReportedDate`, `CountyAssigned`, and `LiveInInstitution`. There were no missing observations for `ReportedDate`. `CollectionDate` was missing for almost 23,000 records and so was not used as a filter. The number of records with `"01SEP20"d LE ReportedDate LE "01NOV20"d` OR `"01SEP21"d LE ReportedDate LE "01NOV21"d` was 181,960 (on 11/22/21).  N=103 records where `CountyAssigned="INTERNATIONAL"` were filtered out. And the nearly 35,000 records where `LiveInInstitution="YES"` were excluded as well.
 
-The filters are applied to CEDRS_Fix dataset to create CEDRS_Filtered data. The full list of variables and their attributes for the CEDRS_Filtered dataset are listed [HERE](Documents/PROC%20contents.CEDRS_Filtered.pdf). 
+The filters were applied to CEDRS_Fix dataset to create the [CEDRS_Filtered dataset](Documents/PROC%20contents.CEDRS_Filtered.pdf). 
+
+## Section 2:
+
+**2. Evaluate various pieces of HH address**
+
+Either address or lat/long could be used to group cases into "Households". Address has multiple components, namely street address, unit number, city, State, zipcode, and county. Each of these elements were evaluated regarding completeness on the CEDRS_Filtered data.
+
+|HH element|Description of element|Number missing|
+|----------|-----------------------|--------------|
+|Address1|Street address|776|
+|Address2|Unit number|166,124|
+|AddressActual|Don't know what this field is|170,587|
+|Address_City|City|462|
+|Address_CityActual|DK what this field is|170,587|
+|Address_State|State|2992|
+|Address_Zipcode|Zip code|646|
+|CountyAssigned|County|0|
+|Address_Latitude|Lat Long|7200|
+|Address_Longitude|Lat Long|7200|
 
 
-Then 2. assess completeness and quality of address components, i.e. address1, address2, city, zip, state, and county.
-And then, hm, how to define HH.
-
+DATA EDITS:
+1. If Address1='' and Address2^='' then Address1=Address2;
+2. If Address1='0' then Address1='';
+3. if Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN') then Address1='';
 
 
 The macro creates a SAS dataset with rates and rolling averages. Tableau was used to connect to this data, idenity the 'high mortality period', and explore relationships between 14 day moving average for mortality rate and selected variables. 
@@ -49,5 +69,7 @@ That's a bummer because I built a beautiful dashboard with highlighted findings.
 #
 **Issues:**
 # Oh! Where do I begin??!! 
-* maybe here at home
+* Definition of a HH? Single family homes only? Should we exclude apartment complexes? If not, is each apartment a separate HH or should the entire apartment complex be a single HH?
+* Almost 3000 cases were missing data for State. Many of these could be CO households. Most of these have Zipcode data. If Zipcode data was cleaned and converted to numeric, it could easily be used to impute State=CO when Zipcode was 80000-80700.
+* Zipcode data needs to be cleaned.
 

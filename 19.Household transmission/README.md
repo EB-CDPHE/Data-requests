@@ -23,7 +23,17 @@ Ugh. Where to begin.
 |2.|FIX.COPHS edits data in COPHS.|
 |3.|RFI.HH_transmission.sas generates response.|
 
-Hm. 1. Filter cases by date range, county, and live in institution.Then 2. assess completeness and quality of address components, i.e. address1, address2, city, zip, state, and county.
+Sections of the HH.sas code
+## Section 1:
+
+**1. Check the filter variables**
+
+Cases in CEDRDS_fix dataset need to be filtered by `ReportedDate`, `CountyAssigned`, and `LiveInInstitution`. There were no missing observations for `ReportedDate`. `CollectionDate` was missing for almost 23,000 records and so was not used as a filter. The number of records with `"01SEP20"d LE ReportedDate LE "01NOV20"d` OR `"01SEP21"d LE ReportedDate LE "01NOV21"d` was 181,960 (on 11/22/21).  N=103 records where `CountyAssigned="INTERNATIONAL"` were filtered out. And the nearly 35,000 records where `LiveInInstitution="YES"` were excluded as well.
+
+The filters are applied to CEDRS_Fix dataset to create CEDRS_Filtered data. The full list of variables and their attributes for the CEDRS_Filtered dataset are listed [HERE](Documents/PROC%20contents.CEDRS_Filtered.pdf). 
+
+
+Then 2. assess completeness and quality of address components, i.e. address1, address2, city, zip, state, and county.
 And then, hm, how to define HH.
 
 

@@ -100,12 +100,32 @@ The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to
 
 It was decided to exclude HH with more than ten cases. Thus, eligible HH were those that had 2-10 cases per HH. There was a total of 61,309 cases in the 24,519 eligible HH.
 
-Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". 
+## Section 5:
+**5. Defining Clusters 
+
+Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". There were a total of 30,988 clusters with the eligible HH.
 
 **Here is the distribution of clusters per HH:**
 ![Num_Clusters_per_HH](Images/Num_Clusters_per_HH2.png)
-#
-#
+
+## Section 6:
+**6. Creating an analysis variable
+Over a quarter of the HH had two clusters of cases, i.e. cases that were more than 30 days apart. Nearly three quarters had only a single cluster of cases.  The data request was to look at the proportion of clusters that began with the various age groups.   
+
+|Abbrev.|Label|Age range|
+|---------|-----|------------|
+|i|infants|0-4 year olds|
+|k|kids|5-11 year olds|
+|t|teens|12-17 year olds|
+|a|adults|18-15 year olds|
+
+Thus, each cluster has a variable, `AG`, which displays the cases by Age Group in the order in which they were reported.
+
+
+The list of variables and their attributes for the final dataset is [HERE](Documents/PROC%20contents.HHcases.pdf).
+
+
+
 #
 
 ## Response

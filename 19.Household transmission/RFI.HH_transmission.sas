@@ -152,9 +152,6 @@ run;
  *--------------------------------------------------------------------*/
 
 
-
-
-
 *** Records by completeness of components of a complete address ***;
 ***-------------------------------------------------------------***;
 
@@ -165,7 +162,7 @@ run;
 run;
 
  * Colorado Records with full address (address1, city, state, county) *;
-   PROC freq data= CEDRS_filtered  order=freq;
+   PROC freq data= CEDRS_Filtered  order=freq;
 /*      where Address_State='CO';*/
       tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
       format Address1   Address_City   Address_State   Address_Zipcode $AnyDataFmt.;
@@ -374,7 +371,9 @@ DATA CEDRS_HouseHolds
   output CEDRS_HouseHolds;
 run;
 /*   proc print data=FlagAddress; run;*/
-/*   proc print data= CEDRS_HouseHolds;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+/*   proc print data= CEDRS_HouseHolds;  id Address1; var NumCases_HH  Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+/*   proc freq data= CEDRS_HouseHolds noprint; tables CountyAssigned * Address_City * Address1/list out=CountCasesperHH; */
+/*   proc freq data= CountCasesperHH; tables count; run;*/
 
 
 *** Then remove HH with more than 10 cases ***;

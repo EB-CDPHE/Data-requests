@@ -1,13 +1,13 @@
 ## Background 
 This data request came from Rachel Herlihy via Alicia Cronquist. Alicia's [email](Documents/Email_request_111021.pdf) was forwarded to me from Eduardo. 
 
-They are interested in learning what role kids going back to school have on COVID transmission within the household (HH) in particular, and the community in general. 
+They are interested in learning what role kids going back to school have on COVID transmission within the household (HH) in particular, and the community in general. As there is no HH identifier in CEDRS, response to this data request is tortuous and complex. 
 
-
-
-Sadly, there is no HH identifier in CEDRS. 
-
-**Population**:  Confirmed and probable cases in CEDRS with `ReportedDate` during fall season, i.e. September 1 - November 1.  **Groups**: School start for 2020 versus 2021. Age groups were 0-4 year olds, "infants"; 5-11 year olds, "kids"; 12-17 year olds, 'teens'; and 18-115 year olds, 'adults'.  **Data requested**: HH's with 2-10 cases reported in CEDRS. 
+**Population**:  Confirmed and probable cases in CEDRS with `ReportedDate` between September 1 - November 1 in 2020 and 2021.  **Data requested**: HH's with 2-10 cases reported in CEDRS.   **Groups**: School start for 2020 versus 2021. Age groups were:
+* 0-4 year olds, "infants"; 
+* 5-11 year olds, "kids"; 
+* 12-17 year olds, 'teens'; 
+* 18-115 year olds, 'adults'
 
 The following specific questions were asked:
 1. Among HH that had 2 or more cases, how frequently was the initial case reported in a minor (0-17 years old)?
@@ -16,6 +16,12 @@ The following specific questions were asked:
 
 ## Code
 Ugh. Where to begin.
+
+|Run order|SAS program|
+|---------|-----------|
+|1.|Access.COPHS pulls data from hosp144 COPHS and curates it.|
+|2.|FIX.COPHS edits data in COPHS.|
+|3.|RFI.HH_transmission.sas generates response.|
 
 Hm. 1. Filter cases by date range, county, and live in institution.Then 2. assess completeness and quality of address components, i.e. address1, address2, city, zip, state, and county.
 And then, hm, how to define HH.

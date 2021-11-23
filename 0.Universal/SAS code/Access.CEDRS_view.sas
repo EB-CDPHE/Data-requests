@@ -57,6 +57,7 @@ DATA CEDRS_view_temp;
                   Refreshed_on = tmp_refreshed_on  
                   Vax_UTD = tmp_Vax_UTD
                   Vax_FirstDose = tmp_Vax_FirstDose
+                  Vax_Booster = tmp_vax_booster
                   COPHS_AdmissionDate = tmp_cophs_admissiondate
                   DateVSDeceased = tmp_datevsdeceased
                   )); 
@@ -76,6 +77,7 @@ DATA CEDRS_view_temp;
    Data_pulled_as_of    = input(tmp_Data_pulled_as_of, yymmdd10.);    format Data_pulled_as_of yymmdd10.;
    Vax_UTD              = input(tmp_Vax_UTD, yymmdd10.);              format Vax_UTD yymmdd10.;
    Vax_FirstDose        = input(tmp_Vax_FirstDose, yymmdd10.);        format Vax_FirstDose yymmdd10.;
+   Vax_Booster          = input(tmp_Vax_Booster, yymmdd10.);        format Vax_Booster yymmdd10.;
    COPHS_AdmissionDate  = input(tmp_COPHS_AdmissionDate, yymmdd10.);  format COPHS_AdmissionDate yymmdd10.;
    DateVSDeceased       = input(tmp_DateVSDeceased, yymmdd10.);       format DateVSDeceased yymmdd10.;
 
@@ -84,7 +86,7 @@ DATA CEDRS_view_temp;
    Refreshed_on = datepart(tmp_refreshed_on);   format Refreshed_on yymmdd10.;
 
 /*   DROP tmp_:  address:  OnsetDate_proxy ;*/
-   DROP tmp_:    OnsetDate_proxy ;
+   DROP tmp_:    OnsetDate_proxy  Earliest_CollectionDate ;  * Earliest_CollectionDate is identical to CollectionDate;
 run;
 
 

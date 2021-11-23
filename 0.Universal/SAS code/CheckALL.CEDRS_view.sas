@@ -20,7 +20,7 @@ OUTPUT:	printed output
  *--------------------------------------------------------------------*/
 
 
-%LET ChkDSN = CEDRS_view_read;       * <-- ENTER name of CEDRS dataset to run data checks against;
+%LET ChkDSN = COVID.CEDRS_view_fix;       * <-- ENTER name of CEDRS dataset to run data checks against;
 
 
 ***  Access CEDRS.view using ODBC  ***;
@@ -90,7 +90,7 @@ run;
 ***---------------------------------------------------------------***;
 
    PROC means data= &ChkDSN n nmiss;
-      var ReportedDate   CollectionDate   OnsetDate   OnsetDate_proxy_dist ;
+      var ReportedDate   CollectionDate  Earliest_CollectionDate  OnsetDate   OnsetDate_proxy_dist ;
 run;
 
 /*__________________________________________________________________*
@@ -101,6 +101,16 @@ run;
  | FIX: Drop Onsetdate_proxy variabe (in Read.CEDRS.sas)            |
  *__________________________________________________________________*/
 
+** Records where CollectionDate AND Earliest_CollectionDate are different **;
+   Proc print data= &ChkDSN;
+      where  CollectionDate ne Earliest_CollectionDate ;
+      var profileid  CollectionDate  Earliest_CollectionDate ;
+run;
+/*______________________________________________________________________________*
+ | FINDINGS:                                                                    |
+ | NO OBS have different values for CollectionDate and Earliest_CollectionDate  |
+ | FIX: Drop Earliest_CollectionDate.                                           |
+ *______________________________________________________________________________*/
 
 
 ***  4. Check ICU variable  ***;

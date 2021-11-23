@@ -52,7 +52,7 @@ DATA CEDRS_view_temp;
                   ReportedDate = tmp_ReportedDate 
                   CollectionDate = tmp_CollectionDate  
                   DeathDate = tmp_DeathDate
-                  Earliest_CollectionDate = tmp_Earliest_CollectionDate   
+/*                  Earliest_CollectionDate = tmp_Earliest_CollectionDate   */  
                   Data_pulled_as_of = tmp_Data_pulled_as_of
                   Refreshed_on = tmp_refreshed_on  
                   Vax_UTD = tmp_Vax_UTD
@@ -72,7 +72,7 @@ DATA CEDRS_view_temp;
    ReportedDate         = input(tmp_ReportedDate, yymmdd10.);         format ReportedDate yymmdd10.;
    CollectionDate       = input(tmp_CollectionDate, yymmdd10.);       format CollectionDate yymmdd10.;
    DeathDate            = input(tmp_DeathDate, yymmdd10.);            format DeathDate yymmdd10.;
-   Earliest_CollectionDate = input(tmp_Earliest_CollectionDate, yymmdd10.); format Earliest_CollectionDate yymmdd10.;
+/*   Earliest_CollectionDate = input(tmp_Earliest_CollectionDate, yymmdd10.); format Earliest_CollectionDate yymmdd10.;*/
    Data_pulled_as_of    = input(tmp_Data_pulled_as_of, yymmdd10.);    format Data_pulled_as_of yymmdd10.;
    Vax_UTD              = input(tmp_Vax_UTD, yymmdd10.);              format Vax_UTD yymmdd10.;
    Vax_FirstDose        = input(tmp_Vax_FirstDose, yymmdd10.);        format Vax_FirstDose yymmdd10.;

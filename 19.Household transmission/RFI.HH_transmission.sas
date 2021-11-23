@@ -386,6 +386,8 @@ Data CEDRS_HH; merge FlagAddress(in=x)  CEDRS_HouseHolds ;
    if NumCases_Cluster=1 then Days_between_cases=0;
 run;
 /*   proc print data= CEDRS_HH;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+/*   proc freq data= CEDRS_HH noprint; tables CountyAssigned * Address_City * Address1/list out=CasesperHH; */
+/*   proc freq data= CasesperHH; tables count; title1 'Number of cases per HH'; run;*/
 
 
 *** Transpose data from Case level (tall) to HH level (wide) ***;
@@ -448,6 +450,12 @@ DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  ;
    HHcases20 = countc(AG, 'ikta');
    HHcases21 = countc(AG, 'IKTA');
    HHcasesTotal = HHcases20 + HHcases21 ;
+
+   HHaddcases20 = HHcases20-1;
+   HHaddcases21 = HHcases21-1;
+
+   ARRAY DayVars{9} DaysBetween2-DaysBetween10 ;
+   MeanTime2Spread= mean(of DayVars{*});
 
 run;
 
@@ -534,10 +542,52 @@ run;
 run;
 
 
+** Average number of cases in clusters by age group of index cases **;
+   PROC means data=HHcases mean max  maxdec=2 ;
+      where Fall20_AG ne '';
+      class Fall20_AG ;
+      format Fall20_AG $1.;
+      var HHaddcases20;
+run;
+
+   PROC means data=HHcases mean max  maxdec=2 ;
+      where Fall21_AG ne '';
+      class Fall21_AG ;
+      format Fall21_AG $1.;
+      var HHaddcases21;
+run;
+ 
+
+** Average time between index cases and next case by age group of index case **;
+   PROC means data=HHcases mean range  maxdec=2 ;
+      where Fall20_AG ne '';
+      class Fall20_AG ;
+      format Fall20_AG $1.;
+      var DaysBetween2;
+run;
+
+   PROC means data=HHcases mean range  maxdec=2 ;
+      where Fall21_AG ne '';
+      class Fall21_AG ;
+      format Fall21_AG $1.;
+      var DaysBetween2;
+run;
 
 
+** Average time between all cases in cluster by age group of index case **;
+   PROC means data=HHcases mean range  maxdec=2 ;
+      where Fall20_AG ne '';
+      class Fall20_AG ;
+      format Fall20_AG $1.;
+      var MeanTime2Spread;
+run;
 
-
+   PROC means data=HHcases mean range  maxdec=2 ;
+      where Fall21_AG ne '';
+      class Fall21_AG ;
+      format Fall21_AG $1.;
+      var MeanTime2Spread;
+run;
 
 
 

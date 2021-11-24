@@ -31,9 +31,8 @@ Cases in CEDRDS_fix dataset need to be filtered by `ReportedDate`, `CountyAssign
 
 The filters were applied to CEDRS_Fix dataset to create the [CEDRS_Filtered dataset](Documents/PROC%20contents.CEDRS_Filtered.pdf). 
 
-## Section 2:
 
-**2. Evaluate various pieces of HH address**
+### **2. Evaluate various pieces of HH address**
 
 Either address or lat/long could be used to group cases into "Households". Address has multiple components, namely street address, unit number, city, State, zipcode, and county. Each of these elements were evaluated regarding completeness on the CEDRS_Filtered data.
 
@@ -63,12 +62,11 @@ Some minor data edits were made. Specifically:
 
 A lot more data cleaning could be done, particularly with ZipCode data and missing State values. Some easy fixes would be to focus on the handful of records missing City but have Address and State or Zipcode data. The city can be easily obtained by googling the street address. 
 
-## Section 3:
-**3. Filter dataset again based on complete address components**
+### **3. Filter dataset again based on complete address components**
 The CEDRS_Filtered dataset is filtered again, keeping only those records with complete address components (Address1, City, and County). Also, the 17 records where `Age_at_Reported=.` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
 
-## Section 4:
-**4. Eligible Households
+
+### **4. Eligible Households
 
 The primary definition of a HH is based on Address1. County and City provide the context for this field to ensure Address1 is unique. CEDRS_Addresses was sorted by County, City, and Address1. A preview of the data was skimmed. Several data issues were noted with Address1. Here are the findings:
 

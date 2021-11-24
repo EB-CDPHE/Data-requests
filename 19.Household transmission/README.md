@@ -120,7 +120,7 @@ Thus, each cluster has a variable, `AG`, which displays the cases by Age Group i
 
 **Here is an exerpt of the HH data:**
 
-![AG_example](images/AG_example3.png)
+![AGexample](images/AGeg.png)
 
 
 The list of variables and their attributes for the final dataset is [HERE](Documents/PROC%20contents.HHcases.pdf).

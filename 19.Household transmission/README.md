@@ -53,10 +53,6 @@ Over 7000 records are missing Lat / Long so it was decided to define HH based on
 
 ![missingdata](Images/Address2.jpg)
 
-![moremissingdata](Images/Address_data.png)
-
-
-
 Almost 98% of the records have data for all address components. Zipcode will not be used to define HH and only cases where State=CO will be used. **Therefore, HH is defined by unique value for Address1, City, and County.**
 
 Some minor data edits were made. Specifically:

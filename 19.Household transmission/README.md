@@ -25,7 +25,7 @@ Here are the SAS programs used to respond to this data request:
 
 Sections of the RFI.HH_transmission.sas code
 
-**1. Check the filter variables**
+### **1. Check the filter variables**
 
 Cases in CEDRDS_fix dataset need to be filtered by `ReportedDate`, `CountyAssigned`, and `LiveInInstitution`. There were no missing observations for `ReportedDate`. `CollectionDate` was missing for almost 23,000 records and so was not used as a filter. The number of records with `"01SEP20"d LE ReportedDate LE "01NOV20"d` OR `"01SEP21"d LE ReportedDate LE "01NOV21"d` was 181,960 (on 11/22/21).  N=103 records where `CountyAssigned="INTERNATIONAL"` were filtered out. And the nearly 35,000 records where `LiveInInstitution="YES"` were excluded as well.
 

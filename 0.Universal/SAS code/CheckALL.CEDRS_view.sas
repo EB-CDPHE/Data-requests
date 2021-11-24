@@ -19,8 +19,12 @@ OUTPUT:	printed output
  | 7. 
  *--------------------------------------------------------------------*/
 
+** Create local copy **;
+DATA CEDRS_view_fix; set COVID.CEDRS_view_fix;
+run;
 
-%LET ChkDSN = COVID.CEDRS_view_fix;       * <-- ENTER name of CEDRS dataset to run data checks against;
+
+%LET ChkDSN = CEDRS_view_fix;       * <-- ENTER name of CEDRS dataset to run data checks against;
 
 
 ***  Access CEDRS.view using ODBC  ***;
@@ -111,6 +115,16 @@ run;
  | NO OBS have different values for CollectionDate and Earliest_CollectionDate  |
  | FIX: Drop Earliest_CollectionDate.                                           |
  *______________________________________________________________________________*/
+
+
+** Correlation of ReportedDate AND CollectionDate **;
+
+   PROC FREQ data= &ChkDSN;
+      where  month(CollectionDate) ne month(ReportedDate) ;
+      tables CollectionDate * ReportedDate  / list  missing missprint ;
+      format CollectionDate  ReportedDate  monyy5.;
+run;
+
 
 
 ***  4. Check ICU variable  ***;
@@ -291,8 +305,19 @@ run;
 
 
 
+***  7. Missing ID variables  ***;
+***---------------------------***;
 
 
+   PROC freq data= &ChkDSN; 
+      tables  vax_booster ; 
+run;
+
+   PROC print data= COVID.CEDRS_view_fix; 
+      where . < vax_booster LE '01FEB21'd ;
+      id ProfileID;
+      var EventID vaccine_received  Vax_FirstDose  Vax_UTD  vax_booster ;
+run;
 
 
 

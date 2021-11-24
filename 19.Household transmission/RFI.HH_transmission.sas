@@ -24,6 +24,9 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 * Completeness of ReportedDate *;
    PROC means data= COVID.CEDRS_view_fix  n nmiss;  var ReportedDate CollectionDate;  run;
 
+* Correlation of ReportedDate and CollectionDate *;
+   PROC means data= COVID.CEDRS_view_fix  ;  var ReportedDate CollectionDate;  run;
+
   * Number of records in time reference period *;
   PROC means data= COVID.CEDRS_view_fix  n nmiss;  
    where ('01SEP20'd le  ReportedDate  le '01NOV20'd ) OR ('01SEP21'd le  ReportedDate  le '01NOV21'd) ;
@@ -542,6 +545,23 @@ run;
 run;
 
 
+** FOR HH with cases in minors:  Distribution of FIRST CASE per AG's involved in time period 1 and 2  **;
+   PROC freq data=HHcases ;
+      tables AnyKids20 AnyKids21 ;
+run;
+
+   PROC freq data=HHcases ;
+      where Fall20_AG ne ''  AND  AnyKids20=1;
+      tables Fall20_AG    /  missing missprint ;
+      format Fall20_AG $1.;
+run;
+   PROC freq data=HHcases ;
+      where Fall21_AG ne ''  AND  AnyKids21=1;
+      tables Fall21_AG    /  missing missprint ;
+      format Fall21_AG $1.;
+run;
+
+
 ** Average number of cases in clusters by age group of index cases **;
    PROC means data=HHcases mean max  maxdec=2 ;
       where Fall20_AG ne '';
@@ -588,6 +608,7 @@ run;
       format Fall21_AG $1.;
       var MeanTime2Spread;
 run;
+
 
 
 

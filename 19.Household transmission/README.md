@@ -66,7 +66,7 @@ A lot more data cleaning could be done, particularly with ZipCode data and missi
 The CEDRS_Filtered dataset is filtered again, keeping only those records with complete address components (Address1, City, and County). Also, the 17 records where `Age_at_Reported=.` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
 
 
-### **4. Eligible Households
+### **4. Eligible Households**
 
 The primary definition of a HH is based on Address1. County and City provide the context for this field to ensure Address1 is unique. CEDRS_Addresses was sorted by County, City, and Address1. A preview of the data was skimmed. Several data issues were noted with Address1. Here are the findings:
 
@@ -98,15 +98,14 @@ The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to
 
 It was decided to exclude HH with more than ten cases. Thus, eligible HH were those that had 2-10 cases per HH. There was a total of 61,309 cases in the 24,519 eligible HH.
 
-### **5. Defining Clusters 
+### **5. Defining Clusters** 
 
 Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". There were a total of 30,988 clusters with the eligible HH.
 
 **Here is the distribution of clusters per HH:**
 ![Num_Clusters_per_HH](Images/Num_Clusters_per_HH2.png)
 
-## Section 6:
-**6. Creating an analysis variable
+###  **6. Creating an analysis variable**
 Over a quarter of the HH had two clusters of cases, i.e. cases that were more than 30 days apart. Nearly three quarters had only a single cluster of cases.  The data request was to look at the proportion of clusters that began with the various age groups.   
 
 |Abbrev.|Label|Age range|

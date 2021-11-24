@@ -93,12 +93,12 @@ These are only a few examples of the types of data issues with Address1. At this
 The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to create "Households". HH with only a sigle case were excluded.
 
 **Here is the distribution of cases per HH:**
+
 ![Num_Cases_per_HH](Images/Num_Cases_per_HH2.png)
 
 It was decided to exclude HH with more than ten cases. Thus, eligible HH were those that had 2-10 cases per HH. There was a total of 61,309 cases in the 24,519 eligible HH.
 
-## Section 5:
-**5. Defining Clusters 
+### **5. Defining Clusters 
 
 Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". There were a total of 30,988 clusters with the eligible HH.
 

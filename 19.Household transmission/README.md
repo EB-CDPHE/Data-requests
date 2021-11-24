@@ -21,10 +21,9 @@ Here are the SAS programs used to respond to this data request:
 |---------|-----------|
 |1.|Access.COPHS pulls data from hosp144 COPHS and curates it.|
 |2.|FIX.COPHS edits data in COPHS.|
-|3.|RFI.HH_transmission.sas generates response.|
+|3.|RFI.HH_transmission.sas creates household dataset and analysis variables and generates response.|
 
-Sections of the HH.sas code
-## Section 1:
+Sections of the RFI.HH_transmission.sas code
 
 **1. Check the filter variables**
 

@@ -103,6 +103,7 @@ It was decided to exclude HH with more than ten cases. Thus, eligible HH were th
 Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". There were a total of 30,988 clusters with the eligible HH.
 
 **Here is the distribution of clusters per HH:**
+
 ![Num_Clusters_per_HH](Images/Num_Clusters_per_HH2.png)
 
 ###  **6. Creating an analysis variable**

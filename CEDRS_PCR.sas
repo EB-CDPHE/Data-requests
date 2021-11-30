@@ -120,7 +120,7 @@ run;
 
 
 ***  Extract code from Fix.LabTests_TT229.sas  ***;
-***-----------------------------------------------***;
+***--------------------------------------------***;
 
 ** STEP 1:  De-duplicate records with two LabTest results per Specimen that have identical values in FOUR variables **;
    proc sort data= Lab_TT229_reduced  
@@ -193,51 +193,44 @@ run;
 ***  Analysis of PCR results in Lab_TT229_fix  ***;
 ***--------------------------------------------***;
 
-
-
-
-
-
-
+** completeness of data **;
    PROC means data= Lab_TT229_fix  n nmiss ;
       var LabSpecimenID  ResultID  ResultDate  ELRid ;
 run;
 
+** view sample of data **;
   proc print data=Lab_TT229_fix(obs=10000);
    where ELRid ne .   AND  ResultDate ne . ;
    id EventID   ;
    var LabSpecimenID  ResultID  ResultText  ResultDate  ;
   run;
 
+
+** sort data by EventID **;
    proc sort data=Lab_TT229_fix
               out= TT229_EventID;
       by EventID  ResultDate  CreateDate ;
 run;
 
+** keep just the first test result for a person per day **;
 Data OnePerDay ; set TT229_EventID ;
    by EventID  ResultDate  ;
    if First.ResultDate=1;
 run;
 
-
+** view sample of data **;
   proc print data=OnePerDay;
 /*   where ELRid ne .   AND  ResultDate ne . ;*/
    id EventID   ;
    var LabSpecimenID  ResultID  ResultText  ResultDate  ;
   run;
 
-
-
+** check that there are not multiple records per person per day **;
   proc freq data= OnePerDay  noprint ;
    tables EventID*ResultDate / list out=NumPCRsPerDay;
 run;
    proc freq data= NumPCRsPerDay;  tables count;  run;
 
 
-   proc print data= NumTestsPerDay; where count=1; run;
 
 
-
-   proc freq data= Lab_TT229_temp; tables ResultID; run;
-   proc freq data= ; tables ResultID; run;
-   proc freq data= ; tables ResultID; run;

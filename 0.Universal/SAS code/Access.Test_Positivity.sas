@@ -3,7 +3,7 @@ PROGRAM:  Access.Test_Positivity
 AUTHOR:   Eric Bush
 CREATED:  November 29, 2021
 MODIFIED: 	
-PURPOSE:	 A single program to read CEDRS view
+PURPOSE:	 Access and curate data on COVID Test Positivity from SQL data table on dhpe144
 INPUT:		tests144.Positivity
 OUTPUT:		         Positivity
 ***********************************************************************************************/
@@ -23,8 +23,6 @@ OUTPUT:		         Positivity
  *------------------------------------------------------------------------------------------------*/
 
 ** 1. Libname to access COVID19 database on dbo144 server using ODBC **;
-/*LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** schema contains "CEDRS_view, a copy of CEDRS_dashboard_constrained";*/
-
 LIBNAME tests144  ODBC  dsn='COVID19' schema=tests;  run;
 
 
@@ -33,28 +31,21 @@ PROC contents data=tests144.COVID19_positivity_Trends  varnum ;  run;
 
 /*________________________________________________________________________________________________*
  | FINDINGS:                                                                 
- |  ID, ProfileID and EventID are numeric instead of character variables.    
- |    --> These need to be converted to character variables prior to running SHRINK macro.     
- |  The following date fields are character variables instead of a numeric variable with date format.
- |    OnsetDate, onsetdate_proxy, onsetdate_proxy_dist, ReportedDate, CollectionDate, DeathDate, 
- |    Earliest_CollectionDate, Data_pulled_as_of
- |    --> ignore onsetdate_proxy; use onsetdate_proxy_dist instead (per Rachel S.)
- |    --> convert these fields to SAS date variables.
- |  Many of the character variables have length of $255.
+ |  The date_as_of is a character variables that holds date values.
+ |    --> convert this field to SAS date variable.
+ |  Character variables have length of $255.
  |    --> Use the macro "Shrink" to minimize the length of the character variables.
  *________________________________________________________________________________________________*/
 
 
 ** 3. Modify SAS dataset per Findings **;
 DATA Positivity_temp; 
-   set tests144.COVID19_positivity_Trends(rename=(date_as_of=tmp_date_as_of)); 
- 
-* Convert temporary numeric ID variable character ID var using the CATS function *;
+   set tests144.COVID19_positivity_Trends; 
 
-* Convert temporary character var for each date field to a date var *;
-   TestDate             = input(tmp_date_as_of, yymmdd10.);            format TestDate yymmdd10.;
+* Convert character var for date field to a date var *;
+   TestDate = input(date_as_of, yymmdd10.);   format TestDate yymmdd10.;
 
-   DROP tmp_:  ;
+   DROP date_as_of ;
 run;
 
 

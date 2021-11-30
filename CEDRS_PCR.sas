@@ -234,3 +234,20 @@ run;
 
 
 
+   
+*** Merge demographic variables from CEDRS with PCR results ***;
+***_________________________________________________________***;
+
+PROC sort data= CEDRS_fix  
+            out=CEDRSkey; 
+   by EventID;
+
+PROC sort data= TT229_EventID  out=TT229_key; by EventID;
+run;
+
+DATA CEDRS_PCR;  merge CEDRSkey(in=C)  TT229_key(in=P);  
+   by ProfileID EventID;
+   if P ;
+run;
+
+   PROC contents data=CEDRS_PCR  varnum ;  title1 'CEDRS_PCR';  run;

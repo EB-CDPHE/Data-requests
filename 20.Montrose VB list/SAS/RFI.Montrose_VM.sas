@@ -60,6 +60,7 @@ DATA Montrose_fix ;
    format  DOB_LName_FName  $85. ;
 run;
 
+
 /*   PROC contents data= Montrose_fix varnum ; title1 'Montrose_fix'; run;*/
 
 ** use to check development of birthdate var and ID var **;
@@ -67,21 +68,24 @@ run;
 /*      tables birthdate ;*/
 /*      tables DOB * birthdate /list;*/
 /*      tables Gender  Vaccination_Date  Vaccine_Manufacturer  ;*/
-/*run;*/
+run;
 
 ** Use to check code that parses Patient_Name into first and last name fields **;
 /*   PROC print data=Montrose_fix ;*/
 /*     id Patient_Name; var   Patient_Name_Last  Patient_Name_First  Patient_Name_Extra  ;*/
 /*run;*/
 
+
+   proc sort data=Montrose_fix
+               out=Montrose_sort ;
+      by DOB  Patient_Name_Last  Patient_Name_First ;
+run;
+
 ** Use to check final ID variable that will be used to merge to CEDRS **;
-   PROC print data=Montrose_fix ;
+   PROC print data=Montrose_sort ;
      id DOB_LName_FName; var BirthDate  Patient_Name  ;
 run;
 
-   PROC freq data=Montrose_fix ;
-/*      tables Gender  Vaccination_Date  Vaccine_Manufacturer  ;*/
-run;
 
 
 
@@ -113,35 +117,68 @@ run;
 
 
 
+***  CEDRS66.Profiles has ProfileID and DOB and Name   ***;
+***  COVID.CEDRS_view_fix has ProfileID for all cases  ***;
+***  Merge the two on ProfileID and keep cases only.   ***;
+***____________________________________________________***;
 
 
-
-***  Create key from COVID.CEDRS_fix   ***;
-***____________________________________***;
-
-
-
-DATA CEDRS;  set COVID.CEDRS_view_fix;
+DATA CEDRS; length ProfileID $ 15; set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  ;
 
+   format  ProfileID $15.;
    Keep  ProfileID  EventID  CountyAssigned   ReportedDate   Age_at_Reported   CollectionDate   
          LiveInInstitution   Homeless   Outbreak_Associated   Symptomatic  OnsetDate  ;
 run;
 
-/*   PROC contents data=CEDRS  varnum ;  title1 'CEDRS';  run;*/
 
-
-   PROC sort  data= CEDRS(keep=ProfileID)  out=CEDRS_Profiles; 
+   PROC sort  data= CEDRS(keep=ProfileID)  
+               out = CEDRS_sort; 
       by ProfileID ;
 
-   PROC sort  data= Profiles_key  out=Profiles_sort; 
+   PROC sort  data= Profiles_key  
+               out = Profiles_sort; 
       by ProfileID ;
 
+DATA CEDRS_key; merge CEDRS_sort(in=c)  Profiles_sort;
+   by ProfileID ;
 
-DATA DOB_key; merge CEDRS_Profiles(in=c)  Profiles_sort;
    if c;
 run;
 
 
-/*   PROC contents data=COPHS_key ; run;*/
+   PROC contents data=CEDRS_sort ; run;
+   PROC contents data=Profiles_sort ; run;
+
 /*   PROC print data= COPHS_key; id COPHS_ID; run;*/
+
+
+
+***  Merge Montrose data with CEDRS using DOB_LName_FName key ***;
+***___________________________________________________________***;
+
+
+   PROC sort  data= CEDRS_key  
+               out = CEDRS_DOB; 
+      by DOB_LName_FName ;
+
+   PROC sort  data= Montrose_sort  
+               out = Montrose_DOB; 
+      by DOB_LName_FName ;
+
+DATA Montrose_cases;  merge Montrose_DOB(in=a)  CEDRS_DOB(in=b) ;
+   by DOB_LName_FName ;
+
+   if a=1 and b=1;
+run;
+
+   PROC contents data= Montrose_cases  varnum ; title1 'Montrose_cases'; run;
+
+
+***  Analyze the n=158 cases that were vaccinated at Montrose clinic on 11/12 or 11/13  ***;
+***-------------------------------------------------------------------------------------***;
+
+   PROC print data=  ;
+      ID  Patient_Name ;
+      var Gender Vaccination_Date  ;
+run;

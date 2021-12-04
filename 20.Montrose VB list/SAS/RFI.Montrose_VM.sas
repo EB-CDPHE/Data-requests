@@ -58,6 +58,11 @@ DATA Montrose_fix ;
    * create ID KEY variable based on Birthdate:Last name:First name format*;
    DOB_LName_FName = catx(":", BirthDate, propcase(Patient_Name_Last), propcase(Patient_Name_First) );
    format  DOB_LName_FName  $85. ;
+
+   * calculate age at vaccination *;
+   Age_at_Vax = INT(Intck('MONTH', DOB, Vaccination_Date)/12) ;   
+   IF month(DOB) = month(Vaccination_Date) then 
+      Age_at_Vax =  Age_at_Vax - ( Day(DOB)>Day(Vaccination_Date) );  
 run;
 
 
@@ -127,12 +132,12 @@ DATA CEDRS; length ProfileID $ 15; set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  ;
 
    format  ProfileID $15.;
-   Keep  ProfileID  EventID  CountyAssigned   ReportedDate   Age_at_Reported   CollectionDate   
-         LiveInInstitution   Homeless   Outbreak_Associated   Symptomatic  OnsetDate  ;
+   Keep  ProfileID  EventID  ReportedDate   Age_at_Reported   CollectionDate   
+         Outbreak_Associated   Symptomatic  OnsetDate  ;
 run;
 
 
-   PROC sort  data= CEDRS(keep=ProfileID)  
+   PROC sort  data= CEDRS  
                out = CEDRS_sort; 
       by ProfileID ;
 
@@ -178,7 +183,40 @@ run;
 ***  Analyze the n=158 cases that were vaccinated at Montrose clinic on 11/12 or 11/13  ***;
 ***-------------------------------------------------------------------------------------***;
 
-   PROC print data=  ;
+** Summary of those vaccianted at Montrose County Vaccination Clinic **;
+   PROC contents data= Montrose_fix  varnum ; title1 'Montrose_fix'; run;
+
+   PROC format;
+         value AgeDec
+         0-19 = '0-19 years'
+         20-<30 = '20-29 years'
+         30-<40 = '30-39 years'
+         40-<50 = '40-49 years'
+         50-<60 = '50-59 years'
+         60-<70 = '60-69 years'
+         70-<80 = '70-79 years'
+         80-<90 = '80-89 years'
+         90-105 = '90-105 years' ;
+run;
+
+   PROC freq data= Montrose_fix ;
+      tables Vaccination_Date  Gender  Age_at_Vax    Vaccine_Manufacturer  ;
+      format Age_at_Vax AgeDec. ;
+run;
+
+proc sort data= Montrose_fix   out= Montrose_VxDate; by Vaccination_Date;
+   PROC freq data= Montrose_VxDate ;
+      tables Gender Age_at_Vax  Vaccine_Manufacturer ;
+      by Vaccination_Date;
+      format Age_at_Vax AgeDec. ;
+run;
+
+
+
+
+   PROC print data= Montrose_cases ;
       ID  Patient_Name ;
-      var Gender Vaccination_Date  ;
+      var Gender  Vaccination_Date  Vaccine_Manufacturer  
+          Age_at_Reported  ReportedDate  CollectionDate OnsetDate  Symptomatic  Outbreak_Associated  EventID; 
+      format Gender $10. ;
 run;

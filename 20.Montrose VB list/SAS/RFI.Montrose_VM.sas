@@ -44,34 +44,44 @@ DATA Montrose_fix ;
    length DOB_LName_FName $ 85  BirthDate $ 10;  
    set Montrose ;
 
-   Patient_Name_Last  = scan(Patient_Name,1,',', );
+   * Patient_Name field has format Last,First (#) *;
+   * parse patient name into last name, then first name, then 'extra' to hold numeric id *;
+   Patient_Name_Last  = scan(Patient_Name,1,',', ); *first pass extracts first word using "," delimiter so hyphenated names kept together*;
    First_Name = scan(Patient_Name,2,',',);
-   Patient_Name_First = scan(First_Name,1,' ', );
-   Patient_Name_Extra = compress(scan(First_Name,2,' ', ),'()');
+   Patient_Name_First = scan(First_Name,1,' ', );  *second pass extracts second word using space delimiter *;
+   Patient_Name_Extra = compress(scan(First_Name,2,' ', ),'()'); * compress fx removes () from numeric id values *;
    DROP First_Name;
 
-   BirthDate = cats(DOB); format BirthDate $10.;
+   * create birthdate var with format YYYY-MM-DD as with CEDRS66.Profiles *;
+   BirthDate = cats(put(DOB,yymmdd10.)); format BirthDate $10.;   *catx fx converts numeric date field to char var *;
 
+   * create ID KEY variable based on Birthdate:Last name:First name format*;
    DOB_LName_FName = catx(":", BirthDate, propcase(Patient_Name_Last), propcase(Patient_Name_First) );
    format  DOB_LName_FName  $85. ;
 run;
 
-   PROC contents data= Montrose_fix varnum ; title1 'Montrose_fix'; run;
+/*   PROC contents data= Montrose_fix varnum ; title1 'Montrose_fix'; run;*/
 
+** use to check development of birthdate var and ID var **;
+/*   PROC freq data=Montrose_fix ;*/
+/*      tables birthdate ;*/
+/*      tables DOB * birthdate /list;*/
+/*      tables Gender  Vaccination_Date  Vaccine_Manufacturer  ;*/
+/*run;*/
 
+** Use to check code that parses Patient_Name into first and last name fields **;
 /*   PROC print data=Montrose_fix ;*/
 /*     id Patient_Name; var   Patient_Name_Last  Patient_Name_First  Patient_Name_Extra  ;*/
 /*run;*/
 
+** Use to check final ID variable that will be used to merge to CEDRS **;
    PROC print data=Montrose_fix ;
-     id DOB_LName_FName; var   Patient_Name  ;
+     id DOB_LName_FName; var BirthDate  Patient_Name  ;
 run;
 
    PROC freq data=Montrose_fix ;
-      tables DOB * birthdate /list;
 /*      tables Gender  Vaccination_Date  Vaccine_Manufacturer  ;*/
 run;
-
 
 
 
@@ -84,7 +94,7 @@ DATA Profiles; set CEDRS66.Profiles;
   keep ProfileID LastName FirstName BirthDate ;
 run;
    PROC contents data=Profiles  varnum ;  run;    
-
+proc freq data=profiles; tables birthdate; run;
 
    proc sort data=Profiles out=DOB_sort; by BirthDate LastName FirstName ;  run;
 DATA Profiles_key;   

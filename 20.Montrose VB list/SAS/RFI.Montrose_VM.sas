@@ -38,23 +38,37 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 ** Import.SAS code **
 
 ** PROC contents of imported spreadsheet data **;
-   PROC contents data=  Montrose  varnum ; title1 ''; run;
+   PROC contents data=  Montrose  varnum ; title1 'Montrose'; run;
 
-DATA Montrose_fix ; set Montrose ;
+DATA Montrose_fix ; 
+   length DOB_LName_FName $ 85  BirthDate $ 10;  
+   set Montrose ;
+
    Patient_Name_Last  = scan(Patient_Name,1,',', );
    First_Name = scan(Patient_Name,2,',',);
    Patient_Name_First = scan(First_Name,1,' ', );
    Patient_Name_Extra = compress(scan(First_Name,2,' ', ),'()');
    DROP First_Name;
+
+   BirthDate = cats(DOB); format BirthDate $10.;
+
+   DOB_LName_FName = catx(":", BirthDate, propcase(Patient_Name_Last), propcase(Patient_Name_First) );
+   format  DOB_LName_FName  $85. ;
 run;
 
+   PROC contents data= Montrose_fix varnum ; title1 'Montrose_fix'; run;
 
+
+/*   PROC print data=Montrose_fix ;*/
+/*     id Patient_Name; var   Patient_Name_Last  Patient_Name_First  Patient_Name_Extra  ;*/
+/*run;*/
 
    PROC print data=Montrose_fix ;
-     id Patient_Name; var   Patient_Name_Last  Patient_Name_First  Patient_Name_Extra  ;
+     id DOB_LName_FName; var   Patient_Name  ;
 run;
 
    PROC freq data=Montrose_fix ;
+      tables DOB * birthdate /list;
 /*      tables Gender  Vaccination_Date  Vaccine_Manufacturer  ;*/
 run;
 
@@ -72,25 +86,16 @@ run;
    PROC contents data=Profiles  varnum ;  run;    
 
 
-   proc sort data=Profiles out=Profiles_sort; by BirthDate LastName FirstName ;  run;
-DATA Profiles_temp;   
-   length DOB_LName_FName $ 100   ProfileID $ 15;  
-   set Profiles_sort(rename=(ProfileID=tmp_ProfileID));  
+   proc sort data=Profiles out=DOB_sort; by BirthDate LastName FirstName ;  run;
+DATA Profiles_key;   
+   length DOB_LName_FName $ 85   ProfileID $ 15;  
+   set DOB_sort(rename=(ProfileID=tmp_ProfileID));  
 
    DOB_LName_FName = catx(":", Birthdate, propcase(LastName), propcase(FirstName) );
    ProfileID = cats(tmp_ProfileID);
-   format  DOB_LName_FName  $100.  ProfileID $15.;
+   format  DOB_LName_FName  $85.  ProfileID $15.;
    keep DOB_LName_FName  ProfileID;
 run; 
-
-
-** Shrink character variables in data set to shortest possible length (based on longest value) **;
-%inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
-
- %shrink(Profiles_temp)
-
-** Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA Profiles_key; set Profiles_temp_;
 
 
    PROC contents data=Profiles_key  ; run;
@@ -101,8 +106,10 @@ DATA Profiles_key; set Profiles_temp_;
 
 
 
-*** Filter data  ***;
-***------------***;
+***  Create key from COVID.CEDRS_fix   ***;
+***____________________________________***;
+
+
 
 DATA CEDRS;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  ;
@@ -111,7 +118,20 @@ DATA CEDRS;  set COVID.CEDRS_view_fix;
          LiveInInstitution   Homeless   Outbreak_Associated   Symptomatic  OnsetDate  ;
 run;
 
-   PROC contents data=CEDRS  varnum ;  title1 'CEDRS';  run;
+/*   PROC contents data=CEDRS  varnum ;  title1 'CEDRS';  run;*/
 
-   PROC print data= CEDRS;  where EventID='5351651' or ProfileID='5351651'; run;
 
+   PROC sort  data= CEDRS(keep=ProfileID)  out=CEDRS_Profiles; 
+      by ProfileID ;
+
+   PROC sort  data= Profiles_key  out=Profiles_sort; 
+      by ProfileID ;
+
+
+DATA DOB_key; merge CEDRS_Profiles(in=c)  Profiles_sort;
+   if c;
+run;
+
+
+/*   PROC contents data=COPHS_key ; run;*/
+/*   PROC print data= COPHS_key; id COPHS_ID; run;*/

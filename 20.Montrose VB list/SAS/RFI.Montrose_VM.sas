@@ -180,10 +180,9 @@ run;
    PROC contents data= Montrose_cases  varnum ; title1 'Montrose_cases'; run;
 
 
-***  Analyze the n=158 cases that were vaccinated at Montrose clinic on 11/12 or 11/13  ***;
-***-------------------------------------------------------------------------------------***;
+*** Summary of those vaccianted at Montrose County Vaccination Clinic ***;
+***-------------------------------------------------------------------***;
 
-** Summary of those vaccianted at Montrose County Vaccination Clinic **;
    PROC contents data= Montrose_fix  varnum ; title1 'Montrose_fix'; run;
 
    PROC format;
@@ -211,12 +210,80 @@ proc sort data= Montrose_fix   out= Montrose_VxDate; by Vaccination_Date;
       format Age_at_Vax AgeDec. ;
 run;
 
+   PROC means data=Montrose_fix  Q1 Median Q3 Mean   maxdec=1;
+      class Vaccination_Date;
+      var Age_at_Vax ;
+run;
+
+
+   PROC format;
+         value Age4Cat
+         0-19 = '0-19 years'
+         20-<50 = '20-49 years'
+         50-<70 = '50-69 years'
+         70-105 = '70-105 years' ;
+run;
+   PROC freq data= Montrose_VxDate ;
+      tables  Age_at_Vax * Vaccination_Date / chisq ;
+      format Age_at_Vax Age4Cat. ;
+run;
 
 
 
+
+***  Analyze the n=158 cases that were vaccinated at Montrose clinic on 11/12 or 11/13  ***;
+***-------------------------------------------------------------------------------------***;
+
+   PROC contents data= Montrose_cases varnum ; run;
+
+** Print listing of cases **;
    PROC print data= Montrose_cases ;
       ID  Patient_Name ;
       var Gender  Vaccination_Date  Vaccine_Manufacturer  
           Age_at_Reported  ReportedDate  CollectionDate OnsetDate  Symptomatic  Outbreak_Associated  EventID; 
       format Gender $10. ;
+run;
+
+** CEDRS case dates **;
+   PROC freq data= Montrose_cases ;
+      tables ReportedDate  CollectionDate  OnsetDate   ;
+      format ReportedDate  CollectionDate  OnsetDate  monyy. ;
+run;
+
+   PROC format;
+         value BeforeAft
+         '01MAR20'd - '31OCT21'd = 'Before 11-1-21'
+         '01NOV21'd - '31DEC21'd = 'After 10-31-21' ;
+run;
+
+   PROC freq data= Montrose_cases ;
+      where ReportedDate < '01NOV21'd;
+      tables ReportedDate  CollectionDate   ;
+      format ReportedDate  CollectionDate  monyy. ;
+      title2 'ReportedDate before November 2021';
+run;
+/*   PROC freq data= Montrose_cases ;*/
+/*      where ReportedDate > '31OCT21'd;*/
+/*      tables ReportedDate * CollectionDate * OnsetDate / list  ;*/
+/*      format ReportedDate  CollectionDate  OnsetDate  WeekU5. ;*/
+/*      title2 'ReportedDate in November 2021';*/
+/*run;*/
+
+
+   proc sort data=Montrose_cases
+               out=Montrose_cases_VXsort ;
+      by CollectionDate OnsetDate;
+run;
+   PROC print data= Montrose_cases_VXsort n;
+      where ReportedDate > '31OCT21'd;
+      id Vaccination_Date; var  OnsetDate  CollectionDate   ReportedDate  ;
+run;
+
+
+
+
+   PROC freq data= Montrose_cases ;
+      where ReportedDate > '31OCT21'd;
+      tables Vaccination_Date  Gender  Age_at_Vax   Vaccine_Manufacturer    ;
+      format Age_at_Vax Age4Cat. ;
 run;

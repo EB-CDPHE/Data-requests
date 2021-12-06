@@ -60,16 +60,20 @@ Here is the link to the variable names and their attributes for the [Montrose_ca
 ##
 ### **3. Characteristics of line listing:**
 ##
-![LineListing](./Images/Vaccinated.png)
-
 There were 1,779 individuals vaccinated on November 12 and 13. The number vaccinated each day was nearly equal. The majority vaccinated were female (55%) and received Moderna (92%). About 80% were 50 plus years old.
+
+![LineListing](./Images/Vaccinated.png)
 
 ##
 ### **4. Analysis of Montrose cases**
 ##
 The 159 vaccinated individuals that have records in CEDRS can be found here: [Montrose_cases.csv](Output%20data/Montrose_cases.csv). 
 
-aset is filtered again, keeping only those records with complete address components (Address1, City, and County). Also, the 17 records where `Age_at_Reported=.` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
+The vast majority of these 159 individuals were reported as cases prior to November 1, 2021. Here is the number of cases by month reported to CEDRS:
+
+![PriorCases](./images/PriorCases2.png)
+
+The 16 records where `ReportedDate > 11/01/21` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
 
 
 

@@ -11,11 +11,11 @@ Here are the SAS programs used to respond to this data request:
 
 |Run order|SAS program|
 |---------|-----------|
-|1.|Access.COPHS pulls data from hosp144 COPHS and curates it.|
-|2.|FIX.COPHS edits data in COPHS.|
-|3.|RFI.Montrose_VB.sas creates dataset from Montrose spreadsheet and of individuals on that list that were in CEDRS.|
+|1.|[Access.CEDRS](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from hosp144 COPHS and curates it.|
+|2.|[FIX.CEDRS](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in COPHS.|
+|3.|[RFI.Montrose_VxCases.sas](./SAS/RFI.Montrose_VxCases.sas) creates dataset from Montrose spreadsheet and of individuals on that list that were in CEDRS.|
 
-Sections of the RFI.HH_transmission.sas code
+Sections of the RFI.Montrose_VxCases.sas code
 
 ### **1. Import spreadsheet and curate data from Montrose Vaccine clinic**
 

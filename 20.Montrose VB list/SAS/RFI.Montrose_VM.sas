@@ -227,7 +227,6 @@ run;
    PROC contents data= Montrose_cases  varnum ; title1 'Montrose_cases'; run;
 
 
-
 *** Summary of those vaccianted at Montrose County Vaccination Clinic ***;
 ***-------------------------------------------------------------------***;
 
@@ -244,18 +243,24 @@ run;
          70-<80 = '70-79 years'
          80-<90 = '80-89 years'
          90-105 = '90-105 years' ;
+
+         value Age4Cat
+         0-19 = '0-19 years'
+         20-<50 = '20-49 years'
+         50-<70 = '50-69 years'
+         70-105 = '70-105 years' ;
 run;
 
    PROC freq data= Montrose_fix ;
       tables Vaccination_Date  Gender  Age_at_Vax    Vaccine_Manufacturer ;
-      format Age_at_Vax AgeDec. ;
+      format Age_at_Vax Age4Cat. ;
 run;
 
 proc sort data= Montrose_fix   out= Montrose_VxDate; by Vaccination_Date;
    PROC freq data= Montrose_VxDate ;
       tables Gender Age_at_Vax  Vaccine_Manufacturer ;
       by Vaccination_Date;
-      format Age_at_Vax AgeDec. ;
+      format Age_at_Vax Age4Cat. ;
 run;
 
    PROC means data=Montrose_fix  Q1 Median Q3 Mean   maxdec=1;
@@ -263,14 +268,6 @@ run;
       var Age_at_Vax ;
 run;
 
-
-   PROC format;
-         value Age4Cat
-         0-19 = '0-19 years'
-         20-<50 = '20-49 years'
-         50-<70 = '50-69 years'
-         70-105 = '70-105 years' ;
-run;
    PROC freq data= Montrose_VxDate ;
       tables  Age_at_Vax * Vaccination_Date / chisq ;
       format Age_at_Vax Age4Cat. ;

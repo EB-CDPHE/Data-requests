@@ -82,7 +82,11 @@ And the proportion of these recent cases by age, gender, and vaccine manufacture
 ![VxCases](./images/VxCasesFreq2.png)
 
 ## Response
-Response was shared with those on the email chain via GitHub link:
+Response was shared with those on the email chain via [email](Documents/Email_response_120521.pdf) on 12/5/21.  
+
+And documentation and additional information were shared on 12/6/21 via GitHub link:
+
+
 
 #
 **Issues:**

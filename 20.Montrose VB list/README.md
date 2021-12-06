@@ -32,7 +32,7 @@ NOTES for CEDRS66.Profiles dataset:
 * CEDRS66.Profiles has ProfileID AND DOB, Last Name, First name
 * DOB, Last Name, First name are the components to the KEY variable
 * DOB needs to be a character format and not a SAS date var
-* KEY variable has length $85 and ProfileID has length $15
+* KEY variable has length 85 and ProfileID has length 15
   ==>  Profiles_Key dataset
 
 NOTES for CEDRS_view dataset:

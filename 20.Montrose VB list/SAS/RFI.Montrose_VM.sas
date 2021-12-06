@@ -276,7 +276,8 @@ run;
 run;
    PROC print data= Montrose_cases_VXsort n;
       where ReportedDate > '31OCT21'd;
-      id Vaccination_Date; var  OnsetDate  CollectionDate   ReportedDate  ;
+      id  Patient_Name ; var  Vaccination_Date  OnsetDate  CollectionDate   ReportedDate  ProfileID  EventID;
+      format ProfileID $10. ;
 run;
 
 

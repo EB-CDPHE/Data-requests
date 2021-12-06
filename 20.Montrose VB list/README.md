@@ -19,7 +19,7 @@ Sections of the RFI.Montrose_VxCases.sas code
 
 ### **1. Import spreadsheet and curate line listing data from Montrose Vaccine clinic**
 
-Patient_Name field has format Last,First (#). Code in this section parses patient name into last name, then first name, then in 'extra' field to hold numeric id, stripped of parentheses.
+`Patient_Name` has a format of Last name,First name (#). Code in this section parses patient name into last name, then first name, then in 'extra' field to hold numeric id, stripped of parentheses.
 Use DOB column to create birthdate var with format YYYY-MM-DD which is consistent with format of DOB in CEDRS66.Profiles. Create new calculated variable "Age at Vaccination". Finally, create KEY variable based on Birthdate:Last name:First name format for match merging to CEDRS cases.
 
 The variable names and their attributes for the Montrose vaccine clinic line listing are [here](./Documents/PROC_Contents.Montrose_Fix.pdf). 

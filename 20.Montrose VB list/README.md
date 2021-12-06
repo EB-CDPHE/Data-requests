@@ -3,18 +3,8 @@ This data request came from Montrose Vaccine clinic via Alicia Cronquist. Alicia
 
 On November 30th Heather Roth sent Lindsey Webb an email with a line list of 1779 individuals vaccinated at Montrose county vaccine clinic on November 12-13, 2021. Lindsey asked Breanna and Alicia if they could have someone look to see if any of these 1779 patients were cases in CEDRS. 
 
- are interested in learning what role kids going back to school have on COVID transmission within the household (HH) in particular, and the community in general. As there is no HH identifier in CEDRS, response to this data request is tortuous and complex. 
+**Population**: First population consisted of 1,779 individuals vaccinated at Montrose vaccine clinic on November 12-13, 2021. Population #2:  Confirmed and probable cases in CEDRS.  **Data requested**: Intersection of the two populations.   **Groups**: Gender, Age, Date vaccinated, and Vaccine manufacturer. 
 
-**Population**:  Confirmed and probable cases in CEDRS with `ReportedDate` between September 1 - November 1 in 2020 and 2021.  **Data requested**: HH's with 2-10 cases reported in CEDRS.   **Groups**: School start for 2020 versus 2021. Age groups were:
-* 0-4 year olds, "infants"; 
-* 5-11 year olds, "kids"; 
-* 12-17 year olds, 'teens'; 
-* 18-115 year olds, 'adults'
-
-The following specific questions were asked:
-1. Among HH that had 2 or more cases, how frequently was the initial case reported in a minor (0-17 years old)?
-2. Proportion of multi-case HH's where minor was first case by Age Group, i.e. infant, kid, teen.
-3. Was this proportion different in Fall 2021 compared to Fall 2020? 
 
 ## Code
 Here are the SAS programs used to respond to this data request:
@@ -23,15 +13,16 @@ Here are the SAS programs used to respond to this data request:
 |---------|-----------|
 |1.|Access.COPHS pulls data from hosp144 COPHS and curates it.|
 |2.|FIX.COPHS edits data in COPHS.|
-|3.|RFI.HH_transmission.sas creates household dataset and analysis variables and generates response.|
+|3.|RFI.Montrose_VB.sas creates dataset from Montrose spreadsheet and of individuals on that list that were in CEDRS.|
 
 Sections of the RFI.HH_transmission.sas code
 
-### **1. Check the filter variables**
+### **1. Import spreadsheet and curate data from Montrose Vaccine clinic**
 
-Cases in CEDRDS_fix dataset need to be filtered by `ReportedDate`, `CountyAssigned`, and `LiveInInstitution`. There were no missing observations for `ReportedDate`. `CollectionDate` was missing for almost 23,000 records and so was not used as a filter. The number of records with `"01SEP20"d LE ReportedDate LE "01NOV20"d` OR `"01SEP21"d LE ReportedDate LE "01NOV21"d` was 181,960 (on 11/22/21).  N=103 records where `CountyAssigned="INTERNATIONAL"` were filtered out. And the nearly 35,000 records where `LiveInInstitution="YES"` were excluded as well.
+Patient_Name field has format Last,First (#). Code in this section parses patient name into last name, then first name, then in 'extra' field to hold numeric id, stripped of parentheses.
+Use DOB column to create birthdate var with format YYYY-MM-DD which is consistent with format of DOB in CEDRS66.Profiles. Create new calculated variable "Age at Vaccination". Finally, create KEY variable based on Birthdate:Last name:First name format for match merging to CEDRS cases.
 
-The filters were applied to CEDRS_Fix dataset to create the [CEDRS_Filtered dataset](Documents/PROC%20contents.CEDRS_Filtered.pdf). 
+The variable names and their attributes for the Montrose vaccine clinic line listing are [here](./Documents/PROC_Contents.Montrose_Fix.pdf). 
 
 
 ### **2. Evaluate various pieces of HH address**

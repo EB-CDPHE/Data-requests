@@ -33,27 +33,28 @@ NOTES for CEDRS66.Profiles dataset:
 * DOB, Last Name, First name are the components to the KEY variable
 * DOB needs to be a character format and not a SAS date var
 * KEY variable has length 85 and ProfileID has length 15
-  ==>  Profiles_Key dataset
+###
+   ==>  Profiles_Key dataset
 
 NOTES for CEDRS_view dataset:
 * COVID.CEDRS_view_fix has ProfileID for all cases
 * Filter out cases not assigned to a Colorado county
 * Keep selected variables from CEDRS
-  ==>  CEDRS dataset
+==>  CEDRS dataset
 
 NOTES for merged dataset of Profiles and CEDRS:
 * SORT Profiles_Key and save as Profiles_sort
 * SORT CEDRS and save as CEDRS_sort
 * Merge Profiles_sort and CEDRS_sort on ProfileID.
 * KEEP only records only from CEDRS 
-  ==>  CEDRS_key  dataset
+==>  CEDRS_key  dataset
 
 NOTES for merged dataset of Montrose and CEDRS:
 * SORT Montrose_fix and save as Montrose_DOB
 * SORT CEDRS_key and save as CEDRS_DOB
 * Merge Montrose_DOB and CEDRS_DOB on KEY variablbe (DOB:LAST:FIRST).
 * KEEP records from both Montrose list and CEDRS 
-  ==>  Montrose_cases  dataset
+==>  Montrose_cases  dataset
 
 Here is the link to the variable names and their attributes for the [Montrose_cases](./Documents/PROC_Contents.Montrose_Cases.pdf) dataset.
 

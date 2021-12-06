@@ -25,43 +25,51 @@ Use DOB column to create birthdate var with format YYYY-MM-DD which is consisten
 The variable names and their attributes for the Montrose vaccine clinic line listing are [here](./Documents/PROC_Contents.Montrose_Fix.pdf). 
 
 
-### **2. Evaluate various pieces of HH address**
-
-Either address or lat/long could be used to group cases into "Households". Address has multiple components, namely street address, unit number, city, State, zipcode, and county. Each of these elements were evaluated regarding completeness on the CEDRS_Filtered data.
-
-|HH element|Description of element|Number missing|
-|----------|-----------------------|--------------|
-|Address1|Street address|776|
-|Address2|Unit number|166,124|
-|AddressActual|Don't know what this field is|170,587|
-|Address_City|City|462|
-|Address_CityActual|DK what this field is|170,587|
-|Address_State|State|2992|
-|Address_Zipcode|Zip code|646|
-|CountyAssigned|County|0|
-|Address_Latitude|Lat Long|7200|
-|Address_Longitude|Lat Long|7200|
-
-Over 7000 records are missing Lat / Long so it was decided to define HH based on address components. Here is a summary of completeness of the various address components:
-
-![missingdata](Images/Address2.jpg)
-
-Almost 98% of the records have data for all address components. Zipcode will not be used to define HH and only cases where State=CO will be used. **Therefore, HH is defined by unique value for Address1, City, and County.**
-
-Some minor data edits were made. Specifically:
-1. If Address1='' and Address2^='' then Address1=Address2;
-2. If Address1='0' then Address1='';
-3. if Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN') then Address1='';
-
-A lot more data cleaning could be done, particularly with ZipCode data and missing State values. Some easy fixes would be to focus on the handful of records missing City but have Address and State or Zipcode data. The city can be easily obtained by googling the street address. 
-
-### **3. Filter dataset again based on complete address components**
-The CEDRS_Filtered dataset is filtered again, keeping only those records with complete address components (Address1, City, and County). Also, the 17 records where `Age_at_Reported=.` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
+### **2. Link ProfileID and KEY variablbe (DOB:LAST:FIRST) and filter on CEDRS cases**
 
 
-### **4. Eligible Households**
+NOTES for CEDRS66.Profiles dataset:
+* CEDRS66.Profiles has ProfileID AND DOB, Last Name, First name
+* DOB, Last Name, First name are the components to the KEY variable
+* DOB needs to be a character format and not a SAS date var
+* KEY variable has length $85 and ProfileID has length $15
+* ==>  Profiles_Key dataset
 
-The primary definition of a HH is based on Address1. County and City provide the context for this field to ensure Address1 is unique. CEDRS_Addresses was sorted by County, City, and Address1. A preview of the data was skimmed. Several data issues were noted with Address1. Here are the findings:
+NOTES for CEDRS_view dataset:
+* COVID.CEDRS_view_fix has ProfileID for all cases
+* Filter out cases not assigned to a Colorado county
+* Keep selected variables from CEDRS
+* ==>  CEDRS dataset
+
+NOTES for merged dataset of Profiles and CEDRS:
+* SORT Profiles_Key and save as Profiles_sort
+* SORT CEDRS and save as CEDRS_sort
+* Merge Profiles_sort and CEDRS_sort on ProfileID.
+* KEEP only records only from CEDRS 
+* ==>  CEDRS_key  dataset
+
+NOTES for merged dataset of Montrose and CEDRS:
+* SORT Montrose_fix and save as Montrose_DOB
+* SORT CEDRS_key and save as CEDRS_DOB
+* Merge Montrose_DOB and CEDRS_DOB on KEY variablbe (DOB:LAST:FIRST).
+* KEEP records from both Montrose list and CEDRS 
+* ==>  Montrose_cases  dataset
+##
+### **3. Characteristics of line listing:**
+##
+![LineListing](./Images/Vaccinated.png)
+
+There were 1,779 individuals vaccinated on November 12 and 13. The number vaccinated each day was nearly equal. The majority vaccinated were female (55%) and received Moderna (92%). About 80% were 50 plus years old.
+
+##
+### **4. Analysis of Montrose cases**
+##
+The 159 vaccinated individuals that have records in CEDRS can be found here: [Montrose_cases.csv](Output%20data/Montrose_cases.csv). 
+
+aset is filtered again, keeping only those records with complete address components (Address1, City, and County). Also, the 17 records where `Age_at_Reported=.` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
+
+
+
 
 Findings:
 ````diff
@@ -69,17 +77,7 @@ Findings:
 + |FINDINGS:
 + | There are several examples of HH's with slightly different values for Address1
 + |    For example:
-+ |    "4037 W 62ND PL"  vs  "4037 W 62ND PL 652563542"
-+ |    "4237 62ND PL  vs "4237 W 62ND PL"  vs "4237 WEST 62ND PLACE"
-+ |    " 5005 W 61ST DR"  vs  " 5005 W.61ST.DR."
-+ |    " 6065 UTICA"  vs  " 6065 UTICA ST"
-+ |    "6288 NEWTON COURT"  vs  "6288 NEWTON CT"
-+ |    "2320 HANDOVER ST"  vs  "2320 HANOVER ST"
-+ |
-+ |    ALSO:  150 N 19TH AVE (in BRIGHTON) is Adams County Sheriff's Detention Facility.
-+ |    FIX: Set Live_in_Institution = 'Yes'
-+ |    Should investigate other addresses that have >10 cases per Address1.
-+ *--------------------------------------------------------------------------------------------*/
++*--------------------------------------------------------------------------------------------*/
 ````
 These are only a few examples of the types of data issues with Address1. At this time, these data issues have been ignored. For the majority of the cases though, it was deemed that Address1, in the context of County and City, was a sufficient tool for defining HH.
 

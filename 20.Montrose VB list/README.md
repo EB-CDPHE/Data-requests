@@ -54,6 +54,9 @@ NOTES for merged dataset of Montrose and CEDRS:
 * Merge Montrose_DOB and CEDRS_DOB on KEY variablbe (DOB:LAST:FIRST).
 * KEEP records from both Montrose list and CEDRS 
 * ==>  Montrose_cases  dataset
+
+Here is the link to the variable names and their attributes for the [Montrose_cases](./Documents/PROC_Contents.Montrose_Cases.pdf) dataset.
+
 ##
 ### **3. Characteristics of line listing:**
 ##

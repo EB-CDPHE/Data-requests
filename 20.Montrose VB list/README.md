@@ -69,71 +69,25 @@ There were 1,779 individuals vaccinated on November 12 and 13. The number vaccin
 ##
 The 159 vaccinated individuals that have records in CEDRS can be found here: [Montrose_cases.csv](Output%20data/Montrose_cases.csv). 
 
-The vast majority of these 159 individuals were reported as cases prior to November 1, 2021. Here is the number of cases by month reported to CEDRS:
+The vast majority of these 159 individuals are in CEDRS with a `ReportedDate < 11/01/21`. Here is the frequency distribution by month reported to CEDRS:
 
 ![PriorCases](./images/PriorCases2.png)
 
-The 16 records where `ReportedDate > 11/01/21` are excluded. The [CEDRS_Addresses](Documents/PROC%20contents.CEDRS_Addresses.pdf) dataset contains 178,093 cases.
+Here is the listing of the 16 records where `ReportedDate > 11/01/21`. 
 
+![VaccinatedCases](./images/VaccinatedCases.png)
 
+And the proportion of these recent cases by age, gender, and vaccine manufacturer:
 
-
-Findings:
-````diff
-+/*------------------------------------------------------------------------------------------*
-+ |FINDINGS:
-+ | There are several examples of HH's with slightly different values for Address1
-+ |    For example:
-+*--------------------------------------------------------------------------------------------*/
-````
-These are only a few examples of the types of data issues with Address1. At this time, these data issues have been ignored. For the majority of the cases though, it was deemed that Address1, in the context of County and City, was a sufficient tool for defining HH.
-
-The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to create "Households". HH with only a sigle case were excluded.
-
-**Here is the distribution of cases per HH:**
-
-![Num_Cases_per_HH](Images/Num_Cases_per_HH2.png)
-
-It was decided to exclude HH with more than ten cases. Thus, eligible HH were those that had 2-10 cases per HH. There was a total of 61,309 cases in the 24,519 eligible HH.
-
-### **5. Defining Clusters** 
-
-Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". There were a total of 30,988 clusters with the eligible HH.
-
-**Here is the distribution of clusters per HH:**
-
-![Num_Clusters_per_HH](Images/Num_Clusters_per_HH2.png)
-
-###  **6. Creating an analysis variable**
-Over a quarter of the HH had two clusters of cases, i.e. cases that were more than 30 days apart. Nearly three quarters had only a single cluster of cases.  The data request was to look at the proportion of clusters that began with the various age groups.   
-
-|Abbrev.|Label|Age range|
-|---------|-----|------------|
-|i or I|infants|0-4 year olds|
-|k or K|kids|5-11 year olds|
-|t or T|teens|12-17 year olds|
-|a or A|adults|18-15 year olds|
-
-Thus, each cluster has a variable, `AG`, which displays the cases by Age Group in the order in which they were reported. For HH cases in Fall 2020, the AG variable is all lower case letters. Whereas for Fall 2021, the AG variable is all upper case letters. 
-
-**Here is an exerpt of the HH data:**
-
-![ListAG](Images/ListAGs.jpg)
-
-#
-The list of variables and their attributes for the final dataset is [HERE](Documents/PROC%20contents.HHcases.pdf).
-
+![VxCases](./images/VxCasesFreq2.png)
 
 ## Response
-Response was shared with Eduardo and Alicia via Google Slides:
-
-https://docs.google.com/presentation/d/12aJxnbAFpz1XrXOR8NyD1DXJisqfUAT8gyXR-TKEWiQ/edit?usp=sharing
-
+Response was shared with those on the email chain via GitHub link:
 
 #
 **Issues:**
-# Oh! Where do I begin??!! 
-* Definition of a HH? Single family homes only? Should we exclude apartment complexes? If not, is each apartment a separate HH or should the entire apartment complex be a single HH?
-* Almost 3000 cases were missing data for State. Many of these could be CO households. Most of these have Zipcode data. If Zipcode data was cleaned and converted to numeric, it could easily be used to impute State=CO when Zipcode was 80000-80700.
-* Zipcode data needs to be cleaned.
+* No column on Montrose Vaccine clinic line listing that contains ProfileID or EventID that could link individuals to CEDRS directly.
+
+* A make-shift key was made by concatenating DOB:Last_Name:First_Name. No effort was made to assess the performance of this key for matching / merging records from line listing to CEDRS. It's possible that some were missed.
+
 

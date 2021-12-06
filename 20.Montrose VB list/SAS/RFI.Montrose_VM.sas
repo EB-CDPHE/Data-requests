@@ -69,7 +69,7 @@ DATA Montrose_fix ;
    * create birthdate var with format YYYY-MM-DD as with CEDRS66.Profiles *;
    BirthDate = cats(put(DOB,yymmdd10.)); format BirthDate $10.;   *catx fx converts numeric date field to char var *;
 
-   * create ID KEY variable based on Birthdate:Last name:First name format*;
+   * create ID KEY variable based on Birthdate:Last name:First name format *;
    DOB_LName_FName = catx(":", BirthDate, propcase(Patient_Name_Last), propcase(Patient_Name_First) );
    format  DOB_LName_FName  $85. ;
 
@@ -275,36 +275,36 @@ run;
 
 
 
-
 ***  Analyze the n=158 cases that were vaccinated at Montrose clinic on 11/12 or 11/13  ***;
 ***-------------------------------------------------------------------------------------***;
 
-   PROC contents data= Montrose_cases varnum ; run;
+   PROC contents data= Montrose_cases varnum ;  title1 'Montrose_cases'; run;
 
 ** Print listing of cases **;
    PROC print data= Montrose_cases ;
       ID  Patient_Name ;
-      var Gender  Vaccination_Date  Vaccine_Manufacturer  
-          Age_at_Reported  ReportedDate  CollectionDate OnsetDate  Symptomatic  Outbreak_Associated  EventID; 
+      var EventID  Gender  Vaccination_Date  Vaccine_Manufacturer  
+          Age_at_Reported  OnsetDate  CollectionDate  ReportedDate  ; 
       format Gender $10. ;
 run;
 
 ** CEDRS case dates **;
-   PROC freq data= Montrose_cases ;
-      tables ReportedDate  CollectionDate  OnsetDate   ;
-      format ReportedDate  CollectionDate  OnsetDate  monyy. ;
-run;
+/*   PROC freq data= Montrose_cases ;*/
+/*      tables ReportedDate  CollectionDate  OnsetDate   ;*/
+/*      format ReportedDate  CollectionDate  OnsetDate  monyy. ;*/
+/*run;*/
+/**/
+/*   PROC format;*/
+/*         value BeforeAft*/
+/*         '01MAR20'd - '31OCT21'd = 'Before 11-1-21'*/
+/*         '01NOV21'd - '31DEC21'd = 'After 10-31-21' ;*/
+/*run;*/
 
-   PROC format;
-         value BeforeAft
-         '01MAR20'd - '31OCT21'd = 'Before 11-1-21'
-         '01NOV21'd - '31DEC21'd = 'After 10-31-21' ;
-run;
-
+** Individuals vaccinated in Montrose Nov 12-13 by month reported to CEDRS (prior to 11/1/21) **;
    PROC freq data= Montrose_cases ;
       where ReportedDate < '01NOV21'd;
-      tables ReportedDate  CollectionDate   ;
-      format ReportedDate  CollectionDate  monyy. ;
+      tables ReportedDate  ;
+      format ReportedDate  monyy. ;
       title2 'ReportedDate before November 2021';
 run;
 /*   PROC freq data= Montrose_cases ;*/
@@ -315,19 +315,20 @@ run;
 /*run;*/
 
 
+** Montrose Vaccinatee's reported as CEDRS case after 11/1/21 **;
    proc sort data=Montrose_cases
                out=Montrose_cases_VXsort ;
       by CollectionDate OnsetDate;
 run;
    PROC print data= Montrose_cases_VXsort n;
       where ReportedDate > '31OCT21'd;
-      id  Patient_Name ; var  Vaccination_Date  OnsetDate  CollectionDate   ReportedDate  ProfileID  EventID;
+      id  Patient_Name ; var  Vaccination_Date  OnsetDate  CollectionDate  ReportedDate  Symptomatic ProfileID  EventID;
       format ProfileID $10. ;
+      title2 'ReportedDate during November 2021';
 run;
 
 
-
-
+** Characteristics of Montrose Vaccinatee's recently reported as cases **;
    PROC freq data= Montrose_cases ;
       where ReportedDate > '31OCT21'd;
       tables Vaccination_Date  Gender  Age_at_Vax   Vaccine_Manufacturer    ;

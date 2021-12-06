@@ -25,7 +25,7 @@ Use DOB column to create birthdate var with format YYYY-MM-DD which is consisten
 The variable names and their attributes for the Montrose vaccine clinic line listing are [here](./Documents/PROC_Contents.Montrose_Fix.pdf). 
 
 
-### **2. Link ProfileID and KEY variablbe (DOB:LAST:FIRST) and filter on CEDRS cases**
+### **2. Link ProfileID and KEY variable (DOB:LAST:FIRST) and filter on CEDRS cases**
 
 
 NOTES for CEDRS66.Profiles dataset:

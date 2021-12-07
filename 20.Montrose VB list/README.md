@@ -35,10 +35,8 @@ The variable names and their attributes for the Montrose vaccine clinic line lis
 * DOB needs to be a character format and not a SAS date var
 * KEY variable has length 85 and ProfileID has length 15
 ````
-
-######
    ==>  Profiles_Key dataset
-######
+
 <u>NOTES for CEDRS_view dataset:</u>
 ````
 * COVID.CEDRS_view_fix has ProfileID for all cases
@@ -47,7 +45,6 @@ The variable names and their attributes for the Montrose vaccine clinic line lis
 ````
   ==>  CEDRS dataset
 
-######
 <u>NOTES for merged dataset of Profiles and CEDRS:</u>
 ````
 * SORT Profiles_Key and save as Profiles_sort

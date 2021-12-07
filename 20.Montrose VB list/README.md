@@ -95,11 +95,12 @@ Response was shared with those on the email chain via [email](Documents/Email_re
 
 And documentation and additional information were shared on 12/6/21 via GitHub link:
 
+https://github.com/EB-CDPHE/Data-requests/blob/f582eea2ad62dcdf35bf76a89b6b6ae39d7777b8/20.Montrose%20VB%20list/README.md
 
 
-#
+##
 **Issues:**
-* No column on Montrose Vaccine clinic line listing that contains ProfileID or EventID that could link individuals to CEDRS directly.
+* No column on Montrose Vaccine clinic line listing contained ProfileID or EventID that could link individuals to CEDRS directly.
 
 * A make-shift key was made by concatenating DOB:Last_Name:First_Name. No effort was made to assess the performance of this key for matching / merging records from line listing to CEDRS. It's possible that some were missed.
 

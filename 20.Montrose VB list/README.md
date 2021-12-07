@@ -88,7 +88,7 @@ Here is the listing of the 16 records where `ReportedDate > 11/01/21`.
 
 And the proportion of these recent cases by age, gender, and vaccine manufacturer:
 
-![VxCases](./images/VxCasesFreq2.png)
+![VxCases](Images/VxCasesFreq2.png)
 
 ## Response
 Response was shared with those on the email chain via [email](Documents/Email_response_120521.pdf) on 12/5/21.  

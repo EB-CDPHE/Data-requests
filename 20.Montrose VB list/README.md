@@ -61,10 +61,8 @@ The variable names and their attributes for the Montrose vaccine clinic line lis
 * Merge Montrose_DOB and CEDRS_DOB on KEY variablbe (DOB:LAST:FIRST).
 * KEEP records from both Montrose list and CEDRS 
 ````
-
-######
    ==>  Montrose_cases  dataset
-######
+
 Here is the link to the variable names and their attributes for the [Montrose_cases](./Documents/PROC_Contents.Montrose_Cases.pdf) dataset.
 
 ##
@@ -81,11 +79,13 @@ The 159 vaccinated individuals that have records in CEDRS can be found here: [Mo
 
 The vast majority of these 159 individuals are in CEDRS with a `ReportedDate < 11/01/21`. Here is the frequency distribution by month reported to CEDRS:
 
-![PriorCases](./images/PriorCases2.png)
+![PC](./images/PriorCases2.png)
+
 
 Here is the listing of the 16 records where `ReportedDate > 11/01/21`. 
 
-![VaccinatedCases](./images/VaccinatedCases.png)
+![VC](./images/VaccinatedCases2.png)
+
 
 And the proportion of these recent cases by age, gender, and vaccine manufacturer:
 

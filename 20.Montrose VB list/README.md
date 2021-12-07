@@ -28,34 +28,40 @@ The variable names and their attributes for the Montrose vaccine clinic line lis
 ### **2. Link ProfileID and KEY variable (DOB:LAST:FIRST) and filter on CEDRS cases**
 
 
-NOTES for CEDRS66.Profiles dataset:
+<u>NOTES for CEDRS66.Profiles dataset:</u>
+````diff
 * CEDRS66.Profiles has ProfileID AND DOB, Last Name, First name
 * DOB, Last Name, First name are the components to the KEY variable
 * DOB needs to be a character format and not a SAS date var
 * KEY variable has length 85 and ProfileID has length 15
+````
+
 ######
    ==>  Profiles_Key dataset
+
 ######
-NOTES for CEDRS_view dataset:
+<u>NOTES for CEDRS_view dataset:</u>
+````diff
 * COVID.CEDRS_view_fix has ProfileID for all cases
 * Filter out cases not assigned to a Colorado county
 * Keep selected variables from CEDRS
+````
+  ==>  CEDRS dataset
+
 ######
-     ==>  CEDRS dataset
-######
-NOTES for merged dataset of Profiles and CEDRS:
+<u>NOTES for merged dataset of Profiles and CEDRS:</u>
 * SORT Profiles_Key and save as Profiles_sort
 * SORT CEDRS and save as CEDRS_sort
 * Merge Profiles_sort and CEDRS_sort on ProfileID.
 * KEEP only records only from CEDRS 
-######
    ==>  CEDRS_key  dataset
-######
-NOTES for merged dataset of Montrose and CEDRS:
+
+<u>NOTES for merged dataset of Montrose and CEDRS:</u>
 * SORT Montrose_fix and save as Montrose_DOB
 * SORT CEDRS_key and save as CEDRS_DOB
 * Merge Montrose_DOB and CEDRS_DOB on KEY variablbe (DOB:LAST:FIRST).
 * KEEP records from both Montrose list and CEDRS 
+
 ######
    ==>  Montrose_cases  dataset
 ######

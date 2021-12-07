@@ -79,7 +79,7 @@ The 159 vaccinated individuals that have records in CEDRS can be found here: [Mo
 
 The vast majority of these 159 individuals are in CEDRS with a `ReportedDate < 11/01/21`. Here is the frequency distribution by month reported to CEDRS:
 
-![PC](./images/PriorCases2.png)
+![PC](./images/PriorCases2.jpg)
 
 
 Here is the listing of the 16 records where `ReportedDate > 11/01/21`. 

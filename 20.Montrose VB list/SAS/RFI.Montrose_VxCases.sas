@@ -332,5 +332,5 @@ run;
    PROC freq data= Montrose_cases ;
       where ReportedDate > '31OCT21'd;
       tables Vaccination_Date  Gender  Age_at_Vax   Vaccine_Manufacturer    ;
-      format Age_at_Vax Age4Cat. ;
+      format Age_at_Vax Age4Cat. Gender $10. ;
 run;

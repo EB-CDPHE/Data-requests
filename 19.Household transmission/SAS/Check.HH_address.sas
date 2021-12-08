@@ -131,13 +131,21 @@ run;
 run;
 /*-----*
  |FIX:
-
+   if ProfileID in ('1798946') then Address_Zipcode = '80921';
+   if ProfileID in ('1062180.1') then compress(Address_Zipcode);
+   if ProfileID in ('1139630') then compress(Address_Zipcode);
+   if ProfileID in ('1161466') then Address_Zipcode = '80021';
+   if ProfileID in ('1163657') then Address_Zipcode = '80004';
+   if ProfileID in ('1167024') then compress(Address_Zipcode);
+   if ProfileID in ('1168983') then Address_Zipcode = '80920';
    if ProfileID in ('1175089') then Address_Zipcode = '80238';
    if ProfileID in ('1188080') then Address_Zipcode = '81101';
    if ProfileID in ('1190997') then Address_Zipcode = '81435';
    if ProfileID in ('1190997') then DO;
-      Address1 = '';
+      Address1 = '280 S MAHONEY DR';
    END;
+   if ProfileID in ('1199577') then compress(Address_Zipcode,'`');
+ *-----*/
 
 
 

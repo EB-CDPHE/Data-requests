@@ -98,25 +98,25 @@ The CEDRS_Addresses data was thus grouped based on County, City, and Address1 to
 
 It was decided to exclude HH with more than ten cases. Thus, eligible HH were those that had 2-10 cases per HH. There was a total of 61,309 cases in the 24,519 eligible HH.
 
-### **5. Defining Clusters** 
+### **5. Household Introductions** 
 
-Cases within a HH were grouped based on how they clustered in time. So a case that was reported within 30 days of the previous case was considered to be part of the same "cluster". There were a total of 30,988 clusters with the eligible HH.
+All eligible HH had at least two cases during the time period. If the second case occured more than 30 days after the first case then it was considered a separate "HH introduction". Thus, cases within a HH were grouped based on how they clustered in time. Any case reported within 30 days of the previous case was considered to be part of the same "HH introduction". There were a total of 30,988 HH Introductions among the eligible HH.
 
-**Here is the distribution of clusters per HH:**
+**Here is the distribution of introductions per HH:**
 
 ![Num_Clusters_per_HH](Images/Num_Clusters_per_HH2.png)
 
 ###  **6. Creating an analysis variable**
-Over a quarter of the HH had two clusters of cases, i.e. cases that were more than 30 days apart. Nearly three quarters had only a single cluster of cases.  The data request was to look at the proportion of clusters that began with the various age groups.   
+Over a quarter of the HH had two HH introductions of COVID, i.e. cases that were more than 30 days apart. Nearly three quarters had only a single HH Introduction.  The data request was to look at the proportion of HH Introductions that began with the various age groups.   
 
-|Abbrev.|Label|Age range|
+|Code|Label|Age range|
 |---------|-----|------------|
 |i or I|infants|0-4 year olds|
 |k or K|kids|5-11 year olds|
 |t or T|teens|12-17 year olds|
 |a or A|adults|18-15 year olds|
 
-Thus, each cluster has a variable, `AG`, which displays the cases by Age Group in the order in which they were reported. For HH cases in Fall 2020, the AG variable is all lower case letters. Whereas for Fall 2021, the AG variable is all upper case letters. 
+Thus, each HH Introduction has a variable, `AG`, which displays the cases by Age Group in the order in which they were reported. For HH cases in Fall 2020, values of the AG variable are lower case letters. Whereas for Fall 2021, the values are upper case letters. 
 
 **Here is an exerpt of the HH data:**
 
@@ -134,8 +134,10 @@ https://docs.google.com/presentation/d/12aJxnbAFpz1XrXOR8NyD1DXJisqfUAT8gyXR-TKE
 
 #
 **Issues:**
-# Oh! Where do I begin??!! 
+
 * Definition of a HH? Single family homes only? Should we exclude apartment complexes? If not, is each apartment a separate HH or should the entire apartment complex be a single HH?
+######
 * Almost 3000 cases were missing data for State. Many of these could be CO households. Most of these have Zipcode data. If Zipcode data was cleaned and converted to numeric, it could easily be used to impute State=CO when Zipcode was 80000-80700.
+######
 * Zipcode data needs to be cleaned.
 

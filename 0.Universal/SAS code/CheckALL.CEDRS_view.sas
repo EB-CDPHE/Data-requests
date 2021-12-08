@@ -16,7 +16,9 @@ OUTPUT:	printed output
  | 4. Invalid values for ICU variable
  | 5. Invalid values for CountyAssigned variable
  | 6. Missing keys and differing formatting (ProfileID and EventID)
- | 7. 
+ | 7. Missing ID variables
+ | 8. Check new Vax_Booster variable
+ | 9. Zip code variable
  *--------------------------------------------------------------------*/
 
 ** Create local copy **;
@@ -305,9 +307,8 @@ run;
 
 
 
-***  7. Missing ID variables  ***;
-***---------------------------***;
-
+***  8. Check new Vax_Booster variable  ***;
+***-------------------------------------***;
 
    PROC freq data= &ChkDSN; 
       tables  vax_booster ; 

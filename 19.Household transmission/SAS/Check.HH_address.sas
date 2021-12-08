@@ -122,6 +122,28 @@ run;
  *-----------------------------------------------------------------*/
 
 
+** Chk4:  Zip code with length=6 **;
+   PROC print data= CEDRS_filtered;
+      where length(Address_Zipcode)=6;
+      id ProfileID ;
+      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State  Address_Zipcode  CountyAssigned  ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+run;
+/*-----*
+ |FIX:
+
+   if ProfileID in ('1175089') then Address_Zipcode = '80238';
+   if ProfileID in ('1188080') then Address_Zipcode = '81101';
+   if ProfileID in ('1190997') then Address_Zipcode = '81435';
+   if ProfileID in ('1190997') then DO;
+      Address1 = '';
+   END;
+
+
+
+
+
+
 ** Zip code with length=9 **;
    PROC print data= CEDRS_filtered;
       where length(Address_Zipcode)=9;

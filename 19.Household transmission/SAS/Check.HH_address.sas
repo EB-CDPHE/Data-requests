@@ -148,20 +148,29 @@ run;
  *-----*/
 
 
-
-
-
-
-** Zip code with length=9 **;
+** Chk5:  Zip code with length=9 **;
    PROC print data= CEDRS_filtered;
       where length(Address_Zipcode)=9;
-      var Address1 Address2 AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
+      var  Address_State Address_Zipcode CountyAssigned  ;
       format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $10. ;
 run;
-/*-----*
+/*--------------------------------------------------------------------------------------------*
  |FIX:
- *-----*/
+   if length(Address_Zipcode)=9 then 
+   Address_Zip4 = cat( substr(Address_Zipcode, 1, 5), '-', substr(Address_Zipcode, 6) );
+ *--------------------------------------------------------------------------------------------*/
 
+
+** Chk6:  Values that are Zip code - plus four **;
+   PROC print data= CEDRS_filtered;
+      where index(Address_Zipcode,'-')=6;
+      var  Address_State Address_Zipcode CountyAssigned  ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $10. ;
+run;
+/*--------------------------------------------------------------------------------------------*
+ |FIX:
+   if index(Address_Zipcode,'-')=6 then Address_Zip4 = Address_Zipcode;
+ *--------------------------------------------------------------------------------------------*/
 
 
 

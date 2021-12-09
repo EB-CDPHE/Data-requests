@@ -40,7 +40,6 @@ run;
    PROC freq data= CEDRS_filtered ;
       tables Address_Zipcode / missing missprint;
 run;
-
 /*-------------------------------------------------------------------------*
  |FINDINGS:
  | For zipcode with 9 digits need to insert '-'.
@@ -129,8 +128,8 @@ run;
    PROC print data= CEDRS_filtered;
       where Address_Zipcode in ('00000','00001','00003');
       id ProfileID ;
-      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State  Address_Zipcode  CountyAssigned  ;
-      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+      var Address1     Address_City      Address_State  Address_Zipcode  CountyAssigned  ;
+      format Address1  AddressActual  $20.  Address2  Address_City  Address_CityActual  $15. ;
 run;
 /*-----------------------------------------------------------------*
  |FIX:
@@ -207,6 +206,7 @@ run;
 /*---------------------------------------------------------------*
  |FIX:
    if ProfileID in ('1793141') then Address_Zipcode = '80235';
+   if ProfileID in ('1192621') then Address_Zipcode = '80232';
  *---------------------------------------------------------------*/
 
 
@@ -251,7 +251,7 @@ run;
  *---------------------------------------------------------------*/
 
 
-** Chk10:  Zip code with length=8 **;
+** Chk10:  Zip code with length=7 **;
    PROC print data= CEDRS_filtered;
       where length( compress(Address_Zipcode) )=7;
       id ProfileID ;
@@ -288,6 +288,8 @@ run;
 
 
 
+*** Apply edits to bad ZipCode data ***;
+***---------------------------------***;
 
 DATA CEDRS_ZipFix ; set CEDRS_filtered ;
 
@@ -379,6 +381,7 @@ DATA CEDRS_ZipFix ; set CEDRS_filtered ;
 
 * Chk7 *;
    if ProfileID in ('1793141') then Address_Zipcode = '80235';
+   if ProfileID in ('1192621') then Address_Zipcode = '80232';
 
 * Chk8 *;
    if ProfileID in ('1782423') then Address_Zipcode = '';
@@ -419,27 +422,90 @@ DATA CEDRS_ZipFix ; set CEDRS_filtered ;
 
 run;
 
+   PROC contents data=CEDRS_ZipFix  varnum ;  title1 'CEDRS_ZipFix';  run;
 
-* Zipcode values *;
+*** new fixed Zipcode values ***;
+***--------------------------***;
+
    PROC freq data= CEDRS_ZipFix ;
       tables Address_Zipcode * Address_Zip4 / list missing missprint;
 run;
 
 
 
-** Chk2:  Zip code with length=4 **;
-   PROC print data= CEDRS_ZipFix;
-      where length( compress(Address_Zipcode) )=4;
-      id ProfileID ;
+***  State values  ***;
+***----------------***;
+
+   PROC freq data= CEDRS_ZipFix ;
+      tables Address_State / missing missprint;
+run;
+/*----------------------------------------------*
+ |FINDINGS:
+ | Over 98% of records have State=CO
+ | N=2997 records where State = missing
+ *----------------------------------------------*/
+
+** Chk12:  Missing State value**;
+
+   PROC format;
+      value $AnyDataFmt
+         ' '='Missing data'
+         other='Has data' ;     
+      value $COzip
+         '80000' - '81800' = 'CO zip'
+         other = 'Non-CO zip' ; 
+run;
+
+   PROC freq data= CEDRS_filtered ;
+      where Address_State='';
+      tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1  Address_City  Address_State Address_Zipcode  $AnyDataFmt.  ;
+run;
+/*------------------------------------------------*
+ |FINDINGS:
+ | Of the N=2997 records where State = missing,
+ | n=2700 have address1, city, and Zipcode data
+ *------------------------------------------------*/
+
+   PROC freq data= CEDRS_filtered ;
+      where Address_State=''  AND  Address_Zipcode ne ''  AND Address1 ne '' AND Address_City ne '';
+      tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1  Address_City  Address_State  $AnyDataFmt.  Address_Zipcode $COzip. ;
+run;
+/*--------------------------------------------------------------------*
+ |FINDINGS:
+ | Of the n=2700 records where State = missing,
+ | AND there is address1, city, and Zipcode data,
+ | ALL but 3 have a CO zip code.
+ |FIX:
+   if Address_State=''  AND  Address1 ne '' AND Address_City ne '' 
+      AND  ( Address_Zipcode>'8000' AND  Address_Zipcode<'81800' )
+      then Address_State='CO ZIP'
+ *---------------------------------------------------------------------*/
+
+
+*** Impute State=CO for Zip in (80000 - 81700) ***;
+***--------------------------------------------***;
+
+DATA CEDRS_ZipStateFix ; set CEDRS_ZipFix ;
+
+* Chk12 *;
+   if Address_State=''  AND  Address1 ne '' AND Address_City ne '' AND 
+      ( Address_Zipcode GE '80000' AND  Address_Zipcode LE '81700' )
+      then Address_State='CO ZIP' ;
+run;
+
+
+   PROC freq data= CEDRS_ZipStateFix ;
+      tables Address_State * Address_Zipcode/ list missing missprint;
+run;
+
+proc print data= CEDRS_ZipStateFix;
+where Address_Zipcode='80045'  AND Address_State='';
+id ProfileID;
       var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
       format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
 run;
 
 
-** Chk4:  Zip code with length=6 **;
-   PROC print data= CEDRS_filtered;
-      where length( compress(Address_Zipcode) )=6;
-      id ProfileID ;
-      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State  Address_Zipcode  CountyAssigned  ;
-      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
-run;
+

@@ -18,7 +18,7 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 
 
 *** Filter data  ***;
-***------------***;
+***--------------***;
 
 DATA CEDRS_filtered;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  AND
@@ -34,7 +34,9 @@ run;
 
 
 
-* Zipcode values *;
+*** Zipcode values ***;
+***----------------***;
+
    PROC freq data= CEDRS_filtered ;
       tables Address_Zipcode / missing missprint;
 run;
@@ -45,6 +47,7 @@ run;
  | Then need to create numeric zipcode from first 'word' 
  | Then can use zipcode range (80000 - 81700) to fill in missing State
  *-------------------------------------------------------------------------*/
+
 
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
 
@@ -150,6 +153,7 @@ run;
  |FIX:
 
    if ProfileID in ('1798946') then Address_Zipcode = '80921';
+   if ProfileID in ('1827041') then Address_Zipcode = '';
    if ProfileID in ('1062180.1') then Address_Zipcode=compress(Address_Zipcode);
    if ProfileID in ('1139630') then Address_Zipcode=compress(Address_Zipcode);
    if ProfileID in ('1161466') then Address_Zipcode = '80021';
@@ -265,14 +269,21 @@ run;
 
 ** Chk11:  Zip code with length=8 **;
    PROC print data= CEDRS_filtered;
-/*      where  compress(Address_Zipcode) = '80908-7420' ;*/
+      where  compress(Address_Zipcode) = '99999' ;
       id ProfileID ;
       var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
       format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
 run;
 /*------------------------------------------------------*
  |FIX:
-   if ProfileID in ('') then Address_Zipcode = '';
+
+   if ProfileID in ('1788953') then Address_Zipcode = '80751';
+   if ProfileID in ('1845892') then Address_Zipcode = '80206';
+   if ProfileID in ('1860954') then Address_Zipcode = '80231';
+   if ProfileID in ('1991145') then Address_Zipcode = '80138';
+   if ProfileID in ('1171752') then Address_Zipcode = '80247';
+   if ProfileID in ('1176504') then Address_Zipcode = '80122';
+
  *------------------------------------------------------*/
 
 
@@ -338,6 +349,7 @@ DATA CEDRS_ZipFix ; set CEDRS_filtered ;
 
 * Chk4 *;
    if ProfileID in ('1798946') then Address_Zipcode = '80921';
+   if ProfileID in ('1827041') then Address_Zipcode = '';
    if ProfileID in ('1062180.1') then Address_Zipcode=compress(Address_Zipcode);
    if ProfileID in ('1139630') then Address_Zipcode=compress(Address_Zipcode);
    if ProfileID in ('1161466') then Address_Zipcode = '80021';
@@ -390,12 +402,20 @@ DATA CEDRS_ZipFix ; set CEDRS_filtered ;
 * Chk10 *;
    if ProfileID in ('1835031') then do;
       Address_Zip4 = '80908-7420';
-      Address_Zipcode = scan(Address_Zipcode,1,'-');
+      Address_Zipcode = scan(Address_Zip4,1,'-');
    end;
    if ProfileID in ('1882941') then do;
       Address_Zip4 = '80911-1675';
-      Address_Zipcode = scan(Address_Zipcode,1,'-');
+      Address_Zipcode = scan(Address_Zip4,1,'-');
    end;
+
+* Chk11 *;
+   if ProfileID in ('1788953') then Address_Zipcode = '80751';
+   if ProfileID in ('1845892') then Address_Zipcode = '80206';
+   if ProfileID in ('1860954') then Address_Zipcode = '80231';
+   if ProfileID in ('1991145') then Address_Zipcode = '80138';
+   if ProfileID in ('1171752') then Address_Zipcode = '80247';
+   if ProfileID in ('1176504') then Address_Zipcode = '80122';
 
 run;
 
@@ -412,5 +432,14 @@ run;
       where length( compress(Address_Zipcode) )=4;
       id ProfileID ;
       var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+run;
+
+
+** Chk4:  Zip code with length=6 **;
+   PROC print data= CEDRS_filtered;
+      where length( compress(Address_Zipcode) )=6;
+      id ProfileID ;
+      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State  Address_Zipcode  CountyAssigned  ;
       format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
 run;

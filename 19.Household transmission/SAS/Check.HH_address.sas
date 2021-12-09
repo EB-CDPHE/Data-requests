@@ -260,14 +260,12 @@ run;
 run;
 /*---------------------------------------------------------------------*
  |FIX:
-
    if ProfileID in ('1835031') then Address_Zipcode = '80908-7420';
    if ProfileID in ('1882941') then Address_Zipcode = '80911-1675';
-
  *----------------------------------------------------------------------*/
 
 
-** Chk11:  Zip code with length=8 **;
+** Chk11:  Zip code = 99999 **;
    PROC print data= CEDRS_filtered;
       where  compress(Address_Zipcode) = '99999' ;
       id ProfileID ;
@@ -445,7 +443,7 @@ run;
  | N=2997 records where State = missing
  *----------------------------------------------*/
 
-** Chk12:  Missing State value**;
+** Chk12:  Missing State value **;
 
    PROC format;
       value $AnyDataFmt

@@ -60,15 +60,17 @@ run;
   if ProfileID in ("1224468.1","1824521") then Address_Zipcode=compress(Address_Zipcode, ',');
  *-----------------------------------------------------------------------------------------------*/
 
+
 ** Chk2:  Zip code with length=4 **;
    PROC print data= CEDRS_filtered;
-      where length( Address_Zipcode )=4;
+      where length( compress(Address_Zipcode) )=4;
       id ProfileID ;
       var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
       format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
 run;
 /*-----------------------------------------------------------------*
  |FIX:
+
    if ProfileID in ('1787033') then Address_Zipcode = '80234';
    if ProfileID in ('1809231') then Address_Zipcode = '80735';
    if ProfileID in ('1813537') then Address_Zipcode = '81069';
@@ -95,6 +97,7 @@ run;
    END;
    if ProfileID in ('1892377') then Address_Zipcode = '80538';
    if ProfileID in ('1910791') then Address_Zipcode = '80214';
+
    if ProfileID in ('1917019') then Address_Zipcode = '81001';
    if ProfileID in ('1917768') then Address_Zipcode = '80127';
    if ProfileID in ('1918088') then Address_Zipcode = '80123';
@@ -111,20 +114,15 @@ run;
    if ProfileID in ('1190606') then Address_Zipcode = '80904';
    if ProfileID in ('1200802') then Address_Zipcode = '80109';
 
-
-
-
-
-
-   if ProfileID in ('1824521') then Address_Zipcode = '80631';
-   if ProfileID in ('1824521') then DO;
-      Address1 = '1705 28TH ST';
-   END;
+/*   if ProfileID in ('1824521') then Address_Zipcode = '80631';*/
+/*   if ProfileID in ('1824521') then DO;*/
+/*      Address1 = '1705 28TH ST';*/
+/*   END;*/
 
  *------------------------------------------------------------------*/
 
 
-** Chk3:  Zip code with length=4 **;
+** Chk3:  Zip code < 00004 **;
    PROC print data= CEDRS_filtered;
       where Address_Zipcode in ('00000','00001','00003');
       id ProfileID ;
@@ -194,6 +192,47 @@ run;
  *--------------------------------------------------------------------------------------------*/
 
 
+** Chk7:  Zip code with length=3 **;
+   PROC print data= CEDRS_filtered;
+      where length( compress(Address_Zipcode) )=3;
+      id ProfileID ;
+      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+run;
+/*---------------------------------------------------------------*
+ |FIX:
+   if ProfileID in ('1793141') then Address_Zipcode = '80235';
+ *---------------------------------------------------------------*/
+
+
+** Chk8:  Zip code with alpha  **;
+   PROC print data= CEDRS_filtered;
+      where ANYalpha(Address_Zipcode)>0;
+      id ProfileID ;
+      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+run;
+/*---------------------------------------------------------------*
+ |FIX:
+
+   if ProfileID in ('1782423') then Address_Zipcode = '';
+   if ProfileID in ('1837939') then Address_Zipcode = '';
+   if ProfileID in ('1839281') then Address_Zipcode = '80504';
+   if ProfileID in ('1849305') then Address_Zipcode = '';
+   if ProfileID in ('1853950') then Address_Zipcode = '80631';
+   if ProfileID in ('1862614') then Address_Zipcode = '81212';
+   if ProfileID in ('1919849') then Address_Zipcode = '';
+   if ProfileID in ('1159268') then Address_Zipcode = '80233';
+   if ProfileID in ('1192621') then Address_Zipcode = '80232';
+   if ProfileID in ('1196519') then Address_Zipcode = '80640';
+   if ProfileID in ('1196519') then DO;
+      Address1 = '6500 E. 88TH AVE';
+      Address2 = 'SP. 244';
+   END;
+
+ *---------------------------------------------------------------*/
+
+
 
 /*-----*
  |FIX:
@@ -208,20 +247,13 @@ DATA CEDRS_ZipFix ; set CEDRS_filtered ;
   if ProfileID in ("1224468.1","1824521") then Address_Zipcode=compress(Address_Zipcode, ',');
 
 * Chk2 *;
-   if ProfileID in ('1178217') then Address_Zipcode = '80002';
-   if ProfileID in ('1190606') then Address_Zipcode = '80904';
-   if ProfileID in ('1200802') then Address_Zipcode = '80109';
-   if ProfileID in ('1136170') then Address_Zipcode = '80016';
-   if ProfileID in ('1138005') then Address_Zipcode = '81641';
-   if ProfileID in ('1165757') then Address_Zipcode = '80526';
-   if ProfileID in ('1165757') then DO; 
-      Address1 = '4500 SENECA ST';
-      Address_City = 'FORT COLLINS';
-   END;
    if ProfileID in ('1787033') then Address_Zipcode = '80234';
+   if ProfileID in ('1809231') then Address_Zipcode = '80735';
    if ProfileID in ('1813537') then Address_Zipcode = '81069';
+   if ProfileID in ('1820354') then Address_Zipcode = '80602';
    if ProfileID in ('1832458') then Address_Zipcode = '81321';
    if ProfileID in ('1832472') then Address_Zipcode = '81321';
+   if ProfileID in ('1838966') then Address_Zipcode = '80439';
    if ProfileID in ('1845873') then Address_Zipcode = '80915';
    if ProfileID in ('1845873') then DO; 
       Address1 = '640 NORTH MURRAY BLVD';
@@ -241,11 +273,22 @@ DATA CEDRS_ZipFix ; set CEDRS_filtered ;
    END;
    if ProfileID in ('1892377') then Address_Zipcode = '80538';
    if ProfileID in ('1910791') then Address_Zipcode = '80214';
-   if ProfileID in ('1824521') then Address_Zipcode = '80631';
-   if ProfileID in ('1824521') then DO;
-      Address1 = '1705 28TH ST';
-   END;
+
    if ProfileID in ('1917019') then Address_Zipcode = '81001';
+   if ProfileID in ('1917768') then Address_Zipcode = '80127';
+   if ProfileID in ('1918088') then Address_Zipcode = '80123';
+   if ProfileID in ('1922636') then Address_Zipcode = '80601';
+   if ProfileID in ('1942000') then Address_Zipcode = '80214';
+   if ProfileID in ('1136170') then Address_Zipcode = '80016';
+   if ProfileID in ('1138005') then Address_Zipcode = '81641';
+   if ProfileID in ('1165757') then Address_Zipcode = '80526';
+   if ProfileID in ('1165757') then DO; 
+      Address1 = '4500 SENECA ST';
+      Address_City = 'FORT COLLINS';
+   END;
+   if ProfileID in ('1178217') then Address_Zipcode = '80002';
+   if ProfileID in ('1190606') then Address_Zipcode = '80904';
+   if ProfileID in ('1200802') then Address_Zipcode = '80109';
 
 * Chk3 *;
    if ProfileID in ('1725872.1') then Address_Zipcode = '80113';
@@ -268,11 +311,35 @@ DATA CEDRS_ZipFix ; set CEDRS_filtered ;
    if ProfileID in ('1199577') then Address_Zipcode=compress(Address_Zipcode,'`');
 
 * Chk5 *;
-   if length(Address_Zipcode)=9 
-   then Address_Zip4 = cat( substr(Address_Zipcode, 1, 5), '-', substr(Address_Zipcode, 6) );
+   if length(Address_Zipcode)=9 then do;
+      Address_Zip4 = cat( substr(Address_Zipcode, 1, 5), '-', substr(Address_Zipcode, 6) );
+      Address_Zipcode = substr(Address_Zipcode, 1, 5);
+   end;
 
 * Chk6 *;
-   if index(Address_Zipcode,'-')=6 then Address_Zip4 = Address_Zipcode;
+   if index(Address_Zipcode,'-')=6 then do;
+      Address_Zip4 = Address_Zipcode;
+      Address_Zipcode = scan(Address_Zipcode,1,'-');
+   end;
+
+* Chk7 *;
+   if ProfileID in ('1793141') then Address_Zipcode = '80235';
+
+* Chk8 *;
+   if ProfileID in ('1782423') then Address_Zipcode = '';
+   if ProfileID in ('1837939') then Address_Zipcode = '';
+   if ProfileID in ('1839281') then Address_Zipcode = '80504';
+   if ProfileID in ('1849305') then Address_Zipcode = '';
+   if ProfileID in ('1853950') then Address_Zipcode = '80631';
+   if ProfileID in ('1862614') then Address_Zipcode = '81212';
+   if ProfileID in ('1919849') then Address_Zipcode = '';
+   if ProfileID in ('1159268') then Address_Zipcode = '80233';
+   if ProfileID in ('1192621') then Address_Zipcode = '80232';
+   if ProfileID in ('1196519') then Address_Zipcode = '80640';
+   if ProfileID in ('1196519') then DO;
+      Address1 = '6500 E. 88TH AVE';
+      Address2 = 'SP. 244';
+   END;
 
 run;
 
@@ -282,11 +349,3 @@ run;
       tables Address_Zipcode * Address_Zip4 / list missing missprint;
 run;
 
-
-** Chk2:  Zip code with length=4 **;
-   PROC print data= CEDRS_ZipFix;
-      where length(Address_Zipcode)=4;
-      id ProfileID ;
-      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
-      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
-run;

@@ -528,7 +528,7 @@ run;
       where  Address_State='CO'  AND  Address_City = ''  AND Address1 ^= ''  AND Address_Zipcode ^= '' ;
       id ProfileID ;
       var Address1 Address2 Address_Zipcode  Address_City      Address_State    ;
-      format Address1  AddressActual  $35.  Address2  Address_City  Address_State  $10. ;
+      format Address1  AddressActual  $40.  Address2  Address_City  Address_State  $10. ;
 run;
 
 /*---------------------------------------------------------------------*
@@ -607,7 +607,16 @@ run;
    if ProfileID in ('926063') then Address_City = 'LITTLETON';
    if ProfileID in ('1921062') then Address_City = 'PUEBLO';
    if ProfileID in ('1158858') then Address_City = 'DENVER';
-
+   if ProfileID in ('1169377') then Address_City = 'THORNTON';
+   if ProfileID in ('1169378') then Address_City = 'COMMERCE CITY';
+   if ProfileID in ('1169377') then Address_City = 'THORNTON';
+   if ProfileID in ('1173094') then DO;
+      Address_City = 'FORT MORGAN';
+      Address1 = '401 E RIVERVIEW AVE';
+      Address2 = 'APT 4';
+   END;
+   if ProfileID in ('1193847') then Address_City = 'CANON CITY';
+   if ProfileID in ('1213980') then Address_City = 'PUEBLO';
 
  *----------------------------------------------------------------------*/
 

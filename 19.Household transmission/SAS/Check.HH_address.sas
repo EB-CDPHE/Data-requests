@@ -493,17 +493,133 @@ DATA CEDRS_ZipStateFix ; set CEDRS_ZipFix ;
       then Address_State='CO ZIP' ;
 run;
 
+** Contents of dataset with fixzed Zipcode and State **;
+   PROC contents data=CEDRS_ZipStateFix  varnum ;  title1 'CEDRS_ZipStateFix';  run;
+
+*** new State distribution with fixed Zipcode ***;
+***-------------------------------------------***;
 
    PROC freq data= CEDRS_ZipStateFix ;
       tables Address_State * Address_Zipcode/ list missing missprint;
 run;
 
-proc print data= CEDRS_ZipStateFix;
-where Address_Zipcode='80045'  AND Address_State='';
-id ProfileID;
-      var Address1 Address2  AddressActual  Address_City  Address_CityActual    Address_State Address_Zipcode CountyAssigned  ;
-      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+
+***  Missing City for State=CO  ***;
+***-----------------------------***;
+
+
+** Chk13: Missing City **;
+   PROC freq data= CEDRS_ZipStateFix ;
+      where  Address_State='CO'  AND  Address_City = ''  ;
+      tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1  Address_City  Address_State Address_Zipcode  $AnyDataFmt.  ;
+run;
+/*------------------------------------------------------------*
+ |FINDINGS:
+ | N=189 records where City = missing,
+ | n=134 are also missing address1, State, and Zipcode data.
+ | FIX:  Leave as city as missing.
+ |
+ | n=42 records have address1, State, and Zipcode.
+ |FIX:  Google address and find City.
+ *------------------------------------------------------------*/
+
+   PROC print data= CEDRS_ZipStateFix;
+      where  Address_State='CO'  AND  Address_City = ''  AND Address1 ^= ''  AND Address_Zipcode ^= '' ;
+      id ProfileID ;
+      var Address1 Address2 Address_Zipcode  Address_City      Address_State    ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_State  $10. ;
 run;
 
+/*---------------------------------------------------------------------*
+ |FIX:
+
+   if ProfileID in ('1790803') then Address_City = 'GRAND JUNCTION';
+   if ProfileID in ('1805723') then Address_City = 'CANON CITY';
+   if ProfileID in ('1810320') then Address_City = 'DENVER';
+   if ProfileID in ('997479') then Address_City = 'CANON CITY';
+   if ProfileID in ('1829366') then Address_City = 'PUEBLO';
+   if ProfileID in ('1829683') then Address_City = 'ELIZABETH';
+   if ProfileID in ('1839692') then Address_City = 'ENGLEWOOD';
+   if ProfileID in ('1841660') then Address_City = 'CANON CITY';
+   if ProfileID in ('1843376') then Address_City = 'CANON CITY';
+   if ProfileID in ('1859049') then Address_City = 'CANON CITY';
+   if ProfileID in ('1879416') then Address_City = 'ALAMOSA';
+   if ProfileID in ('1859049') then Address_City = 'CANON CITY';
+   if ProfileID in ('1893018') then DO;
+      Address_City = Address2;   Address2='';
+   END;
+   if ProfileID in ('1893019') then DO;
+      Address_City = Address2;   Address2='';
+   END;
+   if ProfileID in ('1900125') then Address_City = 'CANON CITY';
+   if ProfileID in ('1915665') then Address_City = 'DENVER';
+   if ProfileID in ('1915738') then Address_City = 'ARVADA';
+   if ProfileID in ('1915745') then DO;
+      Address_City = 'DENVER';
+      Address1 = '2636 KENDALL ST';
+      Address2 = 'Apt. 302';
+   END;
+   if ProfileID in ('1915747') then DO;
+      Address_City = 'DENVER';
+      Address1 = '1540 S ALBION ST';
+      Address2 = '#104';
+   END;
+   if ProfileID in ('1915750') then Address_City = 'LITTLETON';
+   if ProfileID in ('1915751') then DO;
+      Address_City = 'ARVADA';
+      Address1 = '5378 ALLISON ST';
+      Address2 = '#103';
+   END;
+   if ProfileID in ('1915876') then Address_City = 'PUEBLO WEST';
+   if ProfileID in ('1915877') then DO;
+      Address_City = 'DENVER';
+      Address1 = '1490 ZENOBIA ST';
+      Address2 = '#203';
+   END;
+   if ProfileID in ('1915878') then DO;
+      Address_City = 'FORT COLLINS';
+      Address1 = '3717 S TAFT HILL RD';
+      Address2 = 'LOT 68';
+      Address_Zipcode = '80526';
+   END;
+   if ProfileID in ('1915884') then Address_City = 'ARVADA';
+   if ProfileID in ('1915885') then Address_City = 'DENVER';
+   if ProfileID in ('1915886') then Address_City = 'WHEAT RIDGE';
+   if ProfileID in ('1915919') then Address_City = 'DENVER';
+   if ProfileID in ('1915920') then DO;
+      Address_City = 'LAKEWOOD';
+      Address1 = '5995 W HAMPDEN AVE';
+      Address2 = 'B9';
+   END;
+   if ProfileID in ('1915922') then Address_City = 'GREELEY';
+   if ProfileID in ('1915923') then DO;
+      Address_City = 'LITTLETON';
+      Address1 = '8457 S REED ST';
+      Address2 = '102';
+   END;
+   if ProfileID in ('1916402') then Address_City = 'ALAMOSA';
+   if ProfileID in ('1916558') then DO;
+      Address_City = 'LAKEWOOD';
+      Address1 = '7856 W MANSFIELD PKWY';
+      Address2 = '#7106';
+   END;
+   if ProfileID in ('926063') then Address_City = 'LITTLETON';
+   if ProfileID in ('1921062') then Address_City = 'PUEBLO';
+   if ProfileID in ('1158858') then Address_City = 'DENVER';
 
 
+ *----------------------------------------------------------------------*/
+
+
+
+
+
+
+
+
+
+
+   PROC freq data= CEDRS_ZipStateFix ;
+      tables  Address_City * Address_State  / list missing missprint;
+run;

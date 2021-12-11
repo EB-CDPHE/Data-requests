@@ -195,6 +195,13 @@ DATA CEDRS_CO;  set CEDRS_filtered;
    if Address1='' and Address2^='' then Address1=Address2; 
    else if Address1='' and AddressActual^='' then Address1=AddressActual;
 
+  * same house but one has STREET and the other ST *;
+   if ProfileID= '1181098'  then Address_Zipcode = '80443';
+   if ProfileID= '1181099'  then do;
+      Address_Zipcode='80443';
+      Address1='502 B GRANITE ST';
+   end;
+
    if Address1 in ('NO ADDRESS PROVIDED', 'N/A', 'UNK', 'UNKNOWN', '0') then Address1='';
 
    If Address_City=''  AND  Address2 in ('LOVELAND','WELLINGTON')  then Address_City=Address2; 

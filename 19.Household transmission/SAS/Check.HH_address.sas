@@ -806,6 +806,68 @@ run;
    if ProfileID= '1158813'  then Address_Zipcode = '80514';
    if ProfileID= '1158959'  then Address_Zipcode = '80233';
    if ProfileID= '1158960'  then Address_Zipcode = '80229';
+   if ProfileID= '1160752'  then Address_Zipcode = '80260';
+   if ProfileID= '1162196'  then do;
+      Address_Zipcode = '81611';
+      Address1='565 N MILL STREET';
+   end;
+   if ProfileID= '1163029'  then do;
+      Address_Zipcode = '80134';
+      Address1='17577 PINE LANE';
+      Address2='APT. 3304';
+   end;
+   if ProfileID= '1163434'  then do;
+      Address_Zipcode = '80022';
+      Address1='7165 POPLAR ST';
+      Address2='APT 4';
+   end;
+   if ProfileID= '1163939'  then do;
+      Address_Zipcode='81650';
+      Address1='2407 24TH PL';
+      Address_City='RIFLE';
+   end;
+   if ProfileID= '1164907'  then Address_Zipcode = '81635';
+   if ProfileID= '1165653'  then Address_Zipcode = '80920';
+   if ProfileID= '1166386'  then Address_Zipcode = '80018';
+   if ProfileID= '1167357'  then Address_Zipcode = '80022';
+   if ProfileID= '1169268'  then Address_Zipcode = '80222';
+   if ProfileID= '1170874'  then do;
+      Address_Zipcode='80303';
+      Address_City='BOULDER';
+   end;
+   if ProfileID= '1170887'  then Address_Zipcode = '80817';
+   if ProfileID= '1172026'  then do;
+      Address_Zipcode = '80234';
+      Address1='12160 MELODY DR';
+      Address2='202';
+   end;
+   if ProfileID= '1172107'  then do;
+      Address_Zipcode = '80234';
+      Address1='2707 VALMONT RD';
+   end;
+   if ProfileID= '1172129'  then do;
+      Address_Zipcode = '80303';
+      Address1='900 28TH STREET';
+      Address2='APT 7';
+   end;
+   if ProfileID= '1172587'  then Address_Zipcode = '80260';
+   if ProfileID= '1174935'  then Address_Zipcode = '80227';
+   if ProfileID= '1176139'  then Address_Zipcode = '80439';
+   if ProfileID= '1176732'  then Address_Zipcode = '80504';
+   if ProfileID= '1176892'  then Address_Zipcode = '80601';
+   if ProfileID= '1177056'  then Address_Zipcode = '80516';
+   if ProfileID= '1178440'  then Address_Zipcode = '80015';
+   if ProfileID= '1178460'  then Address_Zipcode = '80015';
+   if ProfileID= '1181098'  then Address_Zipcode = '80443';
+   if ProfileID= '1181099'  then do;
+      Address_Zipcode='80443';
+      Address1='502 B GRANITE ST';
+   end;
+
+
+
+
+
 
 
  *-----*/

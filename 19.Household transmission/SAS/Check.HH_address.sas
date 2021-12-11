@@ -3,8 +3,8 @@ PROGRAM:  Check.HH_address.sas
 AUTHOR:   Eric Bush
 CREATED:  December 8, 2021
 MODIFIED:	
-PURPOSE:	  
-INPUT:	 	  
+PURPOSE:	 Data validation of Address components for CEDRS Profiles 
+INPUT:	 COVID.CEDRS_view_fix	  
 OUTPUT:		
 ***********************************************************************************************/
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
@@ -631,19 +631,19 @@ run;
       tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
       format Address1   Address_City   Address_State   Address_Zipcode $AnyDataFmt.;
 run;
-/*----------------------------------------------------------------------------*
+/*-------------------------------------------------------------------------------*
  |FINDINGS:
  | Complete address is based on having data for address1, city, state, zip
- | There are no 181,209 records with complete address (99.5%).
+ | There are 181,209 records with complete address (99.5%).
  | Prior to edits there were 178,475 (97.9%)
  |
  | n=774 records with missing data for Address1. Can't do anything about these.
- | n=179 records only missing zip code. Can google zip if small town. TRY
+ | n=179 records only missing zip code. Can google zip if small town. --> Chk14
  |
  |NEXT STEPS:
  | Find out how many of the 181,209 are missing LAT/LONG.
  | Create Excel sheet and send to GIS guy.
- *----------------------------------------------------------------------------*/
+ *-------------------------------------------------------------------------------*/
 
 
 
@@ -659,11 +659,11 @@ run;
       format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
 run;
 
-/*-----------------------*
+/*-------------------------------------------------------------------------*
  |FINDINGS:
  | n=178 records with data in address1, city, State=CO but missing zip.
  | Several of these have invalid Address1 data. Set these to missing.
- *------------------------*/
+ *-------------------------------------------------------------------------*/
 
 ** Chk14.1: Drop records with invalid Address1 (where State=CO, Zipcode=missing) **;
 ** Address1 is invalid when in ('UNK', 'UNKNOWN', 'NO ADDRESS', 'PO BOX') **;
@@ -694,11 +694,17 @@ run;
       var Address1  Address2  AddressActual  Address_City  Address_CityActual    Address_State   ;
       format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
 run;
-/*------*
+/*------------------------------------------*
  |FINDINGS:
  |  n = 8 where Address1 is a PO Box
- |FIX:
+ | the rest of fixable via google address
+ |FIX:  see datastep below
+ *------------------------------------------*/
 
+
+DATA CEDRS_CityStateZipFix ; set CEDRS_ZipStateCityFix ;
+
+* Chk14 *;
    if ProfileID= '1559379.1'  then Address_Zipcode = '80863';
    if ProfileID= '1717450'  then Address_Zipcode = '81003';
    if ProfileID= '1783300'  then Address_Zipcode = '81101';
@@ -863,17 +869,85 @@ run;
       Address_Zipcode='80443';
       Address1='502 B GRANITE ST';
    end;
+   if ProfileID= '1182162'  then Address_Zipcode = '80214';
+   if ProfileID= '1182164'  then Address_Zipcode = '80214';
+   if ProfileID= '1182166'  then Address_Zipcode = '80214';
+   if ProfileID= '1182167'  then Address_Zipcode = '80214';
+   if ProfileID= '1182168'  then Address_Zipcode = '80214';
+   if ProfileID= '1182170'  then Address_Zipcode = '80214';
+   if ProfileID= '1182171'  then Address_Zipcode = '80214';
+   if ProfileID= '1184879'  then do;
+      Address_Zipcode='80301';
+      Address1='5000 BUTTE ST';
+   end;
+   if ProfileID= '1185880'  then Address_Zipcode = '80219';
+   if ProfileID= '1186380'  then Address_Zipcode = '80134';
+   if ProfileID= '1186890'  then Address_Zipcode = '80237';
+   if ProfileID= '1186998'  then Address_Zipcode = '80130';
+   if ProfileID= '1179048'  then Address_Zipcode = '80487';
+   if ProfileID= '1184499'  then Address_Zipcode = '80002';
+   if ProfileID= '1184997'  then Address_Zipcode = '80435';
+   if ProfileID= '1192138'  then Address_Zipcode = '81620';
+   if ProfileID= '1193698'  then Address_Zipcode = '80226';
+   if ProfileID= '1194295'  then Address_Zipcode = '80642';
+   if ProfileID= '1194309'  then Address_Zipcode = '80498';
+   if ProfileID= '1190354'  then Address_Zipcode = '80226';
+   if ProfileID= '1190389'  then Address_Zipcode = '80214';
+   if ProfileID= '1191307'  then do;
+      Address_Zipcode = '80498';
+      Address1='10000 RYAN GULCH RD';
+      Address2='UNIT G314';
+   end;
+   if ProfileID= '1191308'  then do;
+      Address_Zipcode = '80498';
+      Address1='10000 RYAN GULCH RD';
+      Address2='UNIT G314';
+   end;
+   if ProfileID= '1191502'  then Address_Zipcode = '80023';
+   if ProfileID= '1194659'  then Address_Zipcode = '80601';
+   if ProfileID= '1194737'  then Address_Zipcode = '80031';
+   if ProfileID= '1195685'  then Address_Zipcode = '80138';
+   if ProfileID= '1195686'  then Address_Zipcode = '80503';
+   if ProfileID= '1196930'  then Address_Zipcode = '80204';
+   if ProfileID= '1197176'  then Address_Zipcode = '80239';
+   if ProfileID= '1200716'  then Address_Zipcode = '81632';
+
+RUN;
 
 
+** Contents of dataset with fixzed Zipcode and State **;
+   PROC contents data=CEDRS_CityStateZipFix  varnum ;  title1 'CEDRS_CityStateZipFix';  run;
 
 
-
-
-
- *-----*/
-
-
-
-   PROC freq data= CEDRS_ZipStateFix ;
-      tables  Address_City * Address_State  / list missing missprint;
+ ** FIXED Colorado Records with full address (address1, city, state, county) **;
+   PROC freq data= CEDRS_CityStateZipFix  order=freq;
+      where Address_State='CO';
+      tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1   Address_City   Address_State   Address_Zipcode $AnyDataFmt.;
 run;
+
+
+
+***  Missing Lat / Long  ***;
+***----------------------***;
+
+** Chk15: Missing Lat / Long **;
+   PROC freq data= CEDRS_CityStateZipFix ;
+      where Address1 ne ''  AND Address_City ne ''  AND  Address_State ne ''  AND  Address_Zipcode ne '';
+      where also Address_State='CO';
+      tables Address_Latitude * Address_Longitude  / list missing missprint;
+      format Address_Latitude  Address_Longitude $AnyDataFmt. ;
+run;
+
+** Data set to export to CSV **;
+
+Libname Devon 'K:\CEDRS\TEMP';  run;
+
+DATA Devon.Lat_Long_missing ;  set CEDRS_CityStateZipFix ;
+      where Address1 ne ''  AND Address_City ne ''  AND  Address_State ne ''  AND  Address_Zipcode ne '';
+      where also Address_State='CO'  AND  Address_Latitude = '' ;
+
+   KEEP Address1  Address2  Address_City   Address_State   Address_Zipcode  Address_Latitude  Address_Longitude ;
+run;
+
+

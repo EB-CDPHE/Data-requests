@@ -504,9 +504,9 @@ run;
 run;
 
 
+
 ***  Missing City for State=CO  ***;
 ***-----------------------------***;
-
 
 ** Chk13: Missing City **;
    PROC freq data= CEDRS_ZipStateFix ;
@@ -517,7 +517,7 @@ run;
 /*------------------------------------------------------------*
  |FINDINGS:
  | N=189 records where City = missing,
- | n=134 are also missing address1, State, and Zipcode data.
+ | n=134 are also missing address1 and Zipcode data.
  | FIX:  Leave as city as missing.
  |
  | n=42 records have address1, State, and Zipcode.
@@ -531,9 +531,10 @@ run;
       format Address1  AddressActual  $40.  Address2  Address_City  Address_State  $10. ;
 run;
 
-/*---------------------------------------------------------------------*
- |FIX:
 
+DATA CEDRS_ZipStateCityFix ; set CEDRS_ZipStateFix ;
+
+* Chk13 *;
    if ProfileID in ('1790803') then Address_City = 'GRAND JUNCTION';
    if ProfileID in ('1805723') then Address_City = 'CANON CITY';
    if ProfileID in ('1810320') then Address_City = 'DENVER';
@@ -618,14 +619,196 @@ run;
    if ProfileID in ('1193847') then Address_City = 'CANON CITY';
    if ProfileID in ('1213980') then Address_City = 'PUEBLO';
 
- *----------------------------------------------------------------------*/
+run;
+
+** Contents of dataset with fixzed Zipcode and State **;
+   PROC contents data=CEDRS_ZipStateCityFix  varnum ;  title1 'CEDRS_ZipStateCityFix';  run;
+
+
+ ** FIXED Colorado Records with full address (address1, city, state, county) **;
+   PROC freq data= CEDRS_ZipStateCityFix  order=freq;
+/*      where Address_State='CO';*/
+      tables Address1 * Address_City * Address_State * Address_Zipcode / list missing missprint;
+      format Address1   Address_City   Address_State   Address_Zipcode $AnyDataFmt.;
+run;
+/*----------------------------------------------------------------------------*
+ |FINDINGS:
+ | Complete address is based on having data for address1, city, state, zip
+ | There are no 181,209 records with complete address (99.5%).
+ | Prior to edits there were 178,475 (97.9%)
+ |
+ | n=774 records with missing data for Address1. Can't do anything about these.
+ | n=179 records only missing zip code. Can google zip if small town. TRY
+ |
+ |NEXT STEPS:
+ | Find out how many of the 181,209 are missing LAT/LONG.
+ | Create Excel sheet and send to GIS guy.
+ *----------------------------------------------------------------------------*/
 
 
 
+***  Missing Zipcode  ***;
+***-------------------***;
+
+** Chk14: Missing Zipcode **;
+
+   PROC print data= CEDRS_ZipStateFix;
+      where  Address_State='CO'  AND  Address_City ^= ''  AND Address1 ^= ''  AND Address_Zipcode = '' ;
+      id ProfileID ;
+      var Address1  Address2  AddressActual  Address_City  Address_CityActual    Address_State   ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+run;
+
+/*-----------------------*
+ |FINDINGS:
+ | n=178 records with data in address1, city, State=CO but missing zip.
+ | Several of these have invalid Address1 data. Set these to missing.
+ *------------------------*/
+
+** Chk14.1: Drop records with invalid Address1 (where State=CO, Zipcode=missing) **;
+** Address1 is invalid when in ('UNK', 'UNKNOWN', 'NO ADDRESS', 'PO BOX') **;
+   PROC print data= CEDRS_ZipStateFix;
+      where  Address_State='CO'  AND  Address_City ^= ''  AND Address_Zipcode = '' 
+/*            AND index(Address1,'UNK')>0;  */
+/*            AND index(Address1,'ADDRESS')>0;  */
+            AND index(upcase(Address1),'BOX') > 0  ;  
+
+      id ProfileID ;
+      var Address1  Address2  AddressActual  Address_City  Address_CityActual    Address_State   ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+run;
+/*---------------------------------------*
+ |FINDINGS: 
+ |  n=7 records with unknown address1
+ |  n=17 records with "NO ADDRESS"
+ |FIX: Set Address1 = missing
+ *---------------------------------------*/
 
 
+** Chk14.2: Missing Zipcode **;
+   PROC print data= CEDRS_ZipStateFix;
+      where  Address_State='CO'  AND  Address_City ^= ''  AND Address1 ^= ''  AND  Address_Zipcode = ''
+             AND index(Address1,'UNK')=0   AND  index(Address1,'ADDRESS')=0 ;
+
+      id ProfileID ;
+      var Address1  Address2  AddressActual  Address_City  Address_CityActual    Address_State   ;
+      format Address1  AddressActual  $35.  Address2  Address_City  Address_CityActual  $15. ;
+run;
+/*------*
+ |FINDINGS:
+ |  n = 8 where Address1 is a PO Box
+ |FIX:
+
+   if ProfileID= '1559379.1'  then Address_Zipcode = '80863';
+   if ProfileID= '1717450'  then Address_Zipcode = '81003';
+   if ProfileID= '1783300'  then Address_Zipcode = '81101';
+   if ProfileID= '1792256'  then Address_Zipcode = '80134';
+   if ProfileID= '1794362'  then Address_Zipcode = '81101';
+   if ProfileID= '1794363'  then Address_Zipcode = '81101';
+   if ProfileID= '1795521'  then Address_Zipcode = '80461';
+   if ProfileID= '807567'  then Address_Zipcode = '81631';
+   if ProfileID= '1798172'  then Address_Zipcode = '80238';
+   if ProfileID= '1799624'  then Address_Zipcode = '80920';
+   if ProfileID= '1799858'  then Address_Zipcode = '80233';
+   if ProfileID= '1808411'  then Address_Zipcode = '80919';
+   if ProfileID= '1809324'  then Address_Zipcode = '80925';
+   if ProfileID= '1810496'  then Address_Zipcode = '80219';
+   if ProfileID= '1813304'  then Address_Zipcode = '80923';
+   if ProfileID= '1816676'  then Address_Zipcode = '80247';
+   if ProfileID= '1820602'  then do;
+      Address_Zipcode = '81140';
+      Address1=cats(Address1, ' LN');
+   end;
+   if ProfileID= '1822275'  then Address_Zipcode = '80031';
+   if ProfileID= '1826579'  then Address_Zipcode = '80031';
+   if ProfileID= '1830964'  then Address_Zipcode = '80923';
+   if ProfileID= '1834985'  then Address_Zipcode = '80422';
+   if ProfileID= '1835439'  then do;
+      Address_Zipcode = '80461';
+      Address1='19973 US 24';
+      Address2='#47';
+   end;
+   if ProfileID= '1836080'  then Address_Zipcode = '80109';
+   if ProfileID= '1838657'  then Address_Zipcode = '80459';
+   if ProfileID= '1839612'  then Address_Zipcode = '80459';
+   if ProfileID= '1839707'  then do;
+      Address_Zipcode = '80525';
+      Address1='6603 Autumn Ridge Dr';
+      Address2='UNIT 1';
+   end;
+   if ProfileID= '1843489'  then Address_Zipcode = '81089';
+   if ProfileID= '1847907'  then Address_Zipcode = '80910';
+   if ProfileID= '1850176'  then Address_Zipcode = '80922';
+   if ProfileID= '1854959'  then Address_Zipcode = '80921';
+   if ProfileID= '1859601'  then Address_Zipcode = '80112';
+   if ProfileID= '1864622'  then Address_Zipcode = '80439';
+   if ProfileID= '1864622'  then Address_City = 'EVERGREEN';
+   if ProfileID= '807571'  then Address_Zipcode = '81067';
+   if ProfileID= '1867740'  then Address_Zipcode = '80907';
+   if ProfileID= '1869195'  then Address_Zipcode = '80231';
+   if ProfileID= '1879851'  then Address_Zipcode = '81008';
+   if ProfileID= '1880819'  then Address_Zipcode = '80810';
+   if ProfileID= '1892151'  then Address_Zipcode = '81303';
+   if ProfileID= '1903982'  then Address_Zipcode = '81052';
+   if ProfileID= '1919849'  then do;
+      Address1='';
+      Address_City='';
+   end;
+   if ProfileID= '1970819'  then do;
+      Address_Zipcode='81039';
+      Address_City='FOWLER';
+   end;
+   if ProfileID= '1136330'  then Address_Zipcode = '80601';
+   if ProfileID= '1137786'  then Address_Zipcode = '81122';
+   if ProfileID= '1138330'  then do;
+      Address_Zipcode = '81501';
+      Address1='1102 ELM AVENUE MONUMENT HALL';
+      Address2='215B';
+   end;
+   if ProfileID= '1138384'  then do;
+      Address_Zipcode = '81004';
+      Address1='8151 CIBOLA DR';
+      Address2='BOX 19575';
+   end;
+   if ProfileID= '1138575'  then Address_Zipcode = '80640';
+   if ProfileID= '1138905'  then Address_Zipcode = '80013';
+   if ProfileID= '1140592'  then Address_Zipcode = '80210';
+   if ProfileID= '1140754'  then do;
+      Address_Zipcode = '80205';
+      Address1='2101 Market St';
+      Address2='APT 326';
+   end;
+   if ProfileID= '1140769'  then Address_Zipcode = '80120';
+   if ProfileID= '1141923'  then Address_Zipcode = '80212';
+   if ProfileID= '1144591'  then Address_Zipcode = '80241';
+   if ProfileID= '1145386'  then Address_Zipcode = '80516';
+   if ProfileID= '1145911'  then Address_Zipcode = '80231';
+   if ProfileID= '1148037'  then Address_Zipcode = '80302';
+   if ProfileID= '1150144'  then Address_Zipcode = '80223';
+   if ProfileID= '1150947'  then Address_Zipcode = '80027';
+   if ProfileID= '1151037'  then Address_Zipcode = '80302';
+   if ProfileID= '1151090'  then Address_Zipcode = '80601';
+   if ProfileID= '1152858'  then do;
+      Address_Zipcode = '80631';
+      Address1='1521 8TH AVE';
+      Address2='#415';
+   end;
+   if ProfileID= '1153037'  then Address_Zipcode = '80514';
+   if ProfileID= '1153911'  then Address_Zipcode = '80219';
+   if ProfileID= '1153917'  then Address_Zipcode = '80219';
+   if ProfileID= '1153919'  then Address_Zipcode = '80223';
+   if ProfileID= '1154140'  then Address_Zipcode = '80030';
+   if ProfileID= '1154720'  then Address_Zipcode = '80516';
+   if ProfileID= '1155485'  then Address_Zipcode = '80241';
+   if ProfileID= '1155516'  then Address_Zipcode = '80501';
+   if ProfileID= '1156272'  then Address_Zipcode = '80504';
+   if ProfileID= '1157110'  then Address_Zipcode = '80210';
+   if ProfileID= '1158813'  then Address_Zipcode = '80514';
+   if ProfileID= '1158959'  then Address_Zipcode = '80233';
+   if ProfileID= '1158960'  then Address_Zipcode = '80229';
 
 
+ *-----*/
 
 
 

@@ -951,3 +951,44 @@ DATA Devon.Lat_Long_missing ;  set CEDRS_CityStateZipFix ;
 run;
 
 
+*** Look for misclassification of HH ***;
+***----------------------------------***:
+
+*** Start with CEDRS dataset with fixed addresses ***;
+DATA CEDRS_Addresses;  set CEDRS_CityStateZipFix;
+   where Address_State='CO'  AND  (Address1 ne '')  AND (Address_City ne '')  AND  (Age_at_Reported ^in (.) ) ;
+
+   AgeGroup = put(Age_at_Reported, AgeFmt.);
+   AG = put(Age_at_Reported, AgeFmt1.);
+
+ *  DROP  LiveInInstitution  Homeless  Address2  Address_CityActual  Address_Zip:
+         Address_Latitude  Address_Longitude  Address_Tract2000  ;
+run;
+
+/*   proc freq data=CEDRS_Addresses ; tables AgeGroup AG; run;*/
+   PROC contents data=CEDRS_Addresses  varnum; title1 'CEDRS_Addresses'; run;
+
+
+
+
+**  Sort filtered cases on address variables to define HH  **;
+   proc sort data=CEDRS_Addresses
+               out=Address1_sort;
+      by CountyAssigned  Address_City  Address1  ReportedDate ;
+run;
+
+** Preview Address1 data **;
+   PROC print data= Address1_sort;*(obs=10000);
+      ID ProfileID;
+      var Address1  Address2  Address_City  Address_Zipcode;
+      format address1   Address_City  $40.  Address2  $25.   ;
+run;
+
+
+***  OR  ***;
+
+** Save dataset to view in Excel **;
+DATA Address_data; set Address1_sort;
+   KEEP CountyAssigned ProfileID Address1  Address2  Address_City  Address_Zipcode  ;
+run;
+

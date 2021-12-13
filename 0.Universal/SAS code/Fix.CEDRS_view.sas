@@ -50,7 +50,6 @@ DATA COVID.CEDRS_view_fix ;  set CEDRS_view_read ;
    if EventID= 1294530 then Age_at_Reported=46;
    if EventID= 1392304 then Age_at_Reported=42;
 
-
 run;
 
 

@@ -64,10 +64,10 @@ PROC contents data=Pat_temp  varnum ;  run;
 
 
 ** 4. determine format of dates that are character variables **;
-   PROC freq data=Pat_temp ;
-      tables tmp_dob;
-      format tmp_dob  specimen_collection_date  $12.;
-run;
+/*   PROC freq data=Pat_temp ;*/
+/*      tables tmp_dob;*/
+/*      format tmp_dob  specimen_collection_date  $12.;*/
+/*run;*/
 /*------------------------------------------*
  |FINDINGS:
  | n=19 obs with tmp_dob < '1900-01-01'
@@ -76,27 +76,16 @@ run;
  | n=6835 obs with tmp_dob = missing
  *------------------------------------------*/
 
-   PROC freq data=Pat_temp ;
-      tables specimen_collection_date ;
-      format tmp_dob  specimen_collection_date  $12.;
-run;
+/*   PROC freq data=Pat_temp ;*/
+/*      tables specimen_collection_date ;*/
+/*      format tmp_dob  specimen_collection_date  $12.;*/
+/*run;*/
 /*------------------------------------------------------------*
  |FINDINGS:
  | n=121 obs with specimen_collection_date < '2020-01-01'
  | n= 40 obs with specimen_collection_date > '2021-12-13'
  | n= 415076 with specimen_collection_date = missing.
  *------------------------------------------------------------*/
-
-
-** review four obs that triggered error messages **;
-   PROC print data= Pat_temp;
-      where  event_id in ('1122519');
-      var Event_ID tmp_dob  DOB;
-/*      format tmp_dob $12.;*/
-run;
-
-
-
 
 
 ** 5. Shrink character variables in data set to shortest possible length (based on longest value) **;
@@ -112,10 +101,10 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 7. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA Patient ; set Pat_temp_ ;
+DATA COVID.Patient ; set Pat_temp_ ;
 run;
 
 
 **  8. PROC contents of final dataset  **;
-   PROC contents data=Patient varnum; run;
+   PROC contents data=COVID.Patient varnum;  title1 'COVID.Patient';  run;
 

@@ -40,7 +40,7 @@ PROC contents data=Just146.Patient  varnum ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA Pat_temp; set Just146.Patient(rename=(DOB=tmp_DOB specimen_collection_date=tmp_spec_coll_date )  
+DATA Pat_temp; set Just146.Patient(rename=(DOB=tmp_DOB  specimen_collection_date=tmp_spec_coll_date  hospitalized = tmp_hospitalized )  
                                     KEEP=Profile_ID  Event_id  stub  hospitalized  gender   dob  first_name  full_name
          HCW  HCW_Type  other_hcw  job_address_information  job_description_occupation
          Occupation          Occupation_2          Occupation_3          Occupation_4
@@ -50,11 +50,14 @@ DATA Pat_temp; set Just146.Patient(rename=(DOB=tmp_DOB specimen_collection_date=
          Household_residents  Housing  last_name  name  specimen_collection_date  symptomatic
          variant_test_type ); 
 
+* Convert case of response values to be more consistent *;
+   Hospitalized = upcase(compress(tmp_hospitalized));
 
 * Convert temporary character var for each date field to a date var *;
                         DOB  = input(tmp_dob, yymmdd10.);            format DOB mmddyy10.;
     specimen_collection_date = input(tmp_spec_coll_date, yymmdd10.); format specimen_collection_date mmddyy10.;
 
+    DROP tmp_: ;
 run;
 
 PROC contents data=Pat_temp  varnum ;  run;    

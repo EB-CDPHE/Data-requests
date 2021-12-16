@@ -15,7 +15,115 @@ title;  options pageno=1;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data'; run;
 
-   PROC contents data=COVID.Patient  varnum ;  title1 'COVID.Patient';  run;
+   PROC contents data=COVID.Patient   ;  title1 'COVID.Patient';  run;
+
+
+* Overall *;
+   PROC freq data= Patient_Occupation  ;
+      tables cdphe_case_classification ;
+      title2 'dphe146 DrJustina-Prod';
+run;
+   PROC freq data= Patient_Occupation  ;
+      where lowcase(cdphe_case_classification) = 'confirmed';
+      tables HCW / missing missprint ;
+      label HCW = 'HealthCare Worker';
+      title2 'dphe146 DrJustina-Prod';
+      title3 'Case classification = CONFIRMED';
+run;
+/*----------------------------------------------*
+ FINDINGS:
+ |  HCW=missing for >98% of confirmed cases.
+ *----------------------------------------------*/
+
+   PROC means data= Patient_Occupation  n nmiss;
+      where lowcase(cdphe_case_classification) = 'confirmed';
+      var specimen_collection_date;
+run;
+/*-----------------------------------------------------------------------*
+ FINDINGS:
+ |  About half of confirmed cases are missing specimen collection date.
+ *-----------------------------------------------------------------------*/
+
+* Using Occupation variables to impute for HCW=missing *;
+   PROC freq data= Patient_Occupation ;
+      where lowcase(cdphe_case_classification) = 'confirmed';
+      tables Occupation  Occupation_2   Occupation_3  Occupation_4  / missing missprint ;
+run;
+/*---------------------------------------------------------------------------------------------*
+ FINDINGS:
+ |  Occupations have format of general, specific.
+ |  The majority of the general occupation titles have specific descriptor of "healthcare"
+ |  There is also a general occupation title of "healthcare".
+ *---------------------------------------------------------------------------------------------*/
+
+title;  options pageno=1;
+
+
+*** Filter and curate DrJustina dataset ***;
+***-------------------------------------***;
+
+   DATA Patient_cases;  set Patient_Occupation;
+      where lowcase(cdphe_case_classification) = 'confirmed';
+
+* Backfill missing HCW data *;
+   if HCW='' then DO;
+           if index(Occupation,   'healthcare')>0 then HCW='yes';
+      else if index(Occupation_2, 'healthcare')>0 then HCW='yes';
+      else if index(Occupation_3, 'healthcare')>0 then HCW='yes';
+      else if index(Occupation_4, 'healthcare')>0 then HCW='yes';
+     else HCW='no';
+   END;
+
+   KEEP  Profile_ID  Event_ID  HCW   specimen_collection_date  ;
+run;
+
+   PROC contents data=Patient_cases   ;  title1 'Patient_cases';  run;
+
+
+*** Merge DrJustina data with CEDRS ***;
+***---------------------------------***;
+
+
+*** Merge DrJustina data with CEDRS ***;
+***---------------------------------***;
+   PROC sort data=Patient_cases
+               out=DrJ_sort;
+      by Profile_ID  Event_ID ;
+run;
+
+
+
+*** Fix Patient dataset ***;
+***---------------------***;
+
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
+DATA DASH.HCW ; set COVID.Patient ;
+
+run;
+
+
+
+
+proc freq data= HCW_temp;
+   tables specimen_collection_date;
+   format specimen_collection_date monyy.;
+run;
+
+proc freq data= HCW_temp;
+   where year(specimen_collection_date)=2021;
+   tables specimen_collection_date  * HCW ;
+   format specimen_collection_date monyy.;
+run;
+
+
+*** Create dataset for responding to data request ***;
+***-----------------------------------------------***;
+DATA HCW ; set ;
+
+
+
+*** Proportion of cases that were HealthCare Workers ***;
+***--------------------------------------------------***;
 
 
 *** Explore variables ***;
@@ -65,7 +173,6 @@ run;
          Occupation_specify  Occupation_specify_2  Occupation_specify_3  Occupation_specify_4  ;
 run;
 
-
    PROC format;
       value $AnyDataFmt
          ' '='Missing data'
@@ -76,12 +183,23 @@ run;
       tables HCW ;
 run;
 
+
+** Describe HCW and Occupation fields **;
+   PROC freq data= COVID.Patient;
+/*      tables HCW  / missing missprint ;*/
+      tables Occupation  Occupation_2   Occupation_3  Occupation_4  / missing missprint ;
+run;
+
+
+
+***  Re-assign HCW_type=other to more specific categories  ***;
+***--------------------------------------------------------***;
+
    PROC freq data= Patient  order=freq;
       where HCW='yes';
       tables HCW_type / missing  missprint;
       title1 'HCW_type';
 run;
-
 
 ** Chk 1: Other responses **;
    PROC freq data= Patient  ;

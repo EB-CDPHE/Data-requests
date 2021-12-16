@@ -30,7 +30,7 @@ LIBNAME Just146  ODBC  dsn='DrJustina' schema=dbo;  run;
 
 
 ** 2. Review contents of SAS dataset **;
-PROC contents data=Just146.Patient  varnum ;  run;    
+PROC contents data=Just146.Patient   ;  run;    
 
 /*______________________________________________________________________________________________*
  |FINDINGS:
@@ -40,8 +40,10 @@ PROC contents data=Just146.Patient  varnum ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA Pat_temp; set Just146.Patient(rename=(DOB=tmp_DOB  specimen_collection_date=tmp_spec_coll_date  hospitalized = tmp_hospitalized )  
-                                    KEEP=Profile_ID  Event_id  stub  hospitalized  gender   dob  first_name  full_name
+DATA Pat_temp; 
+   set Just146.Patient
+      (rename=(DOB=tmp_DOB  specimen_collection_date=tmp_spec_coll_date  hospitalized = tmp_hospitalized )  
+       KEEP=Profile_ID  Event_id  stub  hospitalized  gender   dob  first_name  full_name  cdphe_case_classification
          HCW  HCW_Type  other_hcw  job_address_information  job_description_occupation
          Occupation          Occupation_2          Occupation_3          Occupation_4
          Occupation_other    Occupation_other_2    Occupation_other_3    Occupation_other_4
@@ -101,10 +103,10 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
 ** 7. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA COVID.Patient ; set Pat_temp_ ;
+DATA Patient_Occupation ; set Pat_temp_ ;
 run;
 
 
 **  8. PROC contents of final dataset  **;
-   PROC contents data=COVID.Patient varnum;  title1 'COVID.Patient';  run;
+   PROC contents data=Patient_Occupation varnum;  title1 'Patient_Occupation';  run;
 

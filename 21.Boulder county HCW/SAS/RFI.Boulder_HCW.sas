@@ -110,7 +110,7 @@ run;
       by ProfileID  EventID ;
 run;
 
-DATA CEDRS_HCW; 
+DATA HCW_CEDRS; 
    merge CEDRS_sort(in=C)  DrJ_sort(in=J) ;
       by ProfileID  EventID ;
       if J;
@@ -121,17 +121,24 @@ DATA CEDRS_HCW;
 
       if ReportedDate=. and specimen_collection_date ne . then ReportedDate = specimen_collection_date;
 run;
-   PROC contents data=CEDRS_HCW   ;  title1 'CEDRS_HCW';  run;
+   PROC contents data=HCW_CEDRS   ;  title1 'HCW_CEDRS';  run;
 
 
 *** Compare Date vars ***;
 ***-------------------***;
 
-   PROC means data= CEDRS_HCW  n nmiss;
+   PROC means data= HCW_CEDRS  n nmiss;
       var  ReportedDate  CollectionDate  specimen_collection_date;
 run;
 
-   PROC freq data= CEDRS_HCW;
+   PROC freq data= HCW_CEDRS;
+/*      tables  CollectionDate * specimen_collection_date / list missing missprint;*/
+      tables ReportedDate * CollectionDate * specimen_collection_date / list missing missprint;
+      format ReportedDate  CollectionDate  specimen_collection_date monyy. ;
+run;
+
+   PROC freq data= HCW_CEDRS;
+      where year(ReportedDate)=2021;
 /*      tables  CollectionDate * specimen_collection_date / list missing missprint;*/
       tables ReportedDate * CollectionDate * specimen_collection_date / list missing missprint;
       format ReportedDate  CollectionDate  specimen_collection_date monyy. ;
@@ -139,37 +146,24 @@ run;
 
 
 
-*** Fix Patient dataset ***;
-***---------------------***;
-
-libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
-DATA DASH.HCW ; set COVID.Patient ;
-
-run;
-
-
-
-
-proc freq data= HCW_temp;
-   tables specimen_collection_date;
-   format specimen_collection_date monyy.;
-run;
-
-proc freq data= HCW_temp;
-   where year(specimen_collection_date)=2021;
-   tables specimen_collection_date  * HCW ;
-   format specimen_collection_date monyy.;
-run;
-
-
-*** Create dataset for responding to data request ***;
-***-----------------------------------------------***;
-DATA HCW ; set ;
-
-
-
 *** Proportion of cases that were HealthCare Workers ***;
 ***--------------------------------------------------***;
+
+proc freq data= HCW_CEDRS;
+   where year(ReportedDate)=2021;
+   tables ReportedDate  * HCW / nopercent nocol ;
+   format ReportedDate monyy.;
+run;
+
+
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
+DATA DASH.HCW ; set HCW_CEDRS ;
+run;
+
+
+
+
+
 
 
 *** Explore variables ***;

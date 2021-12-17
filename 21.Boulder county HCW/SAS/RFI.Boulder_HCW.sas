@@ -99,7 +99,7 @@ run;
 ***---------------------------------***;
 
 /*   PROC contents data=COVID.CEDRS_view_fix   ;  title1 'COVID.CEDRS_view_fix';  run;*/
-   PROC sort data=COVID.CEDRS_view_fix(KEEP=ProfileID EventID CaseStatus ReportedDate CollectionDate)
+   PROC sort data=COVID.CEDRS_view_fix(KEEP=ProfileID EventID CaseStatus ReportedDate CollectionDate CountyAssigned)
                out=CEDRS_sort;
       by ProfileID  EventID ;
 run;
@@ -131,9 +131,9 @@ run;
       var  ReportedDate  CollectionDate  specimen_collection_date;
 run;
 
-   PROC freq data= HCW_CEDRS;
+   PROC freq data= HCW_CEDRS ;
 /*      tables  CollectionDate * specimen_collection_date / list missing missprint;*/
-      tables ReportedDate * CollectionDate * specimen_collection_date / list missing missprint;
+      tables ReportedDate * specimen_collection_date / list missing missprint;
       format ReportedDate  CollectionDate  specimen_collection_date monyy. ;
 run;
 
@@ -148,6 +148,15 @@ run;
 
 *** Proportion of cases that were HealthCare Workers ***;
 ***--------------------------------------------------***;
+
+proc freq data= HCW_CEDRS;
+   where year(ReportedDate)=2021;
+   tables  HCW ;
+      label HCW = 'HealthCare Worker';
+      title2 'dphe146 DrJustina-Prod';
+      title3 'YEAR=2021  AND  Case classification = CONFIRMED';
+run;
+
 
 proc freq data= HCW_CEDRS;
    where year(ReportedDate)=2021;

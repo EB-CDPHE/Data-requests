@@ -15,14 +15,24 @@ title;  options pageno=1;
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data'; run;
 
-   PROC contents data=COVID.Patient   ;  title1 'COVID.Patient';  run;
+   PROC contents data=Patient_Occupation varnum;  title1 'Patient_Occupation';  run;
 
 
-* Overall *;
+*** Check data from Dr Justina Patient data table ***;
+***-----------------------------------------------***;
+
+* Case Classification *;
    PROC freq data= Patient_Occupation  ;
       tables cdphe_case_classification ;
       title2 'dphe146 DrJustina-Prod';
 run;
+/*--------------------------------------------------------*
+ FINDINGS:
+ | Case classification = confirmed for >90% of records.
+ | N=689,759 confirmed cases.
+ *--------------------------------------------------------*/
+
+* Healthcare Worker indicator *;
    PROC freq data= Patient_Occupation  ;
       where lowcase(cdphe_case_classification) = 'confirmed';
       tables HCW / missing missprint ;
@@ -35,15 +45,6 @@ run;
  |  HCW=missing for >98% of confirmed cases.
  *----------------------------------------------*/
 
-   PROC means data= Patient_Occupation  n nmiss;
-      where lowcase(cdphe_case_classification) = 'confirmed';
-      var specimen_collection_date;
-run;
-/*-----------------------------------------------------------------------*
- FINDINGS:
- |  About half of confirmed cases are missing specimen collection date.
- *-----------------------------------------------------------------------*/
-
 * Using Occupation variables to impute for HCW=missing *;
    PROC freq data= Patient_Occupation ;
       where lowcase(cdphe_case_classification) = 'confirmed';
@@ -55,6 +56,17 @@ run;
  |  The majority of the general occupation titles have specific descriptor of "healthcare"
  |  There is also a general occupation title of "healthcare".
  *---------------------------------------------------------------------------------------------*/
+
+* specimen_collection_date *;
+   PROC means data= Patient_Occupation  n nmiss;
+      where lowcase(cdphe_case_classification) = 'confirmed';
+      var specimen_collection_date;
+run;
+/*-----------------------------------------------------------------------*
+ FINDINGS:
+ |  About half of confirmed cases are missing specimen collection date.
+ *-----------------------------------------------------------------------*/
+
 
 title;  options pageno=1;
 
@@ -74,6 +86,9 @@ title;  options pageno=1;
      else HCW='no';
    END;
 
+   RENAME Profile_ID=ProfileID
+          Event_ID= EventID;
+
    KEEP  Profile_ID  Event_ID  HCW   specimen_collection_date  ;
 run;
 
@@ -83,12 +98,43 @@ run;
 *** Merge DrJustina data with CEDRS ***;
 ***---------------------------------***;
 
+/*   PROC contents data=COVID.CEDRS_view_fix   ;  title1 'COVID.CEDRS_view_fix';  run;*/
+   PROC sort data=COVID.CEDRS_view_fix(KEEP=ProfileID EventID CaseStatus ReportedDate CollectionDate)
+               out=CEDRS_sort;
+      by ProfileID  EventID ;
+run;
+/*   PROC contents data=CEDRS_sort   ;  title1 'CEDRS_sort';  run;*/
 
-*** Merge DrJustina data with CEDRS ***;
-***---------------------------------***;
    PROC sort data=Patient_cases
                out=DrJ_sort;
-      by Profile_ID  Event_ID ;
+      by ProfileID  EventID ;
+run;
+
+DATA CEDRS_HCW; 
+   merge CEDRS_sort(in=C)  DrJ_sort(in=J) ;
+      by ProfileID  EventID ;
+      if J;
+
+      * impute missing date values *;
+      if specimen_collection_date=. and CollectionDate ne . then specimen_collection_date = CollectionDate;
+      else if CollectionDate=. and specimen_collection_date ne . then CollectionDate = specimen_collection_date;
+
+      if ReportedDate=. and specimen_collection_date ne . then ReportedDate = specimen_collection_date;
+run;
+   PROC contents data=CEDRS_HCW   ;  title1 'CEDRS_HCW';  run;
+
+
+*** Compare Date vars ***;
+***-------------------***;
+
+   PROC means data= CEDRS_HCW  n nmiss;
+      var  ReportedDate  CollectionDate  specimen_collection_date;
+run;
+
+   PROC freq data= CEDRS_HCW;
+/*      tables  CollectionDate * specimen_collection_date / list missing missprint;*/
+      tables ReportedDate * CollectionDate * specimen_collection_date / list missing missprint;
+      format ReportedDate  CollectionDate  specimen_collection_date monyy. ;
 run;
 
 

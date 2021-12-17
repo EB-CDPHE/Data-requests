@@ -18,13 +18,20 @@ Sections of the RFI.Boulder_HCW.sas code
 
 ### **1. Check Dr Justina Patient data**
 
-`CDPHE_Case_Classification=confirmed` for >90% of patients. Patients with other response options are excluded. `HCW=missing` for >98% of confirmed cases. Therefore, values of the four Occupation variables are scanned for "healthcare" and used to impute missing values of HCW. Occupations, e.g. Agriculture, Grocery, and Retail, all have sub-categories, one of which is "Healthcare". If HCW was missing and the patient had a sub-category of 'healthcare' then HCW was set to 'yes'.
+`CDPHE_Case_Classification=confirmed` for >90% of patients. Patients with other response options are excluded. 
+
+`HCW=missing` for >98% of confirmed cases. Therefore, values of the four Occupation variables are scanned for "healthcare" and used to impute missing values of HCW. Occupations, e.g. Agriculture, Grocery, and Retail, all have sub-categories, one of which is "Healthcare". If HCW was missing and the patient had a sub-category of 'healthcare' then HCW was set to 'yes'.
 cases.
 
-The variable names and their attributes for the Montrose vaccine clinic line listing are [here](./Documents/PROC_Contents.Montrose_Fix.pdf). 
+`Specimen_Collection_Date = missing` for about half of patients.
 
 
-### **2. Link ProfileID and KEY variable (DOB:LAST:FIRST) and filter on CEDRS cases**
+The variable names and their attributes for the combined dataset are 
+
+
+### **2. Add ReportedDate from CEDRS to Dr Justina Patient data on confirmed cases**
+
+Access and curate CEDRS data and keep case status and date variables. Sort both datasets and merge using ProfileID and EventID.
 
 
 <u>NOTES for CEDRS66.Profiles dataset:</u>

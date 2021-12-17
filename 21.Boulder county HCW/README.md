@@ -1,9 +1,7 @@
 ## Background 
-This data request came from Montrose Vaccine clinic via Alicia Cronquist. Alicia's [email](./Documents/Email_request_120321.pdf) was forwarded to me from Eduardo. 
+This data request came from Eduardo via [email](./Documents/Email_request_120321.pdf).  
 
-On November 30th Heather Roth sent Lindsey Webb an email with a line list of 1779 individuals vaccinated at Montrose county vaccine clinic on November 12-13, 2021. Lindsey asked Breanna and Alicia if they could have someone look to see if any of these 1779 patients were cases in CEDRS. 
-
-**Population**: First population consisted of 1,779 individuals vaccinated at Montrose vaccine clinic on November 12-13, 2021. Population #2:  Confirmed and probable cases in CEDRS.  **Data requested**: Intersection of the two populations.   **Groups**: Gender, Age, Date vaccinated, and Vaccine manufacturer. 
+**Population**: Confirmed Cases in Dr Justina-Prod data table.   **Data requested**: Proportion of confirmed cases that were HCW by month.   **Groups**: Month sample collected was requested. Since Specimen collection date in Dr Justina is missing for half of the records, month per ReportedDate (CEDRS) was used. 
 
 
 ## Code
@@ -11,16 +9,17 @@ Here are the SAS programs used to respond to this data request:
 
 |Run order|SAS program|
 |---------|-----------|
-|1.|[Access.CEDRS](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from hosp144 COPHS and curates it.|
-|2.|[FIX.CEDRS](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in COPHS.|
-|3.|[RFI.Montrose_VxCases.sas](./SAS/RFI.Montrose_VxCases.sas) creates dataset from Montrose spreadsheet and of individuals on that list that were in CEDRS.|
+|1.|[Access.CEDRS_view](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from dbo144 COVID19 and curates it.|
+|2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in CEDRS.|
+|3.|[Access.DrJustina.sas](../0.Universal/SAS%20code/Access.DrJustina_prod.sas) access Patient data table on dphe146 and curates data.
+|4.|[RFI.Boulder_HCW.sas](./SAS/RFI.Boulder_HCW.sas) checks and fixes DrJustina Patient data, adds CEDRS date variable, and summarizes the proportion of confirmed cases that were HCW.|
 
-Sections of the RFI.Montrose_VxCases.sas code
+Sections of the RFI.Boulder_HCW.sas code
 
-### **1. Import spreadsheet and curate line listing data from Montrose Vaccine clinic**
+### **1. Check Dr Justina Patient data**
 
-`Patient_Name` has a format of Last name,First name (#). Code in this section parses patient name into last name, then first name, then in 'extra' field to hold numeric id, stripped of parentheses.
-Use DOB column to create birthdate var with format YYYY-MM-DD which is consistent with format of DOB in CEDRS66.Profiles. Create new calculated variable "Age at Vaccination". Finally, create KEY variable by concatenation of Birthdate:Last name:First name. This KEY variable will be used for match merging to CEDRS cases.
+`CDPHE_Case_Classification=confirmed` for >90% of patients. Patients with other response options are excluded. `HCW=missing` for >98% of confirmed cases. Therefore, values of the four Occupation variables are scanned for "healthcare" and used to impute missing values of HCW. Occupations, e.g. Agriculture, Grocery, and Retail, all have sub-categories, one of which is "Healthcare". If HCW was missing and the patient had a sub-category of 'healthcare' then HCW was set to 'yes'.
+cases.
 
 The variable names and their attributes for the Montrose vaccine clinic line listing are [here](./Documents/PROC_Contents.Montrose_Fix.pdf). 
 
@@ -100,8 +99,10 @@ https://github.com/EB-CDPHE/Data-requests/blob/f582eea2ad62dcdf35bf76a89b6b6ae39
 
 ##
 **Issues:**
-* No column on Montrose Vaccine clinic line listing contained ProfileID or EventID that could link individuals to CEDRS directly.
+* What type of join to use for Dr J data and CEDRS data? Should I add HCW variable to CEDRS cases? Or am I adding CEDRS data, e.g. ReportedDate, to Dr J data?
 
-* A make-shift key was made by concatenating DOB:Last_Name:First_Name. No effort was made to assess the performance of this key for matching / merging records from line listing to CEDRS. It's possible that some were missed.
+* HCW indicator variable is missing for >90% of patients.
+
+* HCW_Type variable is not useful for measuring case exposure.
 
 

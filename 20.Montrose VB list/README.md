@@ -11,8 +11,8 @@ Here are the SAS programs used to respond to this data request:
 
 |Run order|SAS program|
 |---------|-----------|
-|1.|[Access.CEDRS](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from hosp144 COPHS and curates it.|
-|2.|[FIX.CEDRS](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in COPHS.|
+|1.|[Access.CEDRS_view](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from dbo144 COVID19 and curates it.|
+|2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in CEDRS.|
 |3.|[RFI.Montrose_VxCases.sas](./SAS/RFI.Montrose_VxCases.sas) creates dataset from Montrose spreadsheet and of individuals on that list that were in CEDRS.|
 
 Sections of the RFI.Montrose_VxCases.sas code

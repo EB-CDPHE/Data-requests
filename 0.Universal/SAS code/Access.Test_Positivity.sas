@@ -45,7 +45,7 @@ DATA Positivity_temp;
 * Convert character var for date field to a date var *;
    TestDate = input(date_as_of, yymmdd10.);   format TestDate yymmdd10.;
 
-   DROP date_as_of ;
+   DROP date_as_of  Rate ;
 run;
 
 

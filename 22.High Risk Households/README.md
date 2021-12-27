@@ -22,10 +22,9 @@ Two SAS datasets were created and exported to Excel. One for HH's with >10 cases
 ##
 **Issues:**
 
-* Almost 3000 cases were missing data for State. Many of these could be CO households. Most of these have Zipcode data. If Zipcode data was cleaned and converted to numeric, it could easily be used to impute State=CO when Zipcode was 80000-80700.
-######
-* Zipcode data needs to be cleaned.
-* Address data is very messy. Little effort has been made to clean it. For example, Address1='5400 SHERIDAN' has three different cities.
+* Address data is very messy. Little effort has been made to clean it. 
+* NOTE for example the first record where Address1='5400 SHERIDAN BLVD'. If print out all records with this address it can be noted there are three different cities. Not sure if this is the same physical location or not.
+* NOTE for example that the second record where Address1='5400 SHERIDAN BOULEVARD' is most likely the same physical location as the first record but is defined here as a distinct HH. This issue occurs quite commonly. So the number of cases per HH is a minimum and not an accurate count. 
 
 
 

@@ -179,6 +179,9 @@ run;
 
 
 
+***_____________________***;
+*** CODE below NOT used ***;
+***_____________________***;
 
 
 *** Then KEEP HH with more than 10 cases ***;

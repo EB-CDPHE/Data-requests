@@ -56,7 +56,7 @@ The last four sheets were used to generate epi curve which was then copied (view
 ## Response
 Four slides were created. One slide for the overall epi curve for Colorado for each of the two outcome measures. A third slide for comparing the three tiers of counties/regions. The last slide displays the epi curve for the eight individual regions.
 
-Here is the link to the Google slide file [ELR dashboard slides](Documents/ELR%20dashboard%20slides.pdf)).  
+Here is the link to the Google slide file [ELR dashboard slides](Documents/ELR%20dashboard%20slides.pdf).  
 
 
 ##

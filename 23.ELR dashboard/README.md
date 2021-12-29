@@ -10,7 +10,7 @@ The epi questions assigned to data team were:
 ## Code
 The source data was the `covid19_elr_full_dataset_constrained` data table in the TESTS schema on the dphe144 server. Tableau was used to directly connect to the Microsoft SQL server. So no SAS programs were used to respond to this data request.
 
-ELR_Full is the Tableau workbook used to explore the source data.
+### ELR_Full is the Tableau workbook used to explore the source data.
 |Field|Comments|
 |-----|--------|
 |`Test Type`|Several variations of "PCR". These were grouped into single value of "RT-PCR"|
@@ -25,9 +25,23 @@ There were also a few tabs to used to prepare epidemic curve. The request was fo
 
 ![EpiCurve_CaseCounts](./Images/EpiCurve_DailyCount.png)
 
-It made more sense to me to display a 7 day moving average of new daily cases as this would wash out the lab reporting trend.
+It made more sense to me to display a 7 day moving average of new daily cases as this would wash out the lab reporting trend and better display the secular trend. For the Colorado epi curve, both outcome measures were used. For the county-level and Region-level epi curves, just the 7 day moving average was used.
 
+![EpiCurve_7dMovAvg](./Images/EpiCurve_7dayMovAvg.png)
 
+### Test_Positivity is a Tableau workbook.
+This is a workbook I had used before to look at daily test positivity trends with overlay of 7 day moving average. This workbook  was connected to the `covid19_positivity_trends` table in the TESTS schema on the dphe144 server. This data table is used to generate numbers posted on the CDPHE website. My chart was able to match these numbers.
+
+Various attempts were made to duplicate these numbers using the ELR_Full data. However, I was never able to do so. Comparison of different estimates are summarized in the Excel spreadsheet [Test_Positivity_comparison](Documents/Test_Positivity_comparison.xlsx).
+
+### ELR_Omicron is the Tableau workbook used to generate final charts.
+
+Here is a summary of the sheets and dashboards in this workbook.
+
+|Tab title|Tab type|Comments|
+|---------|--------|--------|
+|Outcome by Date added|Sheet|Epi curve using `DateAdded` field. Selector parameter for outcome measure of Case Count or 7 day moving average.|
+|Outcome by Result Date|Sheet|Epi curve using `ResultDate` field. Selector parameter for outcome measure of Case Count or 7 day moving average.|
 
 ## Response
 Two SAS datasets were created and exported to Excel. One for HH's with >10 cases and the most recent case had value of `LiveinInstitution='YES'` and another tab for HH's with >10 cases and the most recent case had value of `LiveinInstitution NOT ='YES'`.  Here is the link to the Excel file: [HighRiskHH](./Output%20data/HighRiskHH.xlsx).  

@@ -1,21 +1,32 @@
 ## Background 
 With the rapid onset of Omicron variant, case investigations are lagging and therefore CEDRS is not able to provide the most recent stats of this new wave. Therefore, Alicia shared a [brainstorming document](../23.ELR%20dashboard/Documents/Doc_ELR%20epi%20questions_122221.pdf) on how we can make use of ELR data. 
 
-Here is the link to the Google doc:
-https://docs.google.com/document/d/1-g2woH1MgEoTWSQOZCQ4O23moS4xwDzIsj8g4HZxEXE/edit
-
+The epi questions assigned to data team were:
+* Epi curve for Colorado.
  
-**Population**: Confirmed and probable cases in CEDRS with  `Address_State=CO` and `Address1 and Address_City NOT missing`.  **Data requested**: List of HH with >10 cases.  **Groups**: LiveInInstitution='YES' vs NOT 'YES' (No and Unknown). 
+**Population**:  ELR laboratory results where `ResultDate> 11/1/21` and `COVID19Negative=NO`.   **Data requested**: Epi curve based on daily count of new cases. Number of new cases is the daily number of distinct patients where `COVID19Negative=NO`. Date variable used was `DateAdded`. (Cf. Issue #1)  **Groups**: Epi curve by Colorado county and all-hazards regions. 
 
 
 ## Code
-Here are the SAS programs used to respond to this data request:
+The source data was the `covid19_elr_full_dataset_constrained` data table in the TESTS schema on the dphe144 server. Tableau was used to directly connect to the Microsoft SQL server. So no SAS programs were used to respond to this data request.
 
-|Run order|SAS program|
-|---------|-----------|
-|1.|[Access.CEDRS_view](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from dbo144 COVID19 and curates it.|
-|2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in CEDRS.|
-|3.|[RFI.High_risk_HH.sas](./SAS/RFI.High_risk_HH.sas) RFI.High_risk_HH.sas creates household dataset and analysis variables and generates datasets to export to Excel.|
+ELR_Full is the Tableau workbook used to explore the source data.
+|Field|Comments|
+|-----|--------|
+|`Test Type`|Several variations of "PCR". These were grouped into single value of "RT-PCR"|
+|`Lab`|Lab has two values: CDPHE and non-CDPHE. Both are included in this analysis|
+|`Result`|>100 different response categories. These were grouped but practically speaking the only responses needed are "POSITIVE" and "NEGATIVE"|
+|`Covid19Negative`|Yes/No indicator variable. >9000 discordant values when compared to `Result` variable|
+|`ResultDate`|This has about 100 records with bad date values, i.e. <2020 with a mode at 1900 for missing DOB and a mode at 2012, probably transpose error at data entry.|
+|`DateAdded`|Another contender. No missing or poor date values. This is the field to be used for epi curves.|
+|`CollectionDate`|Not much of a contender. Defeated by lots of poor quality date values with >2300 records with dates <2020. |
+
+There were also a few tabs to used to prepare epidemic curve. The request was for daily case counts. For such a short time window, i.e. last several weeks, the lab reporting trend was more prominent than secular trend.
+
+![EpiCurve_CaseCounts](./Images/EpiCurve_DailyCount.png)
+
+It made more sense to me to display a 7 day moving average of new daily cases as this would wash out the lab reporting trend.
+
 
 
 ## Response
@@ -26,7 +37,8 @@ Two SAS datasets were created and exported to Excel. One for HH's with >10 cases
 ##
 **Issues:**
 
-* Address data is very messy. Little effort has been made to clean it. 
+* **Outcome variable selection**. There is a `Result` field but it contains a hundred different response categories, i.e. very messy. The vast majority of results however are "Postive" or "Negative". Another outcome variable is `COVID19Negative`. There are >9000 discordant records in the 2x2 of these two outcome variables. RS indicated this was a known issue and that the best outcome variable to use is `COVID19Negative`. 
+* 
 * NOTE for example the first record where Address1='5400 SHERIDAN BLVD'. If print out all records with this address it can be noted there are three different cities. Not sure if this is the same physical location or not.
 * NOTE for example that the second record where Address1='5400 SHERIDAN BOULEVARD' is most likely the same physical location as the first record but is defined here as a distinct HH. This issue occurs quite commonly. So the number of cases per HH is a minimum and not an accurate count. 
 

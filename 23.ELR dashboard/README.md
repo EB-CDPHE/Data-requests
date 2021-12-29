@@ -47,20 +47,26 @@ Here is a summary of the sheets and dashboards in this workbook.
 |Region Outcome by Date added|Sheet|Epi curve using `DateAdded` field. Selector parameter for outcome measure of Case Count or 7 day moving average. Filter for `County (group)` added, i.e. region. Use this sheet to generate chart image exported to response slide. Shade goes from dark to light as move from West to East. Colors go from green to red as you move from North to South.|
 |ELR Region filter|Dashboard|Displays region map to be used as filter for epi curve.|
 |Northern Regions|Sheet|Displays stacked bar chart of epi curves for Northern tier regions.|
+|Southern Regions|Sheet|Displays stacked bar chart of epi curves for Southern tier regions.|
+|Central Regions|Sheet|Displays stacked bar chart of epi curves for Central tier regions.|
+|Single Region epicurve|Sheet|Displays epi curves for filtered region.|
 
+The last four sheets were used to generate epi curve which was then copied (view) and pasted to Google slides. The color legend was copied independently so that it would show on the slide as an appropriate size.
 
 ## Response
-Two SAS datasets were created and exported to Excel. One for HH's with >10 cases and the most recent case had value of `LiveinInstitution='YES'` and another tab for HH's with >10 cases and the most recent case had value of `LiveinInstitution NOT ='YES'`.  Here is the link to the Excel file: [HighRiskHH](./Output%20data/HighRiskHH.xlsx).  
+Four slides were created. One slide for the overall epi curve for Colorado for each of the two outcome measures. A third slide for comparing the three tiers of counties/regions. The last slide displays the epi curve for the eight individual regions.
 
+Here is the link to the Google slide file [ELR dashboard slides](Documents/ELR%20dashboard%20slides.pdf)).  
 
 
 ##
 **Issues:**
 
 * **Outcome variable selection**. There is a `Result` field but it contains a hundred different response categories, i.e. very messy. The vast majority of results however are "Postive" or "Negative". Another outcome variable is `COVID19Negative`. There are >9000 discordant records in the 2x2 of these two outcome variables. RS indicated this was a known issue and that the best outcome variable to use is `COVID19Negative`. 
-* 
-* NOTE for example the first record where Address1='5400 SHERIDAN BLVD'. If print out all records with this address it can be noted there are three different cities. Not sure if this is the same physical location or not.
-* NOTE for example that the second record where Address1='5400 SHERIDAN BOULEVARD' is most likely the same physical location as the first record but is defined here as a distinct HH. This issue occurs quite commonly. So the number of cases per HH is a minimum and not an accurate count. 
+  
+* Was not able to get daily percent positive to match calculated values of Test Positivity from official data table.
+
+* Still need to create epi curves for Colorado by Age and Gender.
 
 
 

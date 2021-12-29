@@ -42,6 +42,12 @@ Here is a summary of the sheets and dashboards in this workbook.
 |---------|--------|--------|
 |Outcome by Date added|Sheet|Epi curve using `DateAdded` field. Selector parameter for outcome measure of Case Count or 7 day moving average.|
 |Outcome by Result Date|Sheet|Epi curve using `ResultDate` field. Selector parameter for outcome measure of Case Count or 7 day moving average.|
+|County Outcome by Date added|Sheet|Epi curve using `DateAdded` field. Selector parameter for outcome measure of Case Count or 7 day moving average. Filter for `County` added.|
+|Colorado Region Map|Sheet|Colorado map displaying County regions with cumuative case count per region|
+|Region Outcome by Date added|Sheet|Epi curve using `DateAdded` field. Selector parameter for outcome measure of Case Count or 7 day moving average. Filter for `County (group)` added, i.e. region. Use this sheet to generate chart image exported to response slide. Shade goes from dark to light as move from West to East. Colors go from green to red as you move from North to South.|
+|ELR Region filter|Dashboard|Displays region map to be used as filter for epi curve.|
+|Northern Regions|Sheet|Displays stacked bar chart of epi curves for Northern tier regions.|
+
 
 ## Response
 Two SAS datasets were created and exported to Excel. One for HH's with >10 cases and the most recent case had value of `LiveinInstitution='YES'` and another tab for HH's with >10 cases and the most recent case had value of `LiveinInstitution NOT ='YES'`.  Here is the link to the Excel file: [HighRiskHH](./Output%20data/HighRiskHH.xlsx).  

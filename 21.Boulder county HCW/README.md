@@ -44,6 +44,7 @@ Tables and charts were added to Google slides document and shared with Eduardo 1
 
 https://docs.google.com/presentation/d/1HXcgunonnQq0SGtmncNtTJhXbHlGYdRk4DLFaDqKZdM/edit#slide=id.p
 
+Alicia Cronquist sent an [email response](Documents/Email_response_122021.pdf) on 12/20/21.
 
 ##
 **Issues:**

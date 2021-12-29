@@ -1,6 +1,7 @@
 ## Background 
-With the rapid onset of Omicron variant, case investigations are lagging and therefore CEDRS is not able to provide the most recent stats of this new wave. Therefore, Alicia shared a [brainstorming document]() on how we can make use of ELR data. Here is the link to the Google doc:
+With the rapid onset of Omicron variant, case investigations are lagging and therefore CEDRS is not able to provide the most recent stats of this new wave. Therefore, Alicia shared a [brainstorming document](../23.ELR%20dashboard/Documents/Doc_ELR%20epi%20questions_122221.pdf) on how we can make use of ELR data. 
 
+Here is the link to the Google doc:
 https://docs.google.com/document/d/1-g2woH1MgEoTWSQOZCQ4O23moS4xwDzIsj8g4HZxEXE/edit
 
  

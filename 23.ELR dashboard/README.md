@@ -1,6 +1,7 @@
 ## Background 
-With the rapid onset of Omicron variant, case investigations are lagging and therefore CEDRS is not able to provide the most recent stats of this new wave. Therefore, Alicia shared a brainstorming document on how we can make use of ELR data.
+With the rapid onset of Omicron variant, case investigations are lagging and therefore CEDRS is not able to provide the most recent stats of this new wave. Therefore, Alicia shared a [brainstorming document]() on how we can make use of ELR data. Here is the link to the Google doc:
 
+https://docs.google.com/document/d/1-g2woH1MgEoTWSQOZCQ4O23moS4xwDzIsj8g4HZxEXE/edit
 
  
 **Population**: Confirmed and probable cases in CEDRS with  `Address_State=CO` and `Address1 and Address_City NOT missing`.  **Data requested**: List of HH with >10 cases.  **Groups**: LiveInInstitution='YES' vs NOT 'YES' (No and Unknown). 

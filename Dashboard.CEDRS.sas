@@ -61,9 +61,14 @@ run;
    PROC contents data=DASH.CEDRS  varnum; title1 'DASH.CEDRS'; run;
 
 
+* CHECK the Number Hospitalized *;
+   PROC freq data= DASH.CEDRS;   tables Hospitalized ;   run;
+
+
 
 ***  Access population data  ***;
 ***--------------------------***;
+
 proc freq data= DASH.CEDRS; 
 tables Vax_UTD * ReportedDate  / list ;  
 tables  Days_since_Vax_UTD ;  

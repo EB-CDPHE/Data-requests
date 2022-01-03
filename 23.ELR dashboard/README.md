@@ -13,7 +13,7 @@ The source data was the `covid19_elr_full_dataset_constrained` data table in the
 ### ELR_Full is the Tableau workbook used to explore the source data.
 |Field|Comments|
 |-----|--------|
-|`Test Type`|Several variations of "PCR". These were grouped into single value of "RT-PCR"|
+|`Test Type`|Several variations of "PCR". These were grouped into single value of "RT-PCR". Test type of "Other Molecular Assays" was excluded at data source.|
 |`Lab`|Lab has two values: CDPHE and non-CDPHE. Both are included in this analysis|
 |`Result`|>100 different response categories. These were grouped but practically speaking the only responses needed are "POSITIVE" and "NEGATIVE"|
 |`Covid19Negative`|Yes/No indicator variable. >9000 discordant values when compared to `Result` variable|
@@ -36,7 +36,7 @@ Various attempts were made to duplicate these numbers using the ELR_Full data. H
 
 ### ELR_Omicron is the Tableau workbook used to generate final charts.
 
-Here is a summary of the sheets and dashboards in this workbook.
+Here is a summary of the sheets and dashboards in ELR_Omicron workbook.
 
 |Tab title|Tab type|Comments|
 |---------|--------|--------|
@@ -53,8 +53,35 @@ Here is a summary of the sheets and dashboards in this workbook.
 
 The last four sheets were used to generate epi curve which was then copied (view) and pasted to Google slides. The color legend was copied independently so that it would show on the slide as an appropriate size.
 
+The next day the following sheets were added to the workbook:
+|Tab title|Tab type|Comments|
+|---------|--------|--------|
+|Gender chart|Sheet|Epi curve (Daily 7d average) by Gender.|
+|Gender box plot|Sheet|Box plot for distribution of all 7d moving averages over entire period|
+|Gender box plot by week|Sheet|Same box plot but by week.| 
+|Gender box plot first six weeks|Sheet|Same box plot but by month for the first six weeks (which have similar distritbution).| 
+|Gender box plot by last two weeks|Sheet|Same box plot but by week for the last two weeks of December. Shows changed in gender distribution.| 
+
+**NOTE**: The last two sheets require resetting the begin and end dates appropriately to produce the expected charts, i.e. charts put into final slides.
+
+### ELR_Omicron_Age is the Tableau workbook used to generate pediatric line charts.
+
+|Tab title|Tab type|Comments|
+|---------|--------|--------|
+|Test type|Sheet|Confirms total number of PCR tests.|
+|Age pop|Sheet|Displays distinct count of patients by Age group. Age groups are similar to previous requests for pediatric epi curves.|
+|Age Case Counts|Sheet|Distinct count of patients that were NOT covid negative, by age group.|
+|Case rates|Sheet|Calcualted variable of ratio of Case counts to 100K population by age group.|
+|Case rate lines by age|Sheet|Epi curves based on case rates by age group.|
+|Case rate 7d avg by age|Sheet|Epi curves based on 7d moving average of case rates by age group.|
+|Pct Tests pos by Age|Sheet|Bar chart of percent of PCR tests that were positive by age.|
+
+**NOTE**: The worksheets using case rates blend the county population data by age group with the ELR_Full data. County name and Age group are used to blend the data.
+
 ## Response
 Four slides were created. One slide for the overall epi curve for Colorado for each of the two outcome measures. A third slide for comparing the three tiers of counties/regions. The last slide displays the epi curve for the eight individual regions.
+
+Two additional slides were added the next day. One for gender and one for age groups.
 
 Here is the link to the Google slide file [ELR dashboard slides](Documents/ELR%20dashboard%20slides.pdf).  
 

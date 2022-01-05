@@ -33,7 +33,7 @@ PROC contents data=dbo144.CEDRS_view  varnum ;  run;
  | FINDINGS:                                                                 
  |  ID, ProfileID and EventID are numeric instead of character variables.    
  |    --> These need to be converted to character variables prior to running SHRINK macro.     
- |  The following date fields are character variables instead of a numeric variable with date format.
+ |  The following date fields are character variables with date format instead of a numeric variable.
  |    OnsetDate, onsetdate_proxy, onsetdate_proxy_dist, ReportedDate, CollectionDate, DeathDate, 
  |    Earliest_CollectionDate, Data_pulled_as_of
  |    --> ignore onsetdate_proxy; use onsetdate_proxy_dist instead (per Rachel S.)

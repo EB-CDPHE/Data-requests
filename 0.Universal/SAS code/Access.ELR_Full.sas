@@ -3,7 +3,7 @@ PROGRAM:  Access.ELR_Full
 AUTHOR:   Eric Bush
 CREATED:  January 5, 2022
 MODIFIED: 	
-PURPOSE:	 Access and curate data on COVID Test Positivity from SQL data table on dhpe144
+PURPOSE:	 Access and curate COVID PCR Test results reported via ELR 
 INPUT:		dbo144.PCR_view
 OUTPUT:		       ELR_Full
 ***********************************************************************************************/

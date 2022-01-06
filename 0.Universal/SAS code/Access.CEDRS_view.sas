@@ -29,18 +29,18 @@ LIBNAME dbo144   ODBC  dsn='COVID19' schema=dbo;  run;         ** schema contain
 **  2. Review contents of SAS dataset  **;
 PROC contents data=dbo144.CEDRS_view  varnum ;  run;    
 
-/*________________________________________________________________________________________________*
+/*_________________________________________________________________________________________________________*
  | FINDINGS:                                                                 
  |  ID, ProfileID and EventID are numeric instead of character variables.    
  |    --> These need to be converted to character variables prior to running SHRINK macro.     
- |  The following date fields are character variables with date format instead of a numeric variable.
+ |  The following date fields are character variables with date format instead of a numeric date variable.
  |    OnsetDate, onsetdate_proxy, onsetdate_proxy_dist, ReportedDate, CollectionDate, DeathDate, 
  |    Earliest_CollectionDate, Data_pulled_as_of
  |    --> ignore onsetdate_proxy; use onsetdate_proxy_dist instead (per Rachel S.)
  |    --> convert these fields to SAS date variables.
  |  Many of the character variables have length of $255.
  |    --> Use the macro "Shrink" to minimize the length of the character variables.
- *________________________________________________________________________________________________*/
+ *___________________________________________________________________________________________________________*/
 
 
 ** 3. Modify SAS dataset per Findings **;

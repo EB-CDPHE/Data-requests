@@ -54,8 +54,8 @@ run;
 run;
 
 ** Tally ResultGroup **;
-   PROC freq data= ELR_Filtered; 
-      tables ResultGroup  ; 
+   PROC freq data= ELR_Filtered  order=freq; 
+      tables Gender  ; 
 run;
 
 
@@ -101,11 +101,12 @@ run;
    Re-do check based on Person_ID instead of PatientID
  QUESTION:
    What is difference between PatientID and PersonID?
+   A> 
  *----------------------------------------------------------*/
 
 
 
-***  4. Check duplicate Patients ***;
+***  4. Check duplicate Person_ID ***;
 ***------------------------------***;
 
 * Count number of obs by Person_ID *;
@@ -256,6 +257,18 @@ run;
       id Person_ID;
       var CollectDate1  DateAdded1  DateAdded2  SpecimenType1 SpecimenType2 ResultGroup1 ResultGroup2 Result1 Result2  ;
       format Person_ID $30. SpecimenType1 SpecimenType2 $20. Result1 Result2 $20.  ;
+run;
+
+   PROC print data= ELR_Person_2obs;
+      where CollectionDate_Diff = 0  AND  (ResultGroup1 ^=ResultGroup2 );
+      id Person_ID;
+      var CollectDate1  DateAdded1  DateAdded2  SpecimenType1 SpecimenType2 ResultGroup1 ResultGroup2 Result1 Result2  ;
+      format Person_ID $30. SpecimenType1 SpecimenType2 $20. Result1 Result2 $20.  ;
+run;
+
+   PROC freq data= ELR_Person_2obs;
+      where CollectionDate_Diff = 0  AND  (ResultGroup1 ^=ResultGroup2 );
+      tables ResultGroup1 * ResultGroup2 / list missing missprint ;
 run;
 
 

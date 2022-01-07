@@ -85,10 +85,4 @@ DATA ELR_Antigen ;  set Antigen_temp_ ;   run;
 
 
 
-** 8.  Move copy to DASHboard directory **;
-/*libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;*/
-/**/
-/*DATA DASH.TestPositivity ; set Test_Positivity ;*/
-/*   KEEP  Lab  Daily_Tests  Daily_Confirmed_only  Positivity  TestDate  ;*/
-/*run;*/
 

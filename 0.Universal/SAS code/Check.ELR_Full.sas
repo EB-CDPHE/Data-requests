@@ -162,6 +162,9 @@ run;
       var DateAdded  CollectionDate;
 run;
 
+   PROC freq data= Persons_w_2tests  ;
+      table DateAdded  CollectionDate;
+run;
 
 * sort by CollectionDate *;
    proc sort data= Persons_w_2tests
@@ -180,14 +183,24 @@ run;
 
 libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 DATA DASH.WideDSN1_new; set WideDSN1;
-CollectionDate_Diff = CollectDate2 - CollectDate1;
+/*   CollectionDate_Diff = CollectDate2 - CollectDate1;*/
+   if CollectDate1 > '01MAR20'd then CollectionDate_Diff = CollectDate2 - CollectDate1;
 run;
+
    proc print data= DASH.WideDSN1_new; format Person_ID $40. ; run;
-   proc freq data= DASH.WideDSN1_new; table CollectionDate_Diff ; run;
+   proc freq data= DASH.WideDSN1_new; 
+      table CollectionDate_Diff ; 
+run;
+
+
+   proc print data= DASH.WideDSN1_new; 
+   where CollectionDate_Diff=0;
+format Person_ID $40. ; run;
 
 
 
-   PROC transpose data=Persons_w_2tests  
+ * transpose DateAdded *;
+  PROC transpose data=Persons_w_2tests  
    out=WideDSN2(drop= _NAME_)
       prefix=DateAdded ; 
       var DateAdded;          
@@ -195,18 +208,19 @@ run;
 run;
    proc print data= WideDSN2; format Person_ID $40. ; run;
 
+
 * transpose SpecimenType *;
    PROC transpose data=Persons_w_2tests  
-   out=WideDSN3(drop= _NAME_)
+   out=WideDSN3(drop= _NAME_   _LABEL_)
       prefix=SpecimenType ; 
       var SpecimenType;          
       by Person_ID;  
 run;
-   proc print data= WideDSN3; format Person_ID $40. ; run;
+   proc print data= WideDSN3; format Person_ID $40.  SpecimenType1 SpecimenType2 $30.  ; run;
 
 * transpose Test_Type *;
    PROC transpose data=Persons_w_2tests  
-   out=WideDSN4(drop= _NAME_)
+   out=WideDSN4(drop= _NAME_   _LABEL_)
       prefix=Test_Type ; 
       var Test_Type;          
       by Person_ID;  
@@ -215,12 +229,12 @@ run;
 
 * transpose Result *;
    PROC transpose data=Persons_w_2tests  
-   out=WideDSN5(drop= _NAME_)
+   out=WideDSN5(drop= _NAME_   _LABEL_)
       prefix=Result ; 
       var Result;          
       by Person_ID;  
 run;
-   proc print data= WideDSN5; format Person_ID $40. ; run;
+   proc print data= WideDSN5; format Person_ID $40. Result1 Result2 $20.  ; run;
 
 * transpose ResultGroup *;
    PROC transpose data=Persons_w_2tests  
@@ -234,11 +248,15 @@ run;
 
 DATA ELR_Person_2obs; merge  WideDSN1  WideDSN2  WideDSN3  WideDSN4  WideDSN5  WideDSN6  ;
       by Person_ID;  
-      var  PatientID  Gender  DateAdded SpecimenType COVID19Negative  Test_Type  Result  ResultGroup  Lab CollectionDate  ;
-      format Person_ID $40.  SpecimenType $20.  Result $15. Test_Type lab $10. ;
-
+   if CollectDate1 > '01MAR20'd then CollectionDate_Diff = CollectDate2 - CollectDate1;
 run;
 
+   PROC print data= ELR_Person_2obs;
+      where CollectionDate_Diff = 0;
+      id Person_ID;
+      var CollectDate1  DateAdded1  DateAdded2  SpecimenType1 SpecimenType2 ResultGroup1 ResultGroup2 Result1 Result2  ;
+      format Person_ID $30. SpecimenType1 SpecimenType2 $20. Result1 Result2 $20.  ;
+run;
 
 
 

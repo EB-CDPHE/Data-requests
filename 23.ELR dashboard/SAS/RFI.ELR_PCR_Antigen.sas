@@ -62,5 +62,10 @@ proc freq data=ELR_PCR_Antigen ; table test; run;
 PROC contents data=ELR_Antigen_filtered  varnum ;  title1 'ELR_Antigen_filtered';  run;
 
 
+** 8.  Move copy to DASHboard directory **;
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
+
+DATA DASH.ELR_PCR_Antigen ; set ELR_PCR_Antigen ;
+run;
 
 

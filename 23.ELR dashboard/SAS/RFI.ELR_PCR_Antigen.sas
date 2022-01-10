@@ -69,3 +69,10 @@ DATA DASH.ELR_PCR_Antigen ; set ELR_PCR_Antigen ;
 run;
 
 
+PROC contents data=DASH.ELR_PCR_Antigen  varnum ;  title1 'DASH.ELR_PCR_Antigen';  run;
+
+PROC freq data= DASH.ELR_PCR_Antigen;
+where DateAdded ge '01DEC21'd;
+tables DateAdded;
+format DateAdded year. ;
+run;

@@ -51,28 +51,40 @@ options pageno=1;
 *** Concatenate the PCR and Antigen ELR Results ***;
 ***_____________________________________________***;
 
-DATA ELR_PCR_Antigen ; 
+DATA ELR_tests ; 
    length Test $ 9 ;
    set ELR_PCR_filtered(in=p)  ELR_Antigen_filtered(in=a) ;
    if p then Test='PCR';  else if a then Test='Antigen';
 run;
 
-proc freq data=ELR_PCR_Antigen ; table test; run;
+proc freq data=ELRtests ; table test; run;
 
-PROC contents data=ELR_Antigen_filtered  varnum ;  title1 'ELR_Antigen_filtered';  run;
+PROC contents data=ELR_tests  varnum ;  title1 'ELR_tests';  run;
+
+
+*** Export to csv file to be read by Tableau ***;
+***------------------------------------------***;
+
+PROC EXPORT DATA= WORK.ELR_tests 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Dashboard data\ELRtests.csv" 
+            DBMS=CSV REPLACE;
+     PUTNAMES=YES;
+RUN;
+
+
 
 
 ** 8.  Move copy to DASHboard directory **;
-libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
-
-DATA DASH.ELR_PCR_Antigen ; set ELR_PCR_Antigen ;
-run;
-
-
-PROC contents data=DASH.ELR_PCR_Antigen  varnum ;  title1 'DASH.ELR_PCR_Antigen';  run;
-
-PROC freq data= DASH.ELR_PCR_Antigen;
-where DateAdded ge '01DEC21'd;
-tables DateAdded;
-format DateAdded year. ;
-run;
+/*libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;*/
+/**/
+/*DATA DASH.ELR_PCR_Antigen ; set ELR_PCR_Antigen ;*/
+/*run;*/
+/**/
+/**/
+/*PROC contents data=DASH.ELR_PCR_Antigen  varnum ;  title1 'DASH.ELR_PCR_Antigen';  run;*/
+/**/
+/*PROC freq data= DASH.ELR_PCR_Antigen;*/
+/*where DateAdded ge '01DEC21'd;*/
+/*tables DateAdded;*/
+/*format DateAdded year. ;*/
+/*run;*/

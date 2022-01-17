@@ -6,6 +6,10 @@ The epi questions assigned to data team were:
  
 **Population**:  ELR laboratory results where `ResultDate> 11/1/21` and `COVID19Negative=NO`.   **Data requested**: Epi curve based on daily count of new cases. Number of new cases is the daily number of distinct patients where `COVID19Negative=NO`. Date variable used was `DateAdded`. (Cf. Issue #1)  **Groups**: Epi curve by Colorado county and all-hazards regions. 
 
+## Documentation
+From Mayra - Here is how they calculate test positivity:
+
+![LPHAdoc](./Images/How_Test_Pos_is_calculated.png)
 
 ## Code
 The source data was the `covid19_elr_full_dataset_constrained` data table in the TESTS schema on the dphe144 server. Tableau was used to directly connect to the Microsoft SQL server. So no SAS programs were used to respond to this data request.

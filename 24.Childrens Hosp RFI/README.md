@@ -1,5 +1,5 @@
 ## Background 
-Alicia received this data request from Christy Smith-Anderson, Pediatrician from Children's Hospital Colorado (CHCO) and Lisa DeCamp. The request was captured in a google doc, which Eduardo shared with me on 1/21/22. [Jan14Request]() . 
+Alicia received this data request from Christy Smith-Anderson, Pediatrician from Children's Hospital Colorado (CHCO) and Lisa DeCamp. The request was captured in a google doc and shared with me on 1/21/22 by Eduardo. Here is the doc: [Jan14Request](./Documents/Data_request_doc_011422.pdf) . 
 
 **Population**:  Confirmed COVID cases (not probable) in Colorado minors (0-<18 years old).   **Data requested**: Number and percent of cases between March 1, 2020 and August 30, 2021. **Groups**: Race and Ethnicity. And three time periods:
 * Time Period 1:   3/1/20 - 9/30/20

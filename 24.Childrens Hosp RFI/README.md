@@ -26,7 +26,7 @@ The workbook has two worksheets for the Ethnicity viz - a bar chart and a stacke
 A copy of the workbook has been placed on the J: drive in this directory: J:\Programs\Other Pathogens or Responses\2019-nCoV\Tableau
 
 ## Response
-I copied images of the two Ethnicity charts, the one Race chart, and the two data tables in the Google doc. Here is the link to the Google file [Jan14Request](./Documents/Data_request_doc_011422.pdf).  
+I copied images of the two Ethnicity charts, the one Race chart, and the two data tables in the Google doc. Here is the link to the Google file [Jan24Response](https://docs.google.com/document/d/1Lqd1g-cuRHGaXNH4M19b8MaWCwmI1ue9H2m0DCzFQBU/edit#heading=h.vo6r01jlzrtw).  
 
 
 ##

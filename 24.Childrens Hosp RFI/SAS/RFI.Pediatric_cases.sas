@@ -3,9 +3,9 @@ PROGRAM:  RFI.Pediatric_cases.sas
 AUTHOR:   Eric Bush
 CREATED:  January 22, 2022
 MODIFIED:	
-PURPOSE:	  
-INPUT:	 	  
-OUTPUT:		
+PURPOSE:	  Respond to data request from Children's Hospital CO for pediatric case counts by Ethnicity and Race
+INPUT:	 COVID.CEDRS_view_fix	  
+OUTPUT:		DASH.CEDRS_minors (to build summary viz and tables in Tableau)
 ***********************************************************************************************/
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
@@ -41,6 +41,10 @@ run;
       tables CaseStatus  TP ;
 run;
 
+
+
+*** Check out the variables in play ***;
+***---------------------------------***;
 
    PROC format;
       value $ RaceFmt
@@ -80,9 +84,8 @@ run;
 
 
 
-
-
-** All together **;
+*** Final Tables for response ***;
+***---------------------------***;
 
    PROC freq data= CEDRS_minors   ;
       where CaseStatus = 'confirmed';
@@ -95,5 +98,14 @@ run;
       where CaseStatus = 'confirmed'  AND  Ethnicity = 'Not Hispanic or Latino' ;
       table Race  * TP  /  missing missprint ;
       format Race $RaceFmt. ;
-title3 "Race by Non-Hispanics for CaseStatus = 'confirmed' by Time Period";
+title3 "Race among Non-Hispanics for CaseStatus = 'confirmed' by Time Period";
 run; 
+
+
+** Put data where Tableau can access it **;
+
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
+
+   DATA DASH.CEDRS_minors ; set CEDRS_minors;
+      where CaseStatus = 'confirmed' ;
+run;

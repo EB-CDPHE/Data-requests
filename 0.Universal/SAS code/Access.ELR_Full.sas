@@ -2,7 +2,7 @@
 PROGRAM:  Access.ELR_Full
 AUTHOR:   Eric Bush
 CREATED:  January 5, 2022
-MODIFIED: 	
+MODIFIED: 01FEB22: remove Address: from DROP statement	
 PURPOSE:	 Access and curate COVID PCR Test results reported via ELR 
 INPUT:		dbo144.PCR_view
 OUTPUT:		       ELR_Full
@@ -63,7 +63,7 @@ DATA PCR_view;
    ReceiveDate    = input(tmp_ReceiveDate, yymmdd10.);       format ReceiveDate yymmdd10.;
 
  * Drop unnecessary variables *;
-   DROP tmp_:  Medical_Record_Number Replicant  Geo:  Address: Phone
+   DROP tmp_:  Medical_Record_Number Replicant  Geo:  Phone
          Sender Submitter Test_Loinc  Reviewed  FileSource  Collection_proxy  Refreshed_ON  Orig_DateAdded ;
 run;
 

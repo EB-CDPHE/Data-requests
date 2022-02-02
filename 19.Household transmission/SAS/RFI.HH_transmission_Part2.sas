@@ -24,7 +24,7 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 
 DATA CEDRS_filtered2;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  AND
-      ('31DEC21'd le  ReportedDate  le '01FEB22'd )  ;
+      ('01JAN22'd le  ReportedDate  le '31JAN22'd )  ;
 
    Keep  ProfileID   CountyAssigned   ReportedDate   Age_at_Reported   CollectionDate   
          LiveInInstitution   Homeless   Outbreak_Associated   Symptomatic  OnsetDate 
@@ -280,7 +280,7 @@ run;
 run;
 /*---------------------------------------------------------------------------------*
  |FINDINGS:
- |  N=124,004 filtered cases from Colorado with Address, City, and County data
+ |  N=112,140 filtered cases from Colorado with Address, City, and County data
  *---------------------------------------------------------------------------------*/
 
 
@@ -505,7 +505,7 @@ quit;
 /*      where year(ReportedDate1)=2020;*/
 /*      tables CountyAssigned * Address_City * Address1  / list out=ClusterPerHH20;*/
 /*   proc print data= ClusterPerHH20; run;*/
-   PROC freq data= ClusterPerHH20;  tables Count;  run;
+/*   PROC freq data= ClusterPerHH20;  tables Count;  run;*/
 
 
 /*   PROC freq data=HHcases noprint ; */

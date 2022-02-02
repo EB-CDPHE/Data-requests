@@ -452,7 +452,7 @@ DATA HHcases; merge WideDSN1  WideDSN2  WideDSN3  ;
    Fall21_AG=compress(AG, 'ikta');
 
    if findc(Fall20_AG,'ikt')>0 then AnyKids20=1; else if Fall20_AG='' then AnyKids20=.; else AnyKids20=0;
-   if findc(Fall21_AG,'IKT')>0 then AnyKids21=1; else if Fall20_AG='' then AnyKids21=.; else AnyKids21=0;
+   if findc(Fall21_AG,'IKT')>0 then AnyKids21=1; else if Fall21_AG='' then AnyKids21=.; else AnyKids21=0;
 
    DROP i  AG1 AG2 AG3 AG4 AG5 AG6 AG7 AG8 AG9 AG10 ;
 
@@ -506,7 +506,7 @@ quit;
 ** Number of clusters by time period **;
    PROC means data=HHcases n ;  where HHcases20>0;    var  Cluster HHcases20 ;  run;
    PROC means data=HHcases n ;  where HHcases21>0;    var  Cluster HHcases21 ;  run;
-   PROC means data=HHcases n ;  where HHcasesTotal>0; var  Cluster HHcases21 ;  run;
+   PROC means data=HHcases n ;  where HHcasesTotal>0; var  Cluster HHcasesTotal ;  run;
 
 
 ** Number of clusters per HH by time period **;

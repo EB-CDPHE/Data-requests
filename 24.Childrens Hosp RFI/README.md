@@ -6,6 +6,7 @@ Alicia received this data request from Christy Smith-Anderson, Pediatrician from
 * Time Period 2:  10/1/20 - 3/31/21
 * Time Period 3:   4/1/21 - 8/31/21
 
+**On 03FEB2022 this request was updated by modifying time period 3 which was meant to extend to 9/30/21.**
 
 ## Code
 Here are the SAS programs used to respond to this data request:

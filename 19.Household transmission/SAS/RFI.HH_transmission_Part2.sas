@@ -104,7 +104,7 @@ run;
  | Half of these are in CO.  n=15 have data in Address1
  *----------------------------------------------------------------------------------*/
 
-* Chk3.1)City missing *;
+* Chk3.1)City missing BUT have Address data *;
    PROC freq data= CEDRS_filtered2 ;
       where Address_City = ''  AND  Address1 ne '' ;
       tables ProfileID * Address1  *  Address_City  * Address_State * address_zipcode / list missing missprint;
@@ -323,7 +323,7 @@ DATA CEDRS_Addresses2;  set CEDRS_CO2;
    DROP  Homeless  Address2  Address_CityActual  Address_Zip:
          Address_Latitude  Address_Longitude  Address_Tract2000  ;
 run;
-/*   proc freq data=CEDRS_Addresses ; tables AgeGroup AG; run;*/
+/*   proc freq data=CEDRS_Addresses2 ; tables AgeGroup AG; run;*/
    PROC contents data=CEDRS_Addresses2  varnum; title1 'CEDRS_Addresses2'; run;
 
 
@@ -495,9 +495,9 @@ quit;
 
 
 ** Number of clusters by time period **;
-   PROC means data=HHcases2 n ;  where HHcases22>0;    var  Cluster HHcases22 ;  run;
-   PROC means data=HHcases2 n ;  where HHcases21>0;    var  Cluster HHcases21 ;  run;
-   PROC means data=HHcases2 n ;  where HHcasesTotal>0; var  Cluster HHcasesTotal ;  run;
+   PROC means data=HHcases2 n sum maxdec=0 ;  where HHcases22>0;    var  Cluster HHcases22 ;  run;
+   PROC means data=HHcases2 n sum maxdec=0 ;  where HHcases21>0;    var  Cluster HHcases21 ;  run;
+   PROC means data=HHcases2 n sum maxdec=0 ;  where HHcasesTotal>0; var  Cluster HHcasesTotal ;  run;
 
 
 ** Number of clusters per HH by time period **;

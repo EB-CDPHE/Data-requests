@@ -302,7 +302,7 @@ run;
 run;
 /*---------------------------------------------------------------------------------*
  |FINDINGS:
- |  N=354,541 filtered PCR positive tests from Colorado with Address, City, and County data
+ |  N=354,545 filtered PCR positive tests from Colorado with Address, City, and County data
  *---------------------------------------------------------------------------------*/
 
 
@@ -345,7 +345,7 @@ DATA ELR_Addresses;  set POS_CO_Person;
 
    DROP  First_Name Last_Name  Address2    AccessionID  ;
 run;
-/*   proc freq data=CEDRS_Addresses ; tables AgeGroup AG; run;*/
+   proc freq data=ELR_Addresses ; tables AgeGroup AG; run;
    PROC contents data=ELR_Addresses  varnum; title1 'ELR_Addresses'; run;
 
 
@@ -402,9 +402,185 @@ run;
 
 
 
+*** Then remove HH with more than 10 cases ***;
+***----------------------------------------***;
+
+Data ELR_HH; merge FlagELRAddress(in=x)  ELR_HouseHolds ;
+   by County  City  Address ;
+   if x=1 then delete;
+
+   if NumCases_Cluster=1 then Days_between_cases=0;
+run;
+/*   proc print data= CEDRS_HH;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+/*   proc freq data= CEDRS_HH noprint; tables CountyAssigned * Address_City * Address1/list out=CasesperHH; */
+/*   proc freq data= CasesperHH; tables count; title1 'Number of cases per HH'; run;*/
 
 
 
+*** Transpose data from Case level (tall) to HH level (wide) ***;
+***----------------------------------------------------------***;
+
+* transpose ReportedDate *;
+   PROC transpose data=ELR_HH  
+   out=WideDSN1(drop= _NAME_)
+      prefix=DateAdded ; 
+      var DateAdded;          
+      by County  City  Address  Cluster ;
+run;
+/*   proc print data= WideDSN1;  run;*/
+
+* transpose AG *;
+   PROC transpose data=ELR_HH  
+   out=WideDSN2(drop= _NAME_)  
+      prefix=AG ; 
+      var AG;        
+      by County  City  Address  Cluster ;
+run;
+/*   proc print data= WideDSN2; run;*/
+
+* transpose Days_since_last_case *;
+   PROC transpose data=ELR_HH  
+   out=WideDSN3(drop= _NAME_)
+      prefix=DaysBetween ; 
+      var Days_since_last_case;          
+      by County  City  Address  Cluster ;
+run;
+/*   proc print data= WideDSN3;  run;*/
+
+
+
+***  Creation of Household (HH) level dataset  ***;
+***--------------------------------------------***;
+
+* Merge transposed datasets and final counter together *;
+DATA HH_PCR_Pos; merge WideDSN1  WideDSN2  WideDSN3  ;
+   by County  City  Address  Cluster ;
+
+   ARRAY RptDates{10} DateAdded1-DateAdded10 ;
+   ARRAY AGvars{10} AG1-AG10 ;
+
+   do i = 1 to 10;
+           if year(RptDates{i}) = 2022 then AGvars{i} = lowcase(AGvars{i}) ;
+      else if year(RptDates{i}) = 2021 then AGvars{i} = upcase(AGvars{i}) ;
+   end;
+
+   AG=cats(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);
+
+   JAN22_AG=compress(AG, 'IKTA');
+   Fall21_AG=compress(AG, 'ikta');
+
+   if findc(JAN22_AG,'ikt')>0 then AnyKids22=1;  else if JAN22_AG=''  then AnyKids22=.; else AnyKids22=0;
+   if findc(Fall21_AG,'IKT')>0 then AnyKids21=1; else if Fall21_AG='' then AnyKids21=.; else AnyKids21=0;
+
+   DROP i  AG1 AG2 AG3 AG4 AG5 AG6 AG7 AG8 AG9 AG10 ;
+
+* ADD variables to analyze *;
+   HHcases22 = countc(AG, 'ikta');
+   HHcases21 = countc(AG, 'IKTA');
+   HHcasesTotal = sum(HHcases22, HHcases21) ;
+
+   HHaddcases22 = HHcases22-1;
+   HHaddcases21 = HHcases21-1;
+
+   ARRAY DayVars{9} DaysBetween2-DaysBetween10 ;
+   MeanTime2Spread= mean(of DayVars{*});
+
+run;
+
+   PROC contents data=HH_PCR_Pos  varnum; title1 'HH_PCR_Pos'; run;
+
+** To get the number of eligible HH and number of cases in those HH **;
+   proc means data= HH_PCR_Pos n sum maxdec=0; var HHcasesTotal; run;
+** To get the number of clusters per HH **;
+/*   proc freq data= HHcases noprint; tables CountyAssigned * Address_City * Address1  /list out=CountClustersperHH; */
+/*   proc freq data= CountClustersperHH; tables count; title1 'Number of clusters per HH'; run;*/
+
+
+
+***  Analyze HH level data  ***;
+***-------------------------***;
+
+** Number of HH with 1+ case in time period 1, 2, and 1&2. **;
+   PROC SQL;
+      select count(*) as NumHH22
+      from
+         (select distinct County, City, Address
+      from HH_PCR_Pos where HHcases22>0 );
+quit;
+
+   PROC SQL;
+      select count(*) as NumHH21
+      from
+         (select distinct County, City, Address
+      from HH_PCR_Pos where HHcases21>0 );
+quit;
+
+   PROC SQL;
+      select count(*) as NumHH
+      from
+         (select distinct County, City, Address
+      from HH_PCR_Pos );
+quit;
+
+
+** Number of clusters by time period **;
+   PROC means data=HH_PCR_Pos n sum maxdec=0;  where HHcases22>0;     var Cluster HHcases22 ;  run;
+   PROC means data=HH_PCR_Pos n sum maxdec=0;  where HHcases21>0;     var Cluster HHcases21 ;  run;
+   PROC means data=HH_PCR_Pos n sum maxdec=0;  where HHcasesTotal>0;  var Cluster HHcasesTotal ;  run;
+
+
+
+** Distribution of FULL list of HH cases involved in time period 1 and 2  **;
+   PROC freq data=HH_PCR_Pos ;
+      where JAN22_AG ne '';
+      tables JAN22_AG    /  missing missprint ;
+run;
+
+
+** Distribution of FIRST CASE per AG's involved in time period 1 and 2  (ALL HH) **;
+   PROC freq data=HH_PCR_Pos ;
+      where JAN22_AG ne '';
+      tables JAN22_AG    /  missing missprint ;
+      format JAN22_AG $1.;
+run;
+
+
+   PROC freq data=HH_PCR_Pos ;
+      tables AnyKids22 AnyKids21 ;
+run;
+
+   PROC freq data=HH_PCR_Pos ;
+      where JAN22_AG ne ''  AND  AnyKids22=1;
+      tables JAN22_AG    /  missing missprint ;
+      format JAN22_AG $1.;
+run;
+
+
+** Average number of cases in clusters by age group of index cases **;
+   PROC means data=HH_PCR_Pos mean max  maxdec=2 ;
+      where JAN22_AG ne '';
+      class JAN22_AG ;
+      format JAN22_AG $1.;
+      var HHaddcases22;
+run;
+
+
+** Average time between index cases and next case by age group of index case **;
+   PROC means data=HH_PCR_Pos mean range  maxdec=2 ;
+      where JAN22_AG ne '';
+      class JAN22_AG ;
+      format JAN22_AG $1.;
+      var DaysBetween2;
+run;
+
+
+** Average time between all cases in cluster by age group of index case **;
+   PROC means data=HH_PCR_Pos mean range  maxdec=2 ;
+      where JAN22_AG ne '';
+      class JAN22_AG ;
+      format JAN22_AG $1.;
+      var MeanTime2Spread;
+run;
 
 
 

@@ -24,11 +24,11 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 DATA CEDRS_minors;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  AND  
       Age_at_Reported < 18  AND  
-      ('01MAR20'd le ReportedDate le '31AUG21'd) ;
+      ('01MAR20'd le ReportedDate le '30SEP21'd) ;
 
         if ('01MAR20'd le ReportedDate le '30SEP20'd) then TP=1 ;
    else if ('01OCT20'd le ReportedDate le '31MAR21'd) then TP=2 ;
-   else if ('01APR21'd le ReportedDate le '31AUG21'd) then TP=3 ;
+   else if ('01APR21'd le ReportedDate le '30SEP21'd) then TP=3 ;
 
    Keep  ProfileID  EventID  Casestatus  CountyAssigned   ReportedDate   Age_at_Reported   CollectionDate   
          Outbreak_Associated   Symptomatic  OnsetDate hospitalized  hospitalized_cophs

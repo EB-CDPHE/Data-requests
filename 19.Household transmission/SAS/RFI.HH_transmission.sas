@@ -504,9 +504,9 @@ quit;
 
 
 ** Number of clusters by time period **;
-   PROC means data=HHcases n ;  where HHcases20>0;    var  Cluster HHcases20 ;  run;
-   PROC means data=HHcases n ;  where HHcases21>0;    var  Cluster HHcases21 ;  run;
-   PROC means data=HHcases n ;  where HHcasesTotal>0; var  Cluster HHcasesTotal ;  run;
+   PROC means data=HHcases n sum maxdec=0 ;  where HHcases20>0;    var  Cluster HHcases20 ;  run;
+   PROC means data=HHcases n sum maxdec=0 ;  where HHcases21>0;    var  Cluster HHcases21 ;  run;
+   PROC means data=HHcases n sum maxdec=0 ;  where HHcasesTotal>0; var  Cluster HHcasesTotal ;  run;
 
 
 ** Number of clusters per HH by time period **;

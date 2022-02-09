@@ -2,7 +2,7 @@
 PROGRAM:  RFI.HH_transmission_Part2.sas
 AUTHOR:   Eric Bush
 CREATED:  November 10, 2021
-MODIFIED: February 1, 2022	
+MODIFIED: 020922:  Change code from ReportedDate to CollectionDate	
 PURPOSE:	 Add third time period to HH transmission study: 01JAN22 - 31JAN22 (start of 2nd semester)
 INPUT:	 COVID.CEDRS_view_fix	  
 OUTPUT:		
@@ -24,7 +24,7 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 
 DATA CEDRS_filtered2;  set COVID.CEDRS_view_fix;
    if CountyAssigned ^= 'INTERNATIONAL'  AND
-      ('01JAN22'd le  ReportedDate  le '31JAN22'd )  ;
+      ('01JAN22'd le  CollectionDate  le '31JAN22'd )  ;
 
    Keep  ProfileID   CountyAssigned   ReportedDate   Age_at_Reported   CollectionDate   
          LiveInInstitution   Homeless   Outbreak_Associated   Symptomatic  OnsetDate 
@@ -49,15 +49,26 @@ options ps=50 ls=150 ;     * Landscape pagesize settings *;
 * Chk1.Address1 missing *;
    PROC freq data= CEDRS_filtered2 ;
       where Address1 in ('');
-      tables Address1 * Address2  / list missing missprint;
-      format Address1 Address2   $35.   ;
+      tables Address1 * Address2 * AddressActual / list missing missprint;
+      format Address1 Address2   $35.  AddressActual $15. ;
 run;
 /*--------------------------------------------------------------------*
  |FINDINGS:
- | n=290 obs missing data for Address1 and Address2
- | N=10 obs where Address1='' and Address2 contains data. THEREFORE:
+ | n=678 obs missing data for Address1 and Address2
+ | N=12 obs where Address1='' and Address2 contains data. THEREFORE:
  | FIX:  If Address1='' and Address2^='' then Address1=Address2;
  *--------------------------------------------------------------------*/
+
+* Chk1.1) Address1 missing and Address2 has data *;
+   PROC print data= CEDRS_filtered2 ;
+      where Address1 = '' and Address2 ne '';
+      id ProfileID; var Address1  Address2    Address_City  Address_State  Address_Zipcode ;
+      format Address1 $15.   Address2   $35.   ;
+run;
+/*-----------------------*
+ |FINDINGS:
+ | Stick with general edit. Those that are just unit # will be deleted anyway
+ *-------------------*/
 
 
 * Chk2.Address1 invalid *;
@@ -202,9 +213,6 @@ run;
 DATA CEDRS_CO2;  set CEDRS_CO_temp;
       where Address_State='CO';
 
-* impute missing collectiondates *;
-   if CollectionDate = . then CollectionDate = ReportedDate;
-
 * impute missing Address1 with Address2 or AddressActual *;
    if Address1='' and Address2^='' then Address1=Address2; 
    else if Address1='' and AddressActual^='' then Address1=AddressActual;
@@ -287,7 +295,7 @@ run;
 run;
 /*---------------------------------------------------------------------------------*
  |FINDINGS:
- |  N=112,140 filtered cases from Colorado with Address, City, and County data
+ |  N=289,413 filtered cases from Colorado with Address, City, and County data
  *---------------------------------------------------------------------------------*/
 
 
@@ -441,8 +449,8 @@ DATA HHcases2; merge WideDSN1  WideDSN2  WideDSN3  ;
    ARRAY AGvars{10} AG1-AG10 ;
 
    do i = 1 to 10;
-           if year(RptDates{i}) = 2022 then AGvars{i} = lowcase(AGvars{i}) ;
-      else if year(RptDates{i}) = 2021 then AGvars{i} = upcase(AGvars{i}) ;
+           if year(CollectDates{i}) = 2022 then AGvars{i} = lowcase(AGvars{i}) ;
+      else if year(CollectDates{i}) = 2021 then AGvars{i} = upcase(AGvars{i}) ;
    end;
 
    AG=cats(AG1,AG2,AG3,AG4,AG5,AG6,AG7,AG8,AG9,AG10);

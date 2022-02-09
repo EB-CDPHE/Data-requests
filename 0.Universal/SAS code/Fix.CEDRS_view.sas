@@ -52,6 +52,9 @@ DATA COVID.CEDRS_view_fix ;  set CEDRS_view_read ;
 
 run;
 
+** 3) impute missing collectiondates **;
+   if CollectionDate = . then CollectionDate = ReportedDate;
+
 
 **  2. Contents of final SAS dataset  **;
 

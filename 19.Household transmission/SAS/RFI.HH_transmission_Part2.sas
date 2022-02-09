@@ -65,10 +65,10 @@ run;
       id ProfileID; var Address1  Address2    Address_City  Address_State  Address_Zipcode ;
       format Address1 $15.   Address2   $35.   ;
 run;
-/*-----------------------*
+/*--------------------------------------------------------------------------*
  |FINDINGS:
- | Stick with general edit. Those that are just unit # will be deleted anyway
- *-------------------*/
+ | Don't use general edit since that moves unit # to Address1 for n=8 obs
+ *--------------------------------------------------------------------------*/
 
 
 * Chk2.Address1 invalid *;
@@ -108,7 +108,37 @@ run;
       id ProfileID;  var Address1 Address2 ;
       format Address1 Address2   $35.   ;
 run;
-
+* Chk2.2)Address1 and Address2 are switched *;
+   PROC print data= CEDRS_filtered2 ;
+      where index(Address2, '9059')=1 OR
+            index(Address2, '13678')=1 OR
+            index(Address2, '2539')=1 OR
+            index(Address2, '1904')=1 OR
+            index(Address2, '1803')=1 OR
+            index(Address2, '1851')=1 OR
+            index(Address2, '1055')=1 OR
+            index(Address2, '13609')=1 OR
+            index(Address2, '21365')=1 OR
+            index(Address2, '1920')=1 OR
+            index(Address2, '2115')=1 OR
+            index(Address2, '902')=1 OR
+            index(Address2, '2201')=1 OR
+            index(Address2, '755')=1 OR
+            index(Address2, '477')=1 OR
+            index(Address2, '5301')=1 OR
+            index(Address2, '1312')=1 OR
+            index(Address2, '34641')=1 OR
+            index(Address2, '1115')=1 OR
+            index(Address2, '62')=1 OR
+            index(Address2, '1217')=1 OR
+            index(Address2, '1700')=1 OR
+            index(Address2, '651')=1 OR
+            index(Address2, '906')=1 OR
+            index(Address2, '1935')=1 OR
+            index(Address2, '105')=1  ;
+      id ProfileID;  var Address1 Address2 Address_City Address_CityActual Address_State;
+      format Address1 Address2   $35. AddressActual  Address_City Address_CityActual Address_State  $20. ;
+run;
 
 * Chk3.City missing *;
    PROC freq data= CEDRS_filtered2 ;
@@ -213,9 +243,41 @@ run;
 DATA CEDRS_CO2;  set CEDRS_CO_temp;
       where Address_State='CO';
 
+
 * impute missing Address1 with Address2 or AddressActual *;
-   if Address1='' and Address2^='' then Address1=Address2; 
-   else if Address1='' and AddressActual^='' then Address1=AddressActual;
+   if ProfileID in ('2314531', '2153365', '2253581', '1866998.1') then do;  
+      Address1=Address2; Address2='';  
+   end;
+/*   if Address1='' and Address2^='' then Address1=Address2; */
+/*   else if Address1='' and AddressActual^='' then Address1=AddressActual;*/
+
+* switch Address1 with Address2  *;
+   if ProfileID= '2250935' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '1360580.1' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2295266' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2296694' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2453382' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2178566' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2292654' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2432220' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2136681' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2161377' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2246189' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2357965' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2304011' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2159068' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '1019144' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2152626' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2180128' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2257598' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2297119' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2349898' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2252216' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2319041' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2147932' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2315071' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2375271' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
+   if ProfileID= '2399481' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
 
 * clean Address1 data *;
    Address1 = compress(Address1, "*.");

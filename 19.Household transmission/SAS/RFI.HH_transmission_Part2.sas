@@ -167,7 +167,7 @@ run;
 /*----------------------------------------------*
  |FINDINGS:
  | Over 98% of records have State=CO
- | State = missing for n=1879 records 
+ | State = missing for n>4794 records 
  *----------------------------------------------*/
 
 
@@ -243,7 +243,6 @@ run;
 DATA CEDRS_CO2;  set CEDRS_CO_temp;
       where Address_State='CO';
 
-
 * impute missing Address1 with Address2 or AddressActual *;
    if ProfileID in ('2314531', '2153365', '2253581', '1866998.1') then do;  
       Address1=Address2; Address2='';  
@@ -280,7 +279,7 @@ DATA CEDRS_CO2;  set CEDRS_CO_temp;
    if ProfileID= '2399481' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
 
 * clean Address1 data *;
-   Address1 = compress(Address1, "*.");
+   Address1 = compress(Address1, "*.,-?");
    if index(Address1, '@')>0 then Address1='';
 
    if Address1 = '*OCCUPATIONAL HEALTH RECORD ONLY*' then Address1 = Address2;
@@ -294,7 +293,7 @@ DATA CEDRS_CO2;  set CEDRS_CO_temp;
    if ProfileID= '2245978' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
    if ProfileID= '2196981' then do;  tmp_Address1=Address1; Address1=Address2; Address2= tmp_Address1;  end;
 
-   if Address1 in ('BAD ADDRESS','BROOMFIELD', 'CASTLE ROCK', 'CENTENNIAL', 'COLORADO',
+   if Address1 in ('BROOMFIELD', 'CASTLE ROCK', 'CENTENNIAL', 'COLORADO',
                   'COLORADO SPRINGS', 'DENVER', 'DURANGO', 'EDWARDS', 'FEDERAL HEIGHTS', 'GREENWOOD VILLAGE',
                   'FT COLLINS', 'LAKEWOOD', 'LONGMONT', 'LONGMOT', 'PUEBLO', 'STEAMBOAT') then 
       Address1='';
@@ -302,10 +301,12 @@ DATA CEDRS_CO2;  set CEDRS_CO_temp;
    if index(Address1,'DO NOT')>0 then Address1='';
    if index(Address1,"DON'T")>0 then Address1='';
 
-   if Address1 in ('GENERAL DELIVERY', 'N', 'N/A', 'NA', 'NEED', 'NONE', 
+   if Address1 in ('BAD ADDRESS','GENERAL DELIVERY', 'N', 'N/A', 'NA', 'NEED', 'NONE', 
                   'U', 'UKNOWN', 'UNDOMICILED', 'UNK', 'UNKNOWN'  ) then 
       Address1='';
 
+   if index(Address1,"ADD NEW")=1 then Address1='';
+   if index(Address1,"ADDRESS")=1 then Address1='';
    if index(Address1,"HOMELESS")=1 then Address1='';
    if index(Address1,"HOTEL")=1 then Address1='';
    if index(Address1,"INTERSTATE")=1 then Address1='';
@@ -341,6 +342,10 @@ DATA CEDRS_CO2;  set CEDRS_CO_temp;
    if ProfileID= '2219301' then Address_City = 'HOWARD';
    if ProfileID= '2252046' then Address_City = 'AURORA';
 
+   if ProfileID= '2437325' then Address_City = 'CANON CITY';
+   if ProfileID= '2437326' then Address_City = 'CANON CITY';
+   if ProfileID= '2447448' then Address_City = 'CANON CITY';
+   if ProfileID= '2447449' then Address_City = 'CANON CITY';
 
    DROP tmp_Address1 ;
 
@@ -357,7 +362,7 @@ run;
 run;
 /*---------------------------------------------------------------------------------*
  |FINDINGS:
- |  N=289,413 filtered cases from Colorado with Address, City, and County data
+ |  N=289,408 filtered cases from Colorado with Address, City, and County data
  *---------------------------------------------------------------------------------*/
 
 
@@ -540,6 +545,8 @@ run;
 
    PROC contents data=HHcases2  varnum; title1 'HHcases2'; run;
 
+** To get the number of eligible HH and number of cases in those HH **;
+   proc means data= HHcases2 n sum maxdec=0; var HHcasesTotal; run;
 ** To get the number of clusters per HH **;
 /*   proc freq data= HHcases noprint; tables CountyAssigned * Address_City * Address1  /list out=CountClustersperHH; */
 /*   proc freq data= CountClustersperHH; tables count; title1 'Number of clusters per HH'; run;*/

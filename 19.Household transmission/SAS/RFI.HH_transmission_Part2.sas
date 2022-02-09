@@ -3,8 +3,8 @@ PROGRAM:  RFI.HH_transmission_Part2.sas
 AUTHOR:   Eric Bush
 CREATED:  November 10, 2021
 MODIFIED: February 1, 2022	
-PURPOSE:	  re-do HH transmission for Jan (start of 2nd semester)
-INPUT:	 	  
+PURPOSE:	 Add third time period to HH transmission study: 01JAN22 - 31JAN22 (start of 2nd semester)
+INPUT:	 COVID.CEDRS_view_fix	  
 OUTPUT:		
 ***********************************************************************************************/
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
@@ -33,6 +33,13 @@ run;
 
    PROC contents data=CEDRS_filtered2  varnum ;  title1 'CEDRS_filtered2';  run;
 
+
+*** Check completeness of date data ***;
+***------------------------------------***;
+
+   PROC means data= CEDRS_filtered2  maxdec=0 n nmiss;
+      var ReportedDate  CollectionDate ;
+run;
 
 
 *** Check completeness of address data ***;
@@ -314,6 +321,7 @@ run;
 *** Filter out records with missing address and age ***;
 *** and DROP unnecessary variables                  ***;
 ***-------------------------------------------------***;
+
 DATA CEDRS_Addresses2;  set CEDRS_CO2;
    where (Address1 ne '')  AND (Address_City ne '')  ;
 
@@ -334,7 +342,7 @@ run;
 **  Sort filtered cases on address variables to define HH  **;
    proc sort data=CEDRS_Addresses2
                out=Address1_sort2;
-      by CountyAssigned  Address_City  Address1  ReportedDate ;
+      by CountyAssigned  Address_City  Address1  CollectionDate ;
 run;
 
 ** Preview Address1 data **;
@@ -355,14 +363,14 @@ DATA CEDRS_HouseHolds2
    by CountyAssigned  Address_City  Address1 ;
 
    if first.Address1 then do;  NumCases_HH=0;  Cluster=1;  NumCases_Cluster=0;  Days_since_last_case=0;  end;
-   else Days_since_last_case = ReportedDate - lag(ReportedDate);
+   else Days_since_last_case = CollectionDate - lag(CollectionDate);
 
    NumCases_HH+1;
 
    if Days_since_last_case >30 then do; Cluster+1;  NumCases_Cluster=0;  Days_since_last_case=0;  end;
 
    NumCases_Cluster+1;
-   Days_since_last_case = ReportedDate - lag(ReportedDate);
+   Days_since_last_case = CollectionDate - lag(CollectionDate);
 
    if last.Address1 then do;
       if NumCases_HH=1 then delete;
@@ -372,7 +380,7 @@ DATA CEDRS_HouseHolds2
   output CEDRS_HouseHolds2;
 run;
 /*   proc print data=FlagAddress; run;*/
-/*   proc print data= CEDRS_HouseHolds;  id Address1; var NumCases_HH  Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+/*   proc print data= CEDRS_HouseHolds;  id Address1; var NumCases_HH  Address_City Address_State Age_at_Reported CollectionDate ;  run;*/
 /*   proc freq data= CEDRS_HouseHolds noprint; tables CountyAssigned * Address_City * Address1/list out=CountCasesperHH; */
 /*   proc freq data= CountCasesperHH; tables count; title1 'Number of cases per HH'; run;*/
 
@@ -386,7 +394,7 @@ Data CEDRS_HH2; merge FlagAddress2(in=x)  CEDRS_HouseHolds2 ;
 
    if NumCases_Cluster=1 then Days_between_cases=0;
 run;
-/*   proc print data= CEDRS_HH;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported ReportedDate ;  run;*/
+/*   proc print data= CEDRS_HH;  id ProfileID; var Address1 Address_City Address_State Age_at_Reported CollectionDate ;  run;*/
 /*   proc freq data= CEDRS_HH noprint; tables CountyAssigned * Address_City * Address1/list out=CasesperHH; */
 /*   proc freq data= CasesperHH; tables count; title1 'Number of cases per HH'; run;*/
 
@@ -394,11 +402,11 @@ run;
 *** Transpose data from Case level (tall) to HH level (wide) ***;
 ***----------------------------------------------------------***;
 
-* transpose ReportedDate *;
+* transpose CollectionDate *;
    PROC transpose data=CEDRS_HH2  
    out=WideDSN1(drop= _NAME_)
-      prefix=ReportedDate ; 
-      var ReportedDate;          
+      prefix=CollectDate ; 
+      var CollectionDate;          
       by CountyAssigned  Address_City  Address1  Cluster ;
 run;
 /*   proc print data= WideDSN1;  run;*/
@@ -429,7 +437,7 @@ run;
 DATA HHcases2; merge WideDSN1  WideDSN2  WideDSN3  ;
    by CountyAssigned  Address_City  Address1  Cluster ;
 
-   ARRAY RptDates{10} ReportedDate1-ReportedDate10 ;
+   ARRAY CollectDates{10} CollectDate1-CollectDate10 ;
    ARRAY AGvars{10} AG1-AG10 ;
 
    do i = 1 to 10;

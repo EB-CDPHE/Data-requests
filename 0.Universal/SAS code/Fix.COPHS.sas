@@ -31,7 +31,15 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 ***  Make edits to CEDRS_view_read and create COVID.CEDRS_view_fix  ***;
 ***-----------------------------------------------------------------***;
 
-DATA COVID.COPHS_fix;  set COPHS_read;
+
+** STEP 1:  De-duplicate records with identical MR_Number, DOB, Hosp_Admission, Facility_Name and Date_Left_Facility **;
+   proc sort data= COPHS_read  
+              out= COPHS_DeDup_Admit  NODUPKEY ;  
+      by MR_Number DOB  Hosp_Admission  Facility_Name  Date_Left_Facility ; 
+run;
+ 
+
+DATA COVID.COPHS_fix;  set COPHS_DeDup_Admit;
 /*   Region = put(County_of_Residence, $WestSlope. );*/
 
 ** 1) Remove duplicate record  **;

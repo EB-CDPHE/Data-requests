@@ -14,6 +14,8 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
 
 /*-----------------------------------------------------------------------------------------*
  | Data Checks for COPHS:
+ | -->  ADMIT level variables  <--
+ | a) missing hospital admit date
  | -->  PATIENT level variables  <--
  | 1. Duplicate records (per MR_Number)
  |    1.1) Records with 4 or more admissions
@@ -51,6 +53,32 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 
    PROC contents data= COPHS_read varnum;  title1 'COPHS_read';  run;
+
+***  a) Missing Hosp_Admission date  ***;
+***-----------------------------------***;
+
+**  Completeness of selected date variables  **;
+   PROC means data= COPHS_read n nmiss ;
+      var Hosp_Admission  DOB  Positive_Test;
+run;
+
+**  Completeness of selected date variables  **;
+   PROC print data= COPHS_read  ;
+      where Hosp_Admission=.;
+      var Facility_Name MR_Number DOB  First_Name Last_Name Gender Race City County_of_Residence   Positive_Test;
+run;
+
+   PROC print data= COPHS_read  ;
+      where Hosp_Admission=.  AND .< year(Positive_Test) <1901;
+      var Facility_Name MR_Number DOB  First_Name Last_Name Gender Race City County_of_Residence   Positive_Test;
+run;
+/*------------
+ |FINDINGS:
+ | n=95 obs where Hosp_Admission=.
+ | n=5 of them have valid data in other fields
+ | n=90 of them have junk data. Seems like data is in wrong variables.
+ | Remove these in Access.COPHS.sas since they impact variable length
+ *----*/
 
 
 ***  1. Duplicate records  ***;
@@ -143,7 +171,7 @@ run;
       id MR_Number;
       by MR_Number;
       var DOB Gender Hosp_Admission Facility_Name Current_Level_of_care        
-          Discharge_Transfer_Death_Disposi   Date_Left_Facility  DateAdded;
+          Discharge_Transfer_Death_Disposi   Date_Left_Facility  ;
       format Last_Name $10.   Discharge_Transfer_Death_Disposi $20. Facility_Name $32.  ;*DateAdded  mmddyy. ;
    title2 'List of dup records with same Hospital admission date';
 run;
@@ -259,13 +287,14 @@ run;
 
 ** Gender **;
    PROC freq data= COPHS_read;
+      where datepart(date_added) ^= '19FEB22'd ;
       tables Gender / missing missprint;
 run;
 
 /*____________________________________________________________________________________*
  |FINDINGS:
- | n=10 records where Gender = "F" (and not "Female").
- | n=21 records where Gender = "M" (and not "Male").
+ | n=375 records where Gender = "F" (and not "Female").
+ | n=430 records where Gender = "M" (and not "Male").
  | n=4 records where Gender = "Unknown"
  *____________________________________________________________________________________*/
 
@@ -274,8 +303,16 @@ run;
       id MR_Number;
       by gender;
       var  First_Name Last_Name DOB Gender city county_of_residence EventID;
+      title2 'Gender is Unknown';
+run;
+
+   PROC print data= COPHS_read;
+      where ANYdigit(Gender)>0  ;
+      id MR_Number;
+/*      var  Hosp_Admission First_Name Last_Name DOB Gender city county_of_residence EventID;*/
       title2 'bad values for Gender';
 run;
+
 
 
 ***  5. City  ***;
@@ -757,6 +794,12 @@ run;
 
 /*-----------------------------------------------------------------------*
  |FINDINGS:
+ | n=1 "AA" and n=1 "AS".  FIX: Change to "Unknown or Unreported"
+ | n=1 "ASIAN".  FIX: Race=PropCase(Race)
+ | n=1  "American Indian Alaska Native"  FIX: Add "/"
+ | n=128 "CA".  FIX:  Change to "Caucasian"
+ | n=13 "HI" and n=14 "HISPANIC".  FIX: Change to "Unknown or Unreported"
+ | n=1 "OT".  FIX: Change to "Other"
  | n=1 "Other Race".  FIX: Change to "Other".
  | n=3 "Native Hawaiian or Other Pacific Islan".  
  |     FIX:  Change to "Pacific Islander/Native Hawaiian"

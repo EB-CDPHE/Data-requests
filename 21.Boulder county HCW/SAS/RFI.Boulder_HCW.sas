@@ -4,7 +4,7 @@ AUTHOR:   Eric Bush
 CREATED:  December 13, 2021
 MODIFIED:	
 PURPOSE:	  
-INPUT:	 	  
+INPUT:	 Patient_Occupation  (created via Access.DrJustina_prod.sas)	  
 OUTPUT:		
 ***********************************************************************************************/
 options ps=50 ls=150 ;     * Landscape pagesize settings *;

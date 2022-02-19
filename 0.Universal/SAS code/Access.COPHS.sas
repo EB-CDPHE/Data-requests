@@ -118,6 +118,10 @@ DATA COPHS_temp;
       Partial
       tmp_:  ;
 
+   * Remove obs with missing Hospital Admit date AND have bogus data (i.e. Positive_Test in 1900) *;
+   if Hosp_Admission=.  AND .< year(Positive_Test) <1901 then DELETE;
+
+
 run;
 
 

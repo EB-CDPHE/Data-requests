@@ -797,9 +797,10 @@ run;
  | n=1 "AA" and n=1 "AS".  FIX: Change to "Unknown or Unreported"
  | n=1 "ASIAN".  FIX: Race=PropCase(Race)
  | n=1  "American Indian Alaska Native"  FIX: Add "/"
- | n=128 "CA".  FIX:  Change to "Caucasian"
+ | n=128 "CA".          FIX:  Change to "White"
+ | n=265 "CAUCASIAN".   FIX:  Change to "White"
  | n=13 "HI" and n=14 "HISPANIC".  FIX: Change to "Unknown or Unreported"
- | n=1 "OT".  FIX: Change to "Other"
+ | n=1 "OT".          FIX: Change to "Other"
  | n=1 "Other Race".  FIX: Change to "Other".
  | n=3 "Native Hawaiian or Other Pacific Islan".  
  |     FIX:  Change to "Pacific Islander/Native Hawaiian"

@@ -1,7 +1,7 @@
 /**********************************************************************************************
 PROGRAM:  HEADER.sas
 AUTHOR:   Eric Bush
-CREATED:  October 22, 2021
+CREATED:  February 21, 2022
 MODIFIED:	
 PURPOSE:	  
 INPUT:	 	  
@@ -14,6 +14,7 @@ title;  options pageno=1;
 
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data'; run;
+
 
 *** Create local copy of data for selected variables  ***;
 ***---------------------------------------------------***;

@@ -30,6 +30,73 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
 
 ***  Make edits to CEDRS_view_read and create COVID.CEDRS_view_fix  ***;
 ***-----------------------------------------------------------------***;
+  PROC format;   value $CntyChk
+   'ADAMS'        = 'ADAMS'
+   'ALAMOSA'      = 'ALAMOSA'
+   'ARAPAHOE'     = 'ARAPAHOE'
+   'ARCHULETA'    = 'ARCHULETA'
+   'BACA'         = 'BACA'
+   'BENT'         = 'BENT'
+   'BOULDER'      = 'BOULDER'
+   'BROOMFIELD'   = 'BROOMFIELD'
+   'CHAFFEE'      = 'CHAFFEE'
+   'CHEYENNE'     = 'CHEYENNE'
+   'CLEAR CREEK'  = 'CLEAR CREEK'
+   'CONEJOS'      = 'CONEJOS'
+   'COSTILLA'     = 'COSTILLA'
+   'CROWLEY'      = 'CROWLEY'
+   'CUSTER'       = 'CUSTER'
+   'DELTA'        = 'DELTA'
+   'DENVER'       = 'DENVER'
+   'DOLORES'      = 'DOLORES'
+   'DOUGLAS'      = 'DOUGLAS'
+   'EAGLE'        = 'EAGLE'
+   'ELBERT'       = 'ELBERT'
+   'EL PASO'      = 'EL PASO'
+   'FREMONT'      = 'FREMONT'
+   'GARFIELD'     = 'GARFIELD'
+   'GILPIN'       = 'GILPIN'
+   'GRAND'        = 'GRAND'
+   'GUNNISON'     = 'GUNNISON'
+   'HINSDALE'     = 'HINSDALE'
+   'HUERFANO'     = 'HUERFANO'
+   'JACKSON'      = 'JACKSON'
+   'JEFFERSON'    = 'JEFFERSON'
+   'KIOWA'        = 'KIOWA'
+   'KIT CARSON'   = 'KIT CARSON'
+   'LAKE'         = 'LAKE'
+   'LA PLATA'     = 'LA PLATA'
+   'LARIMER'      = 'LARIMER'
+   'LAS ANIMAS'   = 'LAS ANIMAS'
+   'LINCOLN'      = 'LINCOLN'
+   'LOGAN'        = 'LOGAN'
+   'MESA'         = 'MESA'
+   'MINERAL'      = 'MINERAL'
+   'MOFFAT'       = 'MOFFAT'
+   'MONTEZUMA'    = 'MONTEZUMA'
+   'MONTROSE'     = 'MONTROSE'
+   'MORGAN'       = 'MORGAN'
+   'OTERO'        = 'OTERO'
+   'OURAY'        = 'OURAY'
+   'PARK'         = 'PARK'
+   'PHILLIPS'     = 'PHILLIPS'
+   'PITKIN'       = 'PITKIN'
+   'PROWERS'      = 'PROWERS'
+   'PUEBLO'       = 'PUEBLO'
+   'RIO BLANCO'   = 'RIO BLANCO'
+   'RIO GRANDE'   = 'RIO GRANDE'
+   'ROUTT'        = 'ROUTT'
+   'SAGUACHE'     = 'SAGUACHE'
+   'SAN JUAN'     = 'SAN JUAN'
+   'SAN MIGUEL'   = 'SAN MIGUEL'
+   'SEDGWICK'     = 'SEDGWICK'
+   'SUMMIT'       = 'SUMMIT'
+   'TELLER'       = 'TELLER'
+   'WASHINGTON'   = 'WASHINGTON'
+   'WELD'         = 'WELD'
+   'YUMA'         = 'YUMA'
+   other = 'NON-COLO COUNTY NAME';
+run;
 
 
 ** STEP 1:  De-duplicate records with identical MR_Number, DOB, Hosp_Admission, Facility_Name and Date_Left_Facility **;
@@ -93,10 +160,25 @@ DATA COVID.COPHS_fix;  set COPHS_DeDup_Admit;
    Discharge_Transfer_Death_Disposi = propcase(Discharge_Transfer_Death_Disposi);
 
 ** 7) Fix race and ethncity responses  **;
-   if Race = "Other Race" then Race = "Other";
-   if Race = "Native Hawaiian or Other Pacific Islan" then Race = "Pacific Islander/Native Hawaiian";
+   Race = PropCase(Race);
+
+   if upcase(Race) in ("AA","AS") then Race = "Unknown Or Unreported";
+   if Race = "American Indian Alaska Native" then Race = "American Indian/Alaskan Native";
+   if upcase(Race) in ("CA","CAUCASIAN") then Race = "White";
+   if upcase(Race) in ("HI","HISPANIC") then Race = "Unknown Or Unreported";
+   if upcase(Race) in ("OT") then Race = "Other";
+   if Race in ("Other Race") then Race = "Other";
+   if Race in ("More Than One Race") then Race = "Multiple races";
+   if Race in ("Multiple") then Race = "Multiple races";
+   if Race = "Native Hawaiian Or Other Pacific Islan" then Race = "Pacific Islander/Native Hawaiian";
+   if Race = "Declined to specify" then Race = "Unknown Or Unreported";
+
    if Ethnicity = "Declined to specify" then Ethnicity = "Unknown or Unreported";
+   if Ethnicity = "-" then Ethnicity = "Unknown or Unreported";
    if Ethnicity = "Non-Hispanic or Latino" then Ethnicity = "Non Hispanic or Latino";
+   if Ethnicity = "Multiple" then Ethnicity = "Unknown or Unreported";
+   if Ethnicity = "Pre-Admission" then Ethnicity = "Unknown or Unreported";
+
 
 run;
 

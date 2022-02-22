@@ -14,17 +14,42 @@ title;  options pageno=1;
 
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
 libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data'; run;
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 
 
 *** Create local copy of data for selected variables  ***;
 ***---------------------------------------------------***;
 
 DATA COPHS_fix;  set COVID.COPHS_fix;
-/*   Keep EventID CountyAssigned  ReportedDate  CaseStatus  Outcome;*/
+   where '01MAR2020'd  le  Hosp_Admission le  '01DEC2022'd; ;
+   Keep Facility_Name MR_Number First_Name Last_Name Gender Race Ethnicity County_of_Residence
+        Date_Added COPHS_Breakthrough COVID19ICD10 Hosp_Admission ICU_Admission DOB Positive_Test ;
 run;
 
    PROC contents data=COPHS_fix  varnum; title1 'COPHS_fix'; run;
 
+
+
+*** Number of cases by Ethnicity and Race ***;
+***---------------------------------------***;
+   PROC means data=COPHS_fix  n  maxdec=0;
+      var Hosp_Admission ;
+      class Ethnicity;
+      title1 'Number of Hospitalizations:  Hispanics';
+run;
+   PROC means data=COPHS_fix  n  maxdec=0;
+      where Ethnicity ^= 'Hispanic or Latino';
+      var Hosp_Admission ;
+      title1 'Number of Hospitalizations:  Non-Hispanics';
+      class Race;
+run;
+
+   PROC freq data= COPHS_fix ;
+      tables Hosp_Admission * Ethnicity /norow nocol nopercent  ;
+      format Hosp_Admission monyy. ;
+      title1 'Number of Hospitalizations:  Hispanics';
+      title2 'by Month';
+run;
 
 
 ***  Access population data  ***;
@@ -77,7 +102,7 @@ run;
 
 
 ** Copy County population data by Race, Age, Gender to dashboard directory **;
-libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 DATA DASH.County_Race; set County_Race;
+run;
 
 

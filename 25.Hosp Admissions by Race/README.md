@@ -17,7 +17,8 @@ Here are the SAS programs used to respond to this data request:
 |1.|[Access.COPHS](../0.Universal/SAS%20code/Access.COPHS.sas) pulls data from dbo144 Hosp.COPHS_tidy and curates it.|
 |2.|[Check.COPHS](../0.Universal/SAS%20code/Check.COPHS.sas) checks COPHS data quality.|
 |3.|[FIX.COPHS](../0.Universal/SAS%20code/Fix.COPHS.sas) edits COPHS data.|
-|4.|[GET.CO_Population_Race.sas](./SAS/GET.CO_Population_Race.sas) filters CEDRS data to population defined above.|
+|4.|[GET.CO_Population_Race.sas](./SAS/GET.CO_Population_Race.sas) downloads data from Colorado's State Demography Office to obtain 2020 population counts by County, Age, Race, and Ethnicity.|
+|5.|[RFI.Hosp_rates_Race.sas](./SAS/RFI.Hosp_rates_Race.sas) to prep COPHS data for use in Tableau and to generate basic counts of cases and population by single Race-Ethnicity categories.
 
 The RFI.Pediatric_cases.sas program filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.
 

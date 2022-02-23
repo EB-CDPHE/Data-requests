@@ -29,12 +29,12 @@ Here are the steps to navigate to the data source:
 2. Population Spreadsheets: Download population datga for all geographies
 
 
-![SDO_page1](./Images/SDO_page1.png)
+![SDO_page1](./Images/SDO_page1box.png)
 
 3. County Population Estimates by Race/Ethnicity, Age and Sex, 2010 to 2020
 
 
-![SDO_page2](Images/SDO_page2.png)
+![SDO_page2](Images/SDO_page2box.png)
 
 Then the following steps were taken to process the downloaded demographic data:
 1. download csv. Default filename is "race-estimates-county.csv" 
@@ -53,13 +53,19 @@ The SAS dataset County_Race_POP2020 is created via this section of code:
 +   else Race_Ethnicity=Race;
 +run;
 ````
+Here is the 2020 population count by single Race-Ethnicity:
+![PopCounts](./Images/Population%20counts%20by%20Race.png)
 
- filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.
+Since the SDO County population data uses County FIPS codes only, another temp dataset that links County FIPS codes with County names was used to join with County_Race_POP2020. The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.County_Population
+
+
 
 Viz and data tables are also constructed in Tableau workbook.
 
-### "Pediatric cases by race" is the Tableau workbook with final charts and tables.
-The workbook has two worksheets for the Ethnicity viz - a bar chart and a stacked bar chart. The bar chart worksheet was duplicated as a crosstab to generate the data table. There is also a worksheet for the Race viz and it's corresponding data table.
+### RFI.Hosp_rates_Race.sas.
+The COPHS_fix dataset is filtered by `Hosp_Admission` where dates are between 01OCT2020 and 01DEC2022 per request and to exclude invalid date values. The indicator variable for Colorado residents was modified in the COPHS.fix code and used to filter data to only Colorado residents. Only selected variables are retained.
+
+ are workbook has two worksheets for the Ethnicity viz - a bar chart and a stacked bar chart. The bar chart worksheet was duplicated as a crosstab to generate the data table. There is also a worksheet for the Race viz and it's corresponding data table.
 
 A copy of the workbook has been placed on the J: drive in this directory: J:\Programs\Other Pathogens or Responses\2019-nCoV\Tableau
 

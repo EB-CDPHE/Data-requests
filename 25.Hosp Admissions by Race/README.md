@@ -14,10 +14,10 @@ Here are the SAS programs used to respond to this data request:
 
 |Run order|SAS program|
 |---------|-----------|
-|1.|[Access.COPHS](../0.Universal/SAS%20code/Access.COPHS.sas) pulls data from dbo144 COVID19 and curates it.|
-|2.|[Check.COPHS](../0.Universal/SAS%20code/Check.COPHS.sas) edits data in CEDRS.|
-|3.|[FIX.COPHS](../0.Universal/SAS%20code/Fix.COPHS.sas) edits data in CEDRS.|
-|4.|[GET.CO_Population_Race.sas](./SAS) filters CEDRS data to population defined above.|
+|1.|[Access.COPHS](../0.Universal/SAS%20code/Access.COPHS.sas) pulls data from dbo144 Hosp.COPHS_tidy and curates it.|
+|2.|[Check.COPHS](../0.Universal/SAS%20code/Check.COPHS.sas) checks COPHS data quality.|
+|3.|[FIX.COPHS](../0.Universal/SAS%20code/Fix.COPHS.sas) edits COPHS data.|
+|4.|[GET.CO_Population_Race.sas](./SAS/GET.CO_Population_Race.sas) filters CEDRS data to population defined above.|
 
 The RFI.Pediatric_cases.sas program filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.
 

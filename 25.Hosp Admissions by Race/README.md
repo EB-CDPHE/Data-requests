@@ -26,10 +26,33 @@ https://coloradodemography.github.io/WebsiteGrid/assets/html/population.html
 Here are the steps to navigate to the data source:
 
 1. Data by Topic:  Population
-2. 
-![SDO_page1]()
+2. Population Spreadsheets: Download population datga for all geographies
+
+
+![SDO_page1](./Images/SDO_page1.png)
+
+3. County Population Estimates by Race/Ethnicity, Age and Sex, 2010 to 2020
+
 
 ![SDO_page2](Images/SDO_page2.png)
+
+Then the following steps were taken to process the downloaded demographic data:
+1. download csv. Default filename is "race-estimates-county.csv" 
+2. open CSV file, delete ID column, Rename Tab to DATA --> then save as Excel file
+3. Save as Excel file file in INPUT folder
+
+The SAS dataset County_Race_POP2020 is created via this section of code:
+````diff
++DATA County_Race_POP2020; length Race_Ethnicity $ 22 ;  set mysheets.DATA;
++   where year=2020;
++   rename sex=Gender;
++   rename count=Population;
++
++* create single Race - Ethnicity variable *;
++   if Ethnicity = 'Hispanic Origin' then Race_Ethnicity='Hispanic Origin';
++   else Race_Ethnicity=Race;
++run;
+````
 
  filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.
 

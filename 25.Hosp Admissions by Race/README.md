@@ -20,7 +20,18 @@ Here are the SAS programs used to respond to this data request:
 |4.|[GET.CO_Population_Race.sas](./SAS/GET.CO_Population_Race.sas) downloads data from Colorado's State Demography Office to obtain 2020 population counts by County, Age, Race, and Ethnicity.|
 |5.|[RFI.Hosp_rates_Race.sas](./SAS/RFI.Hosp_rates_Race.sas) to prep COPHS data for use in Tableau and to generate basic counts of cases and population by single Race-Ethnicity categories.
 
-The RFI.Pediatric_cases.sas program filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.
+The GET.CO_Population_Race.sas obtains data accessed at this website:
+https://coloradodemography.github.io/WebsiteGrid/assets/html/population.html
+
+Here are the steps to navigate to the data source:
+
+1. Data by Topic:  Population
+2. 
+![SDO_page1]()
+
+![SDO_page2](Images/SDO_page2.png)
+
+ filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.
 
 Viz and data tables are also constructed in Tableau workbook.
 

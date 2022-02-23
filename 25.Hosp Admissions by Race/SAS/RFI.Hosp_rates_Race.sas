@@ -3,9 +3,10 @@ PROGRAM:  RFI.Hosp_rates_Race.sas
 AUTHOR:   Eric Bush
 CREATED:  February 21, 2022
 MODIFIED:	
-PURPOSE:	  
+PURPOSE:	 Prep curated and edited COPHS data for use in Tableau 
+          to calculate moving average of Hosp rates by Race - Ethnicity
 INPUT:	 COVID.COPHS_fix     	  
-OUTPUT:		
+OUTPUT:	 DASH.COPHS_fix	
 ***********************************************************************************************/
 options ps=65 ls=110 ;     * Portrait pagesize settings *;
 options ps=50 ls=150 ;     * Landscape pagesize settings *;
@@ -17,16 +18,60 @@ libname MyGIT 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data';
 libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 
 
-*** Create local copy of data for selected variables  ***;
-***---------------------------------------------------***;
+ * Programs run prior to this one *;
+/*--------------------------------*
+ | 1. Access.COPHS.sas
+ | 2. Check.COPHS.sas
+ | 3. Fix.COHPS.sas
+ | 4. CO_Population_Race.sas
+ *--------------------------------*/
+
+
+*** How many COPHS records are for patients outside of CO? ***;
+***--------------------------------------------------------***;
+
+   PROC freq data= COVID.COPHS_fix; tables CO; run;
+
+/*-------------------------------------------------------------------*
+ |FINDINGS:
+ | n=2970 records where CO=0
+ | n=86 records where CO=9 (mistakenly classified in COPHS as CO=1
+ | Over 95% of records CO=1 (n=61,786);
+ | FIX:  Filter on CO=1
+ *-------------------------------------------------------------------*/
+
+   PROC freq data= COVID.COPHS_fix; tables Ethnicity * Race / list ; run;
+
+
+*** Create local copy of filtered data for selected variables  ***;
+***------------------------------------------------------------***;
 
 DATA COPHS_fix;  set COVID.COPHS_fix;
-   where '01MAR2020'd  le  Hosp_Admission le  '01DEC2022'd; ;
-   Keep Facility_Name MR_Number First_Name Last_Name Gender Race Ethnicity County_of_Residence
-        Date_Added COPHS_Breakthrough COVID19ICD10 Hosp_Admission ICU_Admission DOB Positive_Test ;
+   where ('01MAR2020'd  le  Hosp_Admission le  '01DEC2022'd)  AND  CO=1 ;
+
+**  --> NOTE:  Lumps non-Hispanics and Unknown/Unreported together  <--  **;
+   if Ethnicity = 'Hispanic or Latino' then Race_Ethnicity='Hispanic Origin';
+   else if Race = 'American Indian/Alaskan Native' then Race_Ethnicity='American Indian';
+   else if Race in ('Asian','Pacific Islander/Native Hawaiian') then Race_Ethnicity='Asian/Pacific Islander';
+   else if Race = 'Black, African American' then Race_Ethnicity='Black';
+   else if Race = 'White' then Race_Ethnicity='White';
+   else Race_Ethnicity=Race;
+
+
+   Keep Facility_Name MR_Number First_Name Last_Name Gender Race Ethnicity County_of_Residence  CO
+        Date_Added COPHS_Breakthrough COVID19ICD10 Hosp_Admission ICU_Admission DOB Positive_Test 
+        Race_Ethnicity ;
 run;
 
    PROC contents data=COPHS_fix  varnum; title1 'COPHS_fix'; run;
+
+
+*** County data ***;
+***-------------***;
+
+   PROC freq data= COPHS_fix; 
+      tables CO  County_of_Residence ; 
+run;
 
 
 
@@ -43,66 +88,32 @@ run;
       title1 'Number of Hospitalizations:  Non-Hispanics';
       class Race;
 run;
+   PROC means data=COPHS_fix  n  maxdec=0;
+      var Hosp_Admission ;
+      title1 'Number of Hospitalizations:  Race_Ethnicity';
+      class Race_Ethnicity;
+run;
 
    PROC freq data= COPHS_fix ;
-      tables Hosp_Admission * Ethnicity /norow nocol nopercent  ;
+      tables Hosp_Admission * Race_Ethnicity /norow nocol nopercent  ;
       format Hosp_Admission monyy. ;
-      title1 'Number of Hospitalizations:  Hispanics';
+      title1 'Number of Hospitalizations:  Race_Ethnicity';
       title2 'by Month';
 run;
 
 
-***  Access population data  ***;
-***--------------------------***;
+*** Copy COPHS data to dashboard directory ***;
+***----------------------------------------***;
 
-***  Obtain county population data for Race and Ethnicity  ***;
-***--------------------------------------------------------***;
-
-/*_________________________________________________________________________________________*
- | For 2020 county level population data BY RACE and ETHNICITY:
- |-----------------------------------------------------------------------------------------------------------------*
- | SOURCE:  https://coloradodemography.github.io/WebsiteGrid/assets/html/population.html  
- | STEPS:
- |  1) In section for County Spreadsheets, select "County Population Estimates by Race/Ethlnicity, Age and Sex
- |  2) download csv, filter rows to Year=2020, and save as race-estimates-county-2020.csv 
- |  3) edit CSV file by formatting population count column as number with no decimals; delete ID column
- |  4) Save as County_Age_Gender_Race_2020pop.XLSX file in INPUT folder
- *-----------------------------------------------------------------------------------------------------------------*/
-
-** Create libname with XLSX engine that points to XLSX file **;
-libname mysheets xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\25.Hosp Admissions by Race\Input data\County_Age_Gender_Race_2020pop.xlsx' ;
-
-
-** see contents of libref - one dataset for each tab of the spreadsheet **;
-   PROC contents data=mysheets._all_  varnum ; title1; run;
-
-** print tabs from spreadsheet **;
-   proc print data=mysheets.DATA; run;
-
-DATA County_Race; set mysheets.DATA;
-   format County_FIPS z3.0 ;
-   rename sex=Gender;
-   rename count=Population;
-run;
-
-   PROC contents data=County_Race  varnum ; title1 'County_Race'; run;
-
-** Calculate 2020 Colorado Population count by Race and Ethnicity **;
-   PROC means data=County_Race  sum  maxdec=0;
-      where Ethnicity = 'Hispanic Origin';
-      var Population;
-      class Ethnicity ;
-run;
-
-   PROC means data=County_Race  sum  maxdec=0;
-      where Ethnicity ^= 'Hispanic Origin';
-      var Population;
-      class Race ;
+DATA DASH.COPHS_fix; set COPHS_fix;
 run;
 
 
-** Copy County population data by Race, Age, Gender to dashboard directory **;
-DATA DASH.County_Race; set County_Race;
+*** Use output in spreadsheet to check calculation of moving average of hosp rates ***;
+   proc freq data=DASH.COPHS_fix ;
+   where ('01DEC2021'd  le  Hosp_Admission le  '31DEC2021'd);
+   table Hosp_Admission * Race_Ethnicity   /out=REcases ;
 run;
+
 
 

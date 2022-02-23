@@ -46,7 +46,7 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 *** Create local copy of filtered data for selected variables  ***;
 ***------------------------------------------------------------***;
 
-DATA COPHS_fix;  set COVID.COPHS_fix;
+DATA COPHS_fix;  length Race_Ethnicity $ 22 ;  set COVID.COPHS_fix;
    where ('01MAR2020'd  le  Hosp_Admission le  '01DEC2022'd)  AND  CO=1 ;
 
 **  --> NOTE:  Lumps non-Hispanics and Unknown/Unreported together  <--  **;
@@ -92,6 +92,7 @@ run;
       var Hosp_Admission ;
       title1 'Number of Hospitalizations:  Race_Ethnicity';
       class Race_Ethnicity;
+      format Race_Ethnicity $22. ;
 run;
 
    PROC freq data= COPHS_fix ;

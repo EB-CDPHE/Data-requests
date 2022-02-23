@@ -1,10 +1,12 @@
 ## Background 
-This is a new RFI.
+Rachel Herily requested, via Alicia Cronquist, a slide of daily hospitalizations per 100,000 by Race - Ethnicity. The email forwarded to me from Eduardo is [here](Documents/Email_request_021822.pdf).
 
-**Population**:  Confirmed COVID cases (not probable) in Colorado minors (0-<18 years old).   **Data requested**: Number and percent of cases between March 1, 2020 and August 30, 2021. **Groups**: Race and Ethnicity. And three time periods:
-* Time Period 1:   3/1/20 - 9/30/20
-* Time Period 2:  10/1/20 - 3/31/21
-* Time Period 3:   4/1/21 - 8/31/21
+**Population**:  COPHS hospitalization data for Colorado residents.   **Data requested**: 7 day moving average of the hospitalization rate (new hosp admits per 100,000) for COVID cases hospitalized between October 1, 2020 and the present (February 7, 2022 to account for two week lag). **Groups**: Race and Ethnicity. These two variables were combined to be in alignment with the demographic population data:
+* Hispanic orgin (all races)
+* White (Non-Hispanic origin)
+* Black (Non-Hispanic origin)
+* Asian/Pacific Islander (Non-Hispanic origin)
+* American Indian (Non-Hispanic origin)
 
 
 ## Code
@@ -12,9 +14,10 @@ Here are the SAS programs used to respond to this data request:
 
 |Run order|SAS program|
 |---------|-----------|
-|1.|[Access.CEDRS_view](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from dbo144 COVID19 and curates it.|
-|2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in CEDRS.|
-|3.|[RFI.Pediatric_cases.sas](./SAS/RFI.Pediatric_cases.sas) filters CEDRS data to population defined above.|
+|1.|[Access.COPHS](../0.Universal/SAS%20code/Access.COPHS.sas) pulls data from dbo144 COVID19 and curates it.|
+|2.|[Check.COPHS](../0.Universal/SAS%20code/Check.COPHS.sas) edits data in CEDRS.|
+|3.|[FIX.COPHS](../0.Universal/SAS%20code/Fix.COPHS.sas) edits data in CEDRS.|
+|4.|[GET.CO_Population_Race.sas](./SAS) filters CEDRS data to population defined above.|
 
 The RFI.Pediatric_cases.sas program filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.
 

@@ -55,7 +55,7 @@ The SAS dataset County_Race_POP2020 is created via this section of code:
 ````
 ##
 Here is the 2020 population count by single Race-Ethnicity:
-##
+
 ![PopCounts](./Images/Population%20counts%20by%20Race.png)
 
 Since the SDO County population data uses County FIPS codes only, another temp dataset that links County FIPS codes with County names was used to join with County_Race_POP2020. The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.County_Population
@@ -65,6 +65,7 @@ Since the SDO County population data uses County FIPS codes only, another temp d
 The COPHS_fix dataset is filtered by `Hosp_Admission` where dates are between 01OCT2020 and 01DEC2022 per request and to exclude invalid date values. The indicator variable for Colorado residents was modified in the COPHS.fix code and used to filter data to only Colorado residents. Only selected variables are retained.
 
 Here is the distribution of hospitalizations by Ethnicity:
+
 ![Hosp_Ethnicity](./Images/Hosp_Ethnicity.png)
 
 **NOTE: In the creation of a single Race-Ethnicity variable, Race for those that are not Hispanic or Latino was based on race for Non-Hispanics and also those with unknown or unreported Ethnicity.**

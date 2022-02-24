@@ -72,8 +72,8 @@ Here is the distribution of hospitalizations by Ethnicity:
 
 ##
 Here is the 2020 case count, based on hospital admissions, by single Race-Ethnicity:
-##
-![CaseCounts](./images/Case_counts_by_Race.png)
+
+![CaseCounts](./Images/Case_counts_by_Race.png)
 
 The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.COPHS_fix
 

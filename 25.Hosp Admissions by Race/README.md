@@ -104,7 +104,7 @@ Several viz options were dumped in a slide show and shared with Alicia and Eduar
 https://docs.google.com/presentation/d/1XGIxXtwWbv_2lNuf-Ha9Wr0tHw72OqKCjo_DVGIZW9k/edit#slide=id.g116e0aa68a5_0_22
 
 The final viz chosen by RH was this one:
-![FinalViz]
+![FinalViz](./)
 
 
 ##

@@ -86,29 +86,31 @@ Here is a summary of the sheets and dashboards in Hospitalization rates (7d) by 
 
 |Tab title|Tab type|Description|
 |---------|--------|-----------|
-|Population|Sheet|;alskdjf|
-|Cases|Sheet|l;kj|
-|Case rates|Sheet|lkj
-|Case rate calc|Sheet|lkjdf|
-|Case rate by month|Sheet|lkj
-|Case rate 7d plot|Sheet|
-|Case rate 30d plot|Sheet|
-|HospRate|Dashboard|
-|HospRate_w_Denom|Dashboard|
+|Population|Sheet|Check that population counts by single Race/Ethnicity match SAS table|
+|Cases|Sheet|Check that hosp counts by single Race/Ethnicity match SAS table|
+|Case rates|Sheet|Over lay of bar chart of hospitalization and population counts by Race/Ethnicity
+|Case rate calc|Sheet|Calculation of overall hospitalization rate; i.e. number of hospitalizations per 100,000 people by Race/Ethnicity|
+|Case rate by month|Sheet|Hospitalization rate by month of hospital admission
+|Case rate 7d plot|Line chart of 7 day moving average of hospitalization rate by Race/Ethnicity|
+|Case rate 14d plot|Sheet|Line chart of 30 day moving average of hospitalization rate by Race/Ethnicity|
+|Case rate 30d plot|Sheet|Line chart of 30 day moving average of hospitalization rate by Race/Ethnicity|
+|HospRate|Dashboard|7d average of hospitalization rate by Race/Ethnicity with floating color legend and source footnote.
+|HospRate_w_Denom|Dashboard|7d average of hospitalization rate by Race/Ethnicity with floating color legend, source footnote, and denominator values.
 
-
- are workbook has two worksheets for the Ethnicity viz - a bar chart and a stacked bar chart. The bar chart worksheet was duplicated as a crosstab to generate the data table. There is also a worksheet for the Race viz and it's corresponding data table.
-
-A copy of the workbook has been placed on the J: drive in this directory: J:\Programs\Other Pathogens or Responses\2019-nCoV\Tableau
 
 ## Response
-I copied images of the two Ethnicity charts, the one Race chart, and the two data tables in the Google doc. Here is the link to the Google file [Jan24Response](https://docs.google.com/document/d/1Lqd1g-cuRHGaXNH4M19b8MaWCwmI1ue9H2m0DCzFQBU/edit#heading=h.vo6r01jlzrtw).  
+Several viz options were dumped in a slide show and shared with Alicia and Eduardo: 
+
+https://docs.google.com/presentation/d/1XGIxXtwWbv_2lNuf-Ha9Wr0tHw72OqKCjo_DVGIZW9k/edit#slide=id.g116e0aa68a5_0_22
+
+The final viz chosen by RH was this one:
+![FinalViz]
 
 
 ##
 **Issues:**
 
-* None so far. Oh, except that I'm doing the 'analyze and run' thing.
+* Already mentioned in code section. 
 
 
 

@@ -53,17 +53,49 @@ The SAS dataset County_Race_POP2020 is created via this section of code:
 +   else Race_Ethnicity=Race;
 +run;
 ````
+##
 Here is the 2020 population count by single Race-Ethnicity:
+##
 ![PopCounts](./Images/Population%20counts%20by%20Race.png)
 
 Since the SDO County population data uses County FIPS codes only, another temp dataset that links County FIPS codes with County names was used to join with County_Race_POP2020. The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.County_Population
 
 
-
-Viz and data tables are also constructed in Tableau workbook.
-
 ### RFI.Hosp_rates_Race.sas.
 The COPHS_fix dataset is filtered by `Hosp_Admission` where dates are between 01OCT2020 and 01DEC2022 per request and to exclude invalid date values. The indicator variable for Colorado residents was modified in the COPHS.fix code and used to filter data to only Colorado residents. Only selected variables are retained.
+
+Here is the distribution of hospitalizations by Ethnicity:
+![Hosp_Ethnicity](./Images/Hosp_Ethnicity.png)
+
+**NOTE: In the creation of a single Race-Ethnicity variable, Race for those that are not Hispanic or Latino was based on race for Non-Hispanics and also those with unknown or unreported Ethnicity.**
+
+##
+Here is the 2020 case count, based on hospital admissions, by single Race-Ethnicity:
+##
+![CaseCounts](./images/Case_counts_by_Race.png)
+
+The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.COPHS_fix
+
+## Hospitalization rates (7d) by Race/Ethnicity is the Tableau workbook used to generate final charts
+
+The workbook connects to the two data sources described above, i.e.:
+1. County_Population
+2. COPHS_fix
+
+Here is a summary of the sheets and dashboards in Hospitalization rates (7d) by Race/Ethnicity workbook.
+
+|Tab title|Tab type|Description|
+|---------|--------|-----------|
+|Population|Sheet|;alskdjf|
+|Cases|Sheet|l;kj|
+|Case rates|Sheet|lkj
+|Case rate calc|Sheet|lkjdf|
+|Case rate by month|Sheet|lkj
+|Case rate 7d plot|Sheet|
+|Case rate 30d plot|Sheet|
+|HospRate|Dashboard|
+|HospRate_w_Denom|Dashboard|
+
 
  are workbook has two worksheets for the Ethnicity viz - a bar chart and a stacked bar chart. The bar chart worksheet was duplicated as a crosstab to generate the data table. There is also a worksheet for the Race viz and it's corresponding data table.
 

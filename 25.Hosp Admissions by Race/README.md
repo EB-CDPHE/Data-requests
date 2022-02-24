@@ -93,7 +93,7 @@ Here is a summary of the sheets and dashboards in Hospitalization rates (7d) by 
 |Case rate calc|Sheet|Calculation of overall hospitalization rate; i.e. number of hospitalizations per 100,000 people by Race/Ethnicity|
 |Case rate by month|Sheet|Hospitalization rate by month of hospital admission
 |Case rate 7d plot|Sheet|Line chart of 7 day moving average of hospitalization rate by Race/Ethnicity|
-|Case rate 14d plot|Sheet|Line chart of 30 day moving average of hospitalization rate by Race/Ethnicity|
+|Case rate 14d plot|Sheet|Line chart of 14 day moving average of hospitalization rate by Race/Ethnicity|
 |Case rate 30d plot|Sheet|Line chart of 30 day moving average of hospitalization rate by Race/Ethnicity|
 |HospRate|Dashboard|7d average of hospitalization rate by Race/Ethnicity with floating color legend and source footnote.
 |HospRate_w_Denom|Dashboard|7d average of hospitalization rate by Race/Ethnicity with floating color legend, source footnote, and denominator values.

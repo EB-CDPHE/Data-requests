@@ -22,8 +22,8 @@ OUTPUT:	 COVID.CEDRS_view_fix
  *-----------------------------------------------------------------------------------------------------------*/
 
 ** Contents of the input SAS dataset that was created in the Access.* program and validated with the Check.* programn **;
-
 Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\data'; run;
+
 
    PROC contents data=CEDRS_view_read varnum; run;
 /*   PROC contents data=zDSI_Events_fix varnum; run;*/
@@ -50,10 +50,10 @@ DATA COVID.CEDRS_view_fix ;  set CEDRS_view_read ;
    if EventID= 1294530 then Age_at_Reported=46;
    if EventID= 1392304 then Age_at_Reported=42;
 
-run;
-
 ** 3) impute missing collectiondates **;
    if CollectionDate = . then CollectionDate = ReportedDate;
+
+run;
 
 
 **  2. Contents of final SAS dataset  **;

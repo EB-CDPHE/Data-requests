@@ -29,8 +29,6 @@ options ps=65 ls=110 ;     * Portrait pagesize settings *;
  | 8. Invalid values for County_of_Residence variable
  | 9. DOB
  | 10. Missing positive test dates
-
-
  | -->  HOSPITAL level variables  <--
  | 5. Invalid Hospital admission dates
  | 6. Race

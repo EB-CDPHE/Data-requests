@@ -1,3 +1,4 @@
+
 /**********************************************************************************************
 PROGRAM:    Access.COPHS
 AUTHOR:		Eric Bush
@@ -79,11 +80,15 @@ DATA COPHS_temp;
             (UTD=tmp_UTD
              DOB=tmp_dob
              EventID=tmp_EventID
+             Date_Added=tmp_DateAdded
              )); 
 /*   if MR_Number='4172848' AND Hospital_Admission_Date = '2021-07-01' then Positive_COVID_19_Test_Date = '2021-07-02' ;*/
 
 * Convert temporary numeric ID variable character ID var using the CATS function *;
    EventID = cats(tmp_EventID);
+
+*  Extract date part of date-time variable *;
+   Date_Added = datepart(tmp_DateAdded);   format Date_Added mmddyy10.;
 
 * Convert temporary character var for each date field to a date var *;
    Hosp_Admission    = input(Hospital_Admission_Date, yymmdd10.);          format Hosp_Admission mmddyy10.;

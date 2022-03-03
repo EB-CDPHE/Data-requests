@@ -28,7 +28,7 @@ Libname COVID 'J:\Programs\Other Pathogens or Responses\2019-nCoV\Data\SAS Code\
    PROC contents data=COPHS_read varnum; run;
 
 
-***  Make edits to CEDRS_view_read and create COVID.CEDRS_view_fix  ***;
+***  Make edits to COPHS_read and create COVID.COPHS_fix  ***;
 ***-----------------------------------------------------------------***;
   PROC format;   value $CntyChk
    'ADAMS'        = 'ADAMS'
@@ -106,6 +106,7 @@ run;
 run;
  
 
+** STEP 2:  Edit records with bad data **;
 DATA COVID.COPHS_fix;  set COPHS_DeDup_Admit;
 /*   Region = put(County_of_Residence, $WestSlope. );*/
 

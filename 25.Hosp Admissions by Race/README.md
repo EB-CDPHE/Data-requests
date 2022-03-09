@@ -23,10 +23,10 @@ Here are the SAS programs used to respond to this data request:
 The GET.CO_Population_Race.sas obtains data accessed at this website:
 https://coloradodemography.github.io/WebsiteGrid/assets/html/population.html
 
-Here are the steps to navigate to the data source:
+Here are the steps to navigate to the data at State Demography Office (SDO):
 
 1. Data by Topic:  Population
-2. Population Spreadsheets: Download population datga for all geographies
+2. Population Spreadsheets: Download population data for all geographies
 
 
 ![SDO_page1](./Images/SDO_page1box.png)
@@ -39,7 +39,7 @@ Here are the steps to navigate to the data source:
 Then the following steps were taken to process the downloaded demographic data:
 1. download csv. Default filename is "race-estimates-county.csv" 
 2. open CSV file, delete ID column, Rename Tab to DATA --> then save as Excel file
-3. Save as Excel file file in INPUT folder
+3. Save as Excel file in INPUT folder (of this data request folder)
 
 The SAS dataset County_Race_POP2020 is created via this section of code:
 ````diff
@@ -58,11 +58,11 @@ Here is the 2020 population count by single Race-Ethnicity:
 
 ![PopCounts](./Images/Population%20counts%20by%20Race.png)
 
-Since the SDO County population data uses County FIPS codes only, another temp dataset that links County FIPS codes with County names was used to join with County_Race_POP2020. The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.County_Population
+Since the SDO County population data uses County FIPS codes only, another temp dataset that links County FIPS codes with County names was used to join with County_Race_POP2020. The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.County_Population   This data table includes County level population estimates by gender (M|F), Race-Ethnicity, and age (1 yr intervals).
 
 
 ### RFI.Hosp_rates_Race.sas.
-The COPHS_fix dataset is filtered by `Hosp_Admission` where dates are between 01OCT2020 and 01DEC2022 per request and to exclude invalid date values. The indicator variable for Colorado residents was modified in the COPHS.fix code and used to filter data to only Colorado residents. Only selected variables are retained.
+The COPHS_fix dataset is filtered by `Hosp_Admission` where dates are between 01OCT2020 and 01DEC2022 per request and to exclude invalid date values. The indicator variable `CO`for Colorado residents was modified in the COPHS.fix code and used to filter data to only Colorado residents. Only selected variables are retained.
 
 Here is the distribution of hospitalizations by Ethnicity:
 
@@ -71,13 +71,13 @@ Here is the distribution of hospitalizations by Ethnicity:
 **NOTE: In the creation of a single Race-Ethnicity variable, Race for those that are not Hispanic or Latino was based on race for Non-Hispanics and also those with unknown or unreported Ethnicity.**
 
 ##
-Here is the 2020 case count, based on hospital admissions, by single Race-Ethnicity:
+Here is the case count, based on hospital admissions, by single Race-Ethnicity:
 
 ![CaseCounts](./Images/Case_counts_by_Race.png)
 
 The final SAS dataset is stored permanently in my Tableau dashboard directory:  DASH.COPHS_fix
 
-## Hospitalization rates (7d) by Race/Ethnicity is the Tableau workbook used to generate final charts
+## "Hospitalization rates (7d) by Race/Ethnicity" is the Tableau workbook used to generate final charts
 
 The workbook connects to the two data sources described above:
 1. County_Population

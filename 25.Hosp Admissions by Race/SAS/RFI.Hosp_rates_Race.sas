@@ -51,8 +51,8 @@ DATA COPHS_fix;  length Race_Ethnicity $ 40 ;  set COVID.COPHS_fix;
    where ('01MAR2020'd  le  Hosp_Admission le  '31JUL2022'd)  AND  CO=1 ;
 
 **  --> NOTE:  Lumps non-Hispanics and Unknown/Unreported together  <--  **;
-   if Ethnicity = 'Hispanic or Latino' then Race_Ethnicity='Hispanic Origin';
-   else if Race = 'American Indian/Alaskan Native' then Race_Ethnicity='American Indian (Non-Hispanic)';
+   if Ethnicity = 'Hispanic or Latino' then Race_Ethnicity='Hispanic (All Races)';
+   else if Race = 'American Indian/Alaskan Native' then Race_Ethnicity='American Indian/Alaskan Native';
    else if Race in ('Asian','Pacific Islander/Native Hawaiian') then Race_Ethnicity='Asian/Pacific Islander (Non-Hispanic)';
    else if Race = 'Black, African American' then Race_Ethnicity='Black (Non-Hispanic)';
    else if Race = 'White' then Race_Ethnicity='White (Non-Hispanic)';

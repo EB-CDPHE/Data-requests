@@ -20,6 +20,7 @@ Here are the SAS programs used to respond to this data request:
 |4.|[GET.CO_Population_Race.sas](./SAS/GET.CO_Population_Race.sas) downloads data from Colorado's State Demography Office to obtain 2020 population counts by County, Age, Race, and Ethnicity.|
 |5.|[RFI.Hosp_rates_Race.sas](./SAS/RFI.Hosp_rates_Race.sas) to prep COPHS data for use in Tableau and to generate basic counts of cases and population by single Race-Ethnicity categories.
 
+## Population estimates
 The GET.CO_Population_Race.sas obtains data accessed at this website:
 https://coloradodemography.github.io/WebsiteGrid/assets/html/population.html
 

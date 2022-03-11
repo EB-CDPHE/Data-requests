@@ -41,20 +41,21 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
  *-------------------------------------------------------------------*/
 
    PROC freq data= COVID.COPHS_fix; tables Ethnicity * Race / list ; run;
+   PROC freq data= COVID.COPHS_fix; tables  Race  ; run;
 
 
 *** Create local copy of filtered data for selected variables  ***;
 ***------------------------------------------------------------***;
 
-DATA COPHS_fix;  length Race_Ethnicity $ 22 ;  set COVID.COPHS_fix;
-   where ('01MAR2020'd  le  Hosp_Admission le  '01DEC2022'd)  AND  CO=1 ;
+DATA COPHS_fix;  length Race_Ethnicity $ 40 ;  set COVID.COPHS_fix;
+   where ('01MAR2020'd  le  Hosp_Admission le  '31JUL2022'd)  AND  CO=1 ;
 
 **  --> NOTE:  Lumps non-Hispanics and Unknown/Unreported together  <--  **;
    if Ethnicity = 'Hispanic or Latino' then Race_Ethnicity='Hispanic Origin';
-   else if Race = 'American Indian/Alaskan Native' then Race_Ethnicity='American Indian';
-   else if Race in ('Asian','Pacific Islander/Native Hawaiian') then Race_Ethnicity='Asian/Pacific Islander';
-   else if Race = 'Black, African American' then Race_Ethnicity='Black';
-   else if Race = 'White' then Race_Ethnicity='White';
+   else if Race = 'American Indian/Alaskan Native' then Race_Ethnicity='American Indian (Non-Hispanic)';
+   else if Race in ('Asian','Pacific Islander/Native Hawaiian') then Race_Ethnicity='Asian/Pacific Islander (Non-Hispanic)';
+   else if Race = 'Black, African American' then Race_Ethnicity='Black (Non-Hispanic)';
+   else if Race = 'White' then Race_Ethnicity='White (Non-Hispanic)';
    else Race_Ethnicity=Race;
 
 
@@ -74,9 +75,10 @@ run;
 run;
 
 
-
 *** Number of cases by Ethnicity and Race ***;
 ***---------------------------------------***;
+   PROC freq data= COPHS_fix; tables  Race_Ethnicity ; run;
+
    PROC means data=COPHS_fix  n  maxdec=0;
       var Hosp_Admission ;
       class Ethnicity;
@@ -110,6 +112,8 @@ DATA DASH.COPHS_fix; set COPHS_fix;
 run;
 
 
+
+*** CHECK ***;
 *** Use output in spreadsheet to check calculation of moving average of hosp rates ***;
    proc freq data=DASH.COPHS_fix ;
    where ('01DEC2021'd  le  Hosp_Admission le  '31DEC2021'd);

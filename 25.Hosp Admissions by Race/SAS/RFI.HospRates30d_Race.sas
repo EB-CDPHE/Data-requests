@@ -32,21 +32,34 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 *** Colorado Population counts by Race-Ethnicity ***;
 ***----------------------------------------------***;
 
-DATA CO_Population;  length Race_Ethnicity $ 50 ;  set COVID.CO_Population_Race_Ethnicity;
+DATA CO_Pop;  length Race_Ethnicity $ 50 ;  set COVID.CO_Population_Race_Ethnicity;
 **  --> NOTE:  Lumps non-Hispanics and Unknown/Unreported together  <--  **;
         if Race_Ethnicity = 'White' then Race_Ethnicity='White (Non-Hispanic)';
    else if Race_Ethnicity = 'Hispanic, All Races' then Race_Ethnicity='Hispanic (All Races)';
    else if Race_Ethnicity = 'Black or African American' then Race_Ethnicity='Black (Non-Hispanic)';
-   else if Race_Ethnicity = 'American Indian or Alaskan Native' then Race_Ethnicity='American Indian/Alaskan Native (Non-Hispanic)';
+   else if Race_Ethnicity = 'American Indian or Alaska Native' then Race_Ethnicity='American Indian/Alaskan Native (Non-Hispanic)';
    else if Race_Ethnicity in ('Asian','Native Hawaiian or Other Pacific Islander') then Race_Ethnicity='Asian/Pacific Islander (Non-Hispanic)';
 
+   format Race_Ethnicity $50.;
+run;
+
+   PROC means data=CO_Pop maxdec=0  sum  noprint; 
+      var population; 
+      class Race_Ethnicity; 
+      output out=RaceCatPop sum=Population;
+run;
+DATA CO_Population; set RaceCatPop;
+   where _TYPE_=1;
+   drop _Type_ _FREQ_ ;
 run;
 
    PROC contents data=CO_Population varnum; title1 'CO_Population'; run;
 
    PROC print data=CO_Population ; sum population; run;
 
-   PROC means data=CO_Population maxdec=0  sum ; var population; class Race_Ethnicity; run;
+
+
+
 
 
 *** Create timeline of all dates ***;
@@ -89,6 +102,7 @@ run;
    PROC contents data=COPHS_filter  varnum; title1 'COPHS_filter'; run;
 
    PROC freq data=COPHS_filter ; tables Race_Ethnicity; run;
+
 
 
 *** TEMPLATE for calculation of Hosp Rate by Race_Ethnicity ***;
@@ -155,14 +169,14 @@ Data COPHS_Race_rate; set COPHS_Race_date;
    end;
 
 * drop patient level variable *;
-   DROP  MR_Number ;
+   DROP  MR_Number  CO  County_of_Residence ;
 run;
    proc print data= COPHS_Race_rate ;  ID Hosp_Admission_first ;  run;
 
     
 ** add ALL reported dates for populations with sparse data **;
 ** Merge Timeline with case rate data **;
-Data COPHS_Race_dates;  length county_of_residence $ 13  ;  merge Timeline  COPHS_Race_rate;
+Data COPHS_Race_dates;  merge Timeline  COPHS_Race_rate;
    by Hosp_Admission_first;
 
 * backfill missing with 0 *; 
@@ -192,8 +206,52 @@ quit;
 run;
 
 
+*** RUN MACRO for each Race-Ethnicity group ***;
+***-----------------------------------------***;
+
+%include 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.RaceRates.sas';
 
 
+%RaceRates(Hispanic (All Races), MovingAverage_Hispanic)
+%RaceRates(White (Non-Hispanic), MovingAverage_White)
+%RaceRates(Black (Non-Hispanic), MovingAverage_Black)
+%RaceRates(American Indian/Alaskan Native (Non-Hispanic), MovingAverage_NatAmer)
+%RaceRates(Asian/Pacific Islander (Non-Hispanic), MovingAverage_Asian)
+%RaceRates(Other, MovingAverage_Other)
 
 
+***  Combine the Race datasets into one dataset  ***;
+***----------------------------------------------***;
 
+Data MovingAverage_Race ; 
+   set   MovingAverage_White    
+         MovingAverage_Black    
+         MovingAverage_Hispanic   
+         MovingAverage_NatAmer  
+         MovingAverage_Asian  
+         MovingAverage_Other ;
+run;
+
+
+*** Merge combined moving averages by Race with Population count by Race ***;
+   proc sort data= MovingAverage_Race
+               out= MovingAverage_Sort;
+      by Race_Ethnicity;
+   proc sort data= CO_Population
+               out= CO_Population_Sort;
+      by Race_Ethnicity;
+run;
+
+DATA HospRates30d_by_Race; merge  MovingAverage_Sort  CO_Population_Sort ;
+   by Race_Ethnicity;
+run;
+
+
+**  Save combined dataset to Dashboard data directory (for Tableau)  **;
+
+libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
+
+DATA DASH.HospRates30d_by_Race; set  HospRates30d_by_Race;
+run;
+
+   PROC contents data= DASH.HospRates30d_by_Race varnum; title1 'DASH.HospRates30d_by_Race'; run;

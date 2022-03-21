@@ -85,8 +85,8 @@ DATA CEDRS_view_temp;
 * Extract date part of a datetime variable  *;
    Refreshed_on = datepart(tmp_refreshed_on);   format Refreshed_on yymmdd10.;
 
-/*   DROP tmp_:  address:  OnsetDate_proxy ;*/
-   DROP tmp_:    OnsetDate_proxy  Earliest_CollectionDate ;  * Earliest_CollectionDate is identical to CollectionDate;
+   DROP tmp_:  address:  OnsetDate_proxy  Earliest_CollectionDate  ;
+/*   DROP tmp_:    OnsetDate_proxy  Earliest_CollectionDate ;  * Earliest_CollectionDate is identical to CollectionDate;*/
 run;
 
 

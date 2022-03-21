@@ -47,25 +47,26 @@ proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned; run;
 
    PROC contents data=COVID.CEDRS_view_fix varnum ;  title1 'COVID.CEDRS_view_fix';  run;
 
-DATA CO_cases;  set COVID.CEDRS_view_fix;
+
+DATA CO_county_cases;  set COVID.CEDRS_view_fix;
    keep ReportedDate CountyAssigned CaseStatus  Outcome ;
 run;
 
-   PROC contents data=CO_cases varnum ;  title1 'CO_cases';  run;
+   PROC contents data=CO_county_cases varnum ;  title1 'CO_county_cases';  run;
 
 
 *** Colorado - Daily Case counts by status ***:
 ***----------------------------------------***;
 
-**  Sort by date  **;
-  PROC sort data=CO_cases  
-             out= Rpt_Date_sort; 
-      by ReportedDate;
+**  Sort by County and Date  **;
+  PROC sort data=CO_county_cases  
+             out= Cnty_Rpt_Date_sort; 
+      by CountyAssigned ReportedDate;
 run;
 
 **  Reduce dataset from patient level to date level (one obs per date reported)  **;
-Data Cases_counted; set Rpt_Date_sort;
-   by ReportedDate;
+Data Cnty_Cases_counted; set Cnty_Rpt_Date_sort;
+   by CountyAssigned ReportedDate;
 
    * set accumulator vars to 0 for first ReportedDate in group *;
    if first.ReportedDate then DO;  NumProbable=0;  NumConfirmed=0;  NumProbDead=0;  NumConfDead=0;   END;
@@ -89,8 +90,14 @@ Data Cases_counted; set Rpt_Date_sort;
 run;
 
 
+**  Sort by County and Date  **;
+  PROC sort data=Cnty_Cases_counted  
+             out= Rpt_Date_sort2; 
+      by CountyAssigned ReportedDate;
+run;
+
 ** add ALL reported dates for populations with sparse data **;
-Data Colorado_dates;  merge Timeline  Cases_counted;
+Data Colorado_dates;  merge Timeline  Rpt_Date_sort2;
    by ReportedDate;
 
    * backfill missing with 0 and add vars to describe population *;

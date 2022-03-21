@@ -49,6 +49,7 @@ proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned; run;
 
 DATA CO_cases;  set COVID.CEDRS_view_fix;
    keep ReportedDate CountyAssigned CaseStatus  Outcome ;
+   if CountyAssigned = 'INTERNATIONAL' then CountyAssigned = 'UNALLOCATED' ;
 run;
 
    PROC contents data=CO_cases varnum ;  title1 'CO_cases';  run;
@@ -103,6 +104,10 @@ Data Colorado_dates;  merge Timeline  Cases_counted;
    * create total vars *;
    TotalCases = NumProbable + NumConfirmed ;
    TotalDead = NumProbDead + NumConfDead ;
+
+   * clean up obs with missing data *;
+   if ReportedDate > '20MAR22'd then DELETE;
+   if CountyAssigned = '' then DELETE;
 
 run;
 
@@ -176,7 +181,7 @@ run;
 ***----------------------***;
 
 PROC EXPORT DATA= WORK.Cases_stats
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Cases_Counts032122.csv" 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Cases_Counts_Colorado_032122.csv" 
             DBMS=CSV REPLACE;
             PUTNAMES=YES;
 RUN;

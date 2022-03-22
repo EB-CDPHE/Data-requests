@@ -28,9 +28,11 @@ The dataset of daily counts are merged to the Timeline dataset so that every day
 After this section, a table of case counts before and after the data manipulation is created as a check.
 
 **From CEDRS_fix data:**
-![CaseCountsBefore](Images/Case_counts_start.png)
 
+![CaseCountsBefore](Images/Case_counts_start.png)
+##
 **From historical daily summary data:**
+
 ![CaseCountsAfter](Images/Case_counts_end.png)
 
 The Colorado_dates dataset that contains daily totals for cases and deaths by status is read again date and cummulative totals are added to the dataset and daily changes are calculated. Labels are defined to match the 12 column headers in the template spreadsheet.

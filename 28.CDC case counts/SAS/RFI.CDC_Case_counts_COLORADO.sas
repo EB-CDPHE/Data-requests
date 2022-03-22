@@ -179,6 +179,8 @@ DATA Bulk_Historical_032222_Colorado;
       NumConfirmed  CumConfirmed    NumProbable  CumProbable    TotalCases  TotalCumCases
       NumConfDead   CumConfDead     NumProbDead  CumProbDead    TotalDead   TotalCumDead  ;                                                            ;
    set Cases_stats;
+
+   DROP  Daily:  ;
 run;
 
    PROC contents data= Bulk_Historical_032222_Colorado varnum;  run;

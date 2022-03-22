@@ -39,9 +39,9 @@ The Colorado_dates dataset that contains daily totals for cases and deaths by st
 ## Findings
 For this first weekly submission of historical counts, the total counts by status for cases and deaths was:
 
-![TotalCases](./images/Total_counts_CASES.png)
+![TotalCases](./images/Total_counts_CASES.jpg)
 
-![TotalDeaths](./images/Total_counts_DEATHS.png)
+![TotalDeaths](./images/Total_counts_DEATHS.jpg)
 
 #
 

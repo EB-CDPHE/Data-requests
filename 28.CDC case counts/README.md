@@ -1,7 +1,20 @@
 ## Background 
-This data request came from CDC Aggregate Data team for historical data in order to reconcile Colorado COVID cases and deaths in their aggregate dataset. Here is the [email](./CDC_email.pdf). The original request came in August 3, 2021. I was tasked with it on September 22, 2021.  The email contains the specific data elements requested. 
+CDC scrapes the CDPHE website daily to capture Colorado case counts. It calculates the differences each day to determine new cases. However, CDPHE dashboard for COVID-19 reflects not only the diseaes dynamics in the Colorado population but also workload constraints and integration issues. Thus, when the CDPHE dashboard is updated with a large bolus of cases, it appears to CDC as a spike in case counts. So, for example, recently Colorado has been erronously identified as a national hotspot. To amend this situation, we have been asked to report historical case counts to CDC weekly.
 
-**Population**:  Confirmed and probable cases in CEDRS by ReportedDate. **Groups**: Case status (confirmed and probable) and Outcome (Patient died).  **Data requested**: Daily count of confirmed, probable, and total cases. Daily count of deaths for confirmed and probable cases, and total deaths. For each of these outcomes a cumulative daily total was calcualted. Daily change in cumulative totals was calcuated for total cases and total deaths. 
+Some of the background regarding this request is part of a lengthy email [chain](../28/../28.CDC%20case%20counts/Documents/CDC_Historical_Case_Count_RFI_032122.pdf) between CDPHE and the CDC Aggregate Data team. The original request came in March 14, 2022. I was tasked with it on March 21, 2022.  The email contains the specific data elements requested. 
+
+**Population**:  Confirmed and probable cases in CEDRS by ReportedDate. Include cases unallocated to a county, i.e. `CountyAssigned="INTERNATIONAL"` **Groups**: Case status (confirmed and probable) and Outcome (Patient died) for all of Colorado and by Colorado county.  **Data requested**: Daily count of confirmed, probable, and total cases. Daily count of deaths for confirmed and probable cases, and total deaths. For each of these outcomes a cumulative daily total was calcualted. Daily change in cumulative totals was calcuated for total cases and total deaths. 
+
+## Code
+Here are the SAS programs used to respond to this data request:
+
+|Run order|SAS program|
+|---------|-----------|
+|1.|[Access.CEDRS_view](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from dbo144 COVID19 and curates it.|
+|2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data pulled from CEDRS.|
+|3.|[RFI.Pediatric_cases.sas](./SAS/RFI.Pediatric_cases.sas) filters CEDRS data to population defined above.|
+
+
 
 #
 ## Findings

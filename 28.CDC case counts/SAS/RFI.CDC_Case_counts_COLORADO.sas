@@ -23,7 +23,6 @@ OPTIONS pageno=1;
  *--------------------------------*/
 
 
-
 *** Create timeline of all dates ***;
 ***------------------------------***;
 
@@ -40,7 +39,8 @@ run;
 proc print data= timeline;  run;
 
 
-proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned; run;
+/*proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned; run;*/
+
 
 *** Create local copy of CEDRS case data for selected variables  ***;
 ***--------------------------------------------------------------***;
@@ -49,7 +49,6 @@ proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned; run;
 
 DATA CO_cases;  set COVID.CEDRS_view_fix;
    keep ReportedDate CountyAssigned CaseStatus  Outcome ;
-   if CountyAssigned = 'INTERNATIONAL' then CountyAssigned = 'UNALLOCATED' ;
 run;
 
    PROC contents data=CO_cases varnum ;  title1 'CO_cases';  run;
@@ -115,12 +114,16 @@ run;
 *** Check numbers ***;
 ***---------------***;
 
+options nodate pageno=1;
 * Starting dataset (Patient level) *;
-   PROC freq data= CO_cases ;  tables CaseStatus  Outcome ;  run;
+   PROC freq data= CO_cases ;  tables CaseStatus  Outcome /missing missprint;  
+   title1;  title2 'Starting dataset:  CEDRS_fix';
+run;
 
  * Reduced dataset (Date level) *;
   PROC means data= Colorado_dates  sum maxdec=0;
       var  NumProbable  NumConfirmed  TotalDead ;
+   title1; title2 'Summary dataset:  Colorado_dates';
 run;
 
 
@@ -167,15 +170,20 @@ run;
 ***  Evaluate outcome  ***;
 ***--------------------***;
 
+title;
    PROC print data= Cases_stats l; 
       where ReportedDate ge '01MAR20'd;
       sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead;
 run;
 
    PROC means data= Cases_stats n sum maxdec=0;
-      var NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
+      var NumConfirmed  NumProbable  TotalCases  CumConfirmed   CumProbable  TotalCumCases ;
+   title1; title2 'Final counts: CASES';
 run;
-
+   PROC means data= Cases_stats n sum maxdec=0;
+      var NumConfDead  NumProbDead  TotalDead    CumConfDead   CumProbDead  TotalCumDead  ;
+   title1; title2 'Final counts: DEATHS';
+run;
 
 ***  Export data to CSV  ***;
 ***----------------------***;

@@ -33,14 +33,16 @@ After this section, a table of case counts before and after the data manipulatio
 **From historical daily summary data:**
 ![CaseCountsAfter](Images/Case_counts_end.png)
 
+The Colorado_dates dataset that contains daily totals for cases and deaths by status is read again date and cummulative totals are added to the dataset and daily changes are calculated. Labels are defined to match the 12 column headers in the template spreadsheet.
 
 #
 ## Findings
-At the time of this response, here are the calculated totals for the requested data:
+For this first weekly submission of historical counts, the total counts by status for cases and deaths was:
 
-![VarTotals](./Var_totals.png)
+![TotalCases](./images/Total_counts_CASES.png)
 
-The N=631 is the number of days between January 1, 2020 and September 22, 2021. 
+![TotalDeaths](./images/Total_counts_DEATHS.png)
+
 #
 
 ## Response

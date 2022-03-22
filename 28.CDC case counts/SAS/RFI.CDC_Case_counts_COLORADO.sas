@@ -48,7 +48,7 @@ proc print data= timeline;  run;
    PROC contents data=COVID.CEDRS_view_fix varnum ;  title1 'COVID.CEDRS_view_fix';  run;
 
 DATA CO_cases;  set COVID.CEDRS_view_fix;
-   keep ReportedDate CountyAssigned CaseStatus  Outcome ;
+   keep ReportedDate CaseStatus  Outcome ;
 run;
 
    PROC contents data=CO_cases varnum ;  title1 'CO_cases';  run;
@@ -106,7 +106,6 @@ Data Colorado_dates;  merge Timeline  Cases_counted;
 
    * clean up obs with missing data *;
    if ReportedDate > '20MAR22'd then DELETE;
-   if CountyAssigned = '' then DELETE;
 
 run;
 
@@ -148,48 +147,70 @@ Data Cases_stats; set Colorado_dates;
 
 * add labels *;
    LABEL 
-      NumConfirmed = 'New confirmed cases for the day'
-      NumProbable = 'New probable cases for the day'
-      TotalCases = 'Total of Confirmed and Probable cases'
+      ReportedDate = 'Submission_Date'
 
-      NumConfDead = 'Confirmed cases that died'
-      NumProbDead = 'Probable cases that died day'
-      TotalDead = 'Total of Confirmed and Probable deaths'
+      NumConfirmed = 'New_Confirmed_Cases'
+      CumConfirmed = 'Total_Confirmed_Cases'
 
-      CumConfirmed = 'Cumulative total of confirmed cases'
-      CumProbable = 'Cumulative total of probable cases'
-      TotalCumCases = 'Cumulative total of all cases'
+      NumProbable = 'New_Probable_Cases'
+      CumProbable = 'Total_Probable_Cases'
 
-      CumConfDead = 'Confirmed cases that died'
-      CumProbDead = 'Probable cases that died day'
-      TotalCumDead = 'Cumulative total of all deaths'  ;
+      TotalCases = 'Total_New_Cases'
+      TotalCumCases = 'Total_Cases'
+
+
+      NumConfDead = 'New_Confirmed_Deathsd'
+      CumConfDead = 'Total_Confirmed_Deaths'
+
+      NumProbDead = 'New_Probable_Deaths'
+      CumProbDead = 'Total_Probable_Deaths'
+
+      TotalDead = 'New_deaths'
+      TotalCumDead = 'Total_Deaths'  ;
 
 run;
+
+***  FINAL dataset  ***;
+***-----------------***;
+
+** Need to re-order variables to match column headers in Template **;
+DATA Bulk_Historical_032222_Colorado;
+   retain ReportedDate
+      NumConfirmed  CumConfirmed    NumProbable  CumProbable    TotalCases  TotalCumCases
+      NumConfDead   CumConfDead     NumProbDead  CumProbDead    TotalDead   TotalCumDead  ;                                                            ;
+   set Cases_stats;
+run;
+
+   PROC contents data= Bulk_Historical_032222_Colorado varnum;  run;
 
 
 ***  Evaluate outcome  ***;
 ***--------------------***;
 
 title;
-   PROC print data= Cases_stats l; 
+   PROC print data= Bulk_Historical_032222_Colorado l; 
       where ReportedDate ge '01MAR20'd;
-      sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead;
+      sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
 run;
 
-   PROC means data= Cases_stats n sum maxdec=0;
-      var NumConfirmed  NumProbable  TotalCases  CumConfirmed   CumProbable  TotalCumCases ;
+   PROC means data= Bulk_Historical_032222_Colorado n sum maxdec=0;
+      var NumConfirmed  NumProbable  TotalCases   ;
    title1; title2 'Final counts: CASES';
 run;
-   PROC means data= Cases_stats n sum maxdec=0;
-      var NumConfDead  NumProbDead  TotalDead    CumConfDead   CumProbDead  TotalCumDead  ;
+   PROC means data= Bulk_Historical_032222_Colorado n sum maxdec=0;
+      var NumConfDead  NumProbDead  TotalDead   ;
    title1; title2 'Final counts: DEATHS';
 run;
+
+
+
+
 
 ***  Export data to CSV  ***;
 ***----------------------***;
 
-PROC EXPORT DATA= WORK.Cases_stats
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Cases_Counts_Colorado_032122.csv" 
-            DBMS=CSV REPLACE;
-            PUTNAMES=YES;
+PROC EXPORT DATA= WORK.BULK_HISTORICAL_032222_COLORADO 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Bulk_Historical_Update_Colorado_2022-03-22.xlsx" 
+            DBMS=EXCEL LABEL REPLACE;
+     SHEET="Jurisdictional Aggregate Data"; 
 RUN;

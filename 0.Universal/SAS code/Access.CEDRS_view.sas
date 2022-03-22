@@ -79,7 +79,7 @@ DATA CEDRS_view_temp;
    Vax_FirstDose        = input(tmp_Vax_FirstDose, yymmdd10.);        format Vax_FirstDose yymmdd10.;
    Vax_Booster          = input(tmp_Vax_Booster, yymmdd10.);        format Vax_Booster yymmdd10.;
    COPHS_AdmissionDate  = input(tmp_COPHS_AdmissionDate, yymmdd10.);  format COPHS_AdmissionDate yymmdd10.;
-   DateVSDeceased       = input(tmp_DateVSDeceased, yymmdd10.);       format DateVSDeceased yymmdd10.;
+   DateVSDeceased       = input(tmp_DateVSDeceased, mmddyy10.);       format DateVSDeceased mmddyy10.;
 
 
 * Extract date part of a datetime variable  *;

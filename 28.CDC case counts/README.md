@@ -5,6 +5,8 @@ Some of the background regarding this request is part of a lengthy email [chain]
 
 **Population**:  Confirmed and probable cases in CEDRS by ReportedDate. Include cases unallocated to a county, i.e. `CountyAssigned="INTERNATIONAL"` **Groups**: Case status (confirmed and probable) and Outcome (Patient died) for all of Colorado and by Colorado county.  **Data requested**: Daily count of confirmed, probable, and total cases. Daily count of deaths for confirmed and probable cases, and total deaths. For each of these outcomes a cumulative daily total was calcualted. Daily change in cumulative totals was calcuated for total cases and total deaths. 
 
+The CDC Aggregate Data team provided a [template](./Documents/Bulk_Historical_Update_Template.xlsx) as before. This is to capture Colorado level numbers. I don't think there is a template for County level numbers.
+
 ## Code
 Here are the SAS programs used to respond to this data request:
 
@@ -12,8 +14,24 @@ Here are the SAS programs used to respond to this data request:
 |---------|-----------|
 |1.|[Access.CEDRS_view](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from dbo144 COVID19 and curates it.|
 |2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data pulled from CEDRS.|
-|3.|[RFI.Pediatric_cases.sas](./SAS/RFI.Pediatric_cases.sas) filters CEDRS data to population defined above.|
+|3.|[RFI.CDC_Case_counts_COLORADO.sas](./SAS/RFI.CDC_Case_counts_COLORADO.sas) to generate requested filters CEDRS data to population defined above.|
+|4.|[RFI.CDC_Case_counts_COUNTY.sas](./SAS/RFI.CDC_Case_counts_COLORADO.sas) to generate requested filters CEDRS data to population defined above.|
 
+The RFI.CDC_Case_counts_COLORADO.sas program is based on [RFI.Historical_case_counts.sas](../12.Historical case counts by status/RFI.Historical_case_counts.sas). It creates a "timeline" - a SAS dataset that contains every date value from 3/1/20 to present.
+
+An unfiltered copy of CEDRS_view_fix is made and `CountyAssigned = "INTERNATIONAL"` is changed to `CountyAssigned = "UNALLOCATED"` as this is how CDC displays case counts for patients where assigned county is out-of-State. The only variables kept are ReportedDate, County, case status, and outcome.
+
+The patient-level dataset is reduced to a single record per day. Each record contains accumulated number of cases and deaths by case status, i.e. confirmed, probable. 
+
+The dataset of daily counts are merged to the Timeline dataset so that every day of the pandemic is represented. For days with no cases or deaths, accumulator variables are backfilled with zeros. New variables for totals across case status are calculated. The extra days from the Timeline dataset, which had values going to 3/31/22 resulted in obs with missing county values. These records were deleted.
+
+After this section, a table of case counts before and after the data manipulation is created as a check.
+
+**From CEDRS_fix data:**
+![CaseCountsBefore](Images/Case_counts_start.png)
+
+**From historical daily summary data:**
+![CaseCountsAfter](Images/Case_counts_end.png)
 
 
 #

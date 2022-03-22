@@ -1,7 +1,7 @@
 ## Background 
 CDC scrapes the CDPHE website daily to capture Colorado case counts. It calculates the differences each day to determine new cases. However, CDPHE dashboard for COVID-19 reflects not only the diseaes dynamics in the Colorado population but also workload constraints and integration issues. Thus, when the CDPHE dashboard is updated with a large bolus of cases, it appears to CDC as a spike in case counts. So, for example, recently Colorado has been erronously identified as a national hotspot. To amend this situation, we have been asked to report historical case counts to CDC weekly.
 
-Some of the background regarding this request is part of a lengthy [email chain](./Documents/) between CDPHE and the CDC Aggregate Data team. Here is the [email](./documents/). The original request came in August 3, 2021. I was tasked with it on September 22, 2021.  The email contains the specific data elements requested. 
+Some of the background regarding this request is part of a lengthy [email chain](./Documents/CDC_Historical_Case_Count_RFI_032222.pdf) between CDPHE and the CDC Aggregate Data team. Here is th. The original request came in August 3, 2021. I was tasked with it on September 22, 2021.  The email contains the specific data elements requested. 
 
 **Population**:  Confirmed and probable cases in CEDRS by ReportedDate. **Groups**: Case status (confirmed and probable) and Outcome (Patient died).  **Data requested**: Daily count of confirmed, probable, and total cases. Daily count of deaths for confirmed and probable cases, and total deaths. For each of these outcomes a cumulative daily total was calcualted. Daily change in cumulative totals was calcuated for total cases and total deaths. 
 

@@ -40,7 +40,8 @@ run;
 proc print data= timeline;  run;
 
 
-proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned; run;
+proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned / missing missprint; run;
+
 
 *** Create local copy of CEDRS case data for selected variables  ***;
 ***--------------------------------------------------------------***;
@@ -50,6 +51,7 @@ proc freq data= COVID.CEDRS_view_fix; tables CountyAssigned; run;
 
 DATA CO_county_cases;  set COVID.CEDRS_view_fix;
    keep ReportedDate CountyAssigned CaseStatus  Outcome ;
+   if CountyAssigned = 'INTERNATIONAL' then CountyAssigned = 'UNALLOCATED' ;
 run;
 
    PROC contents data=CO_county_cases varnum ;  title1 'CO_county_cases';  run;
@@ -60,12 +62,12 @@ run;
 
 **  Sort by County and Date  **;
   PROC sort data=CO_county_cases  
-             out= Cnty_Rpt_Date_sort; 
+             out= CO_county_cases_sort; 
       by CountyAssigned ReportedDate;
 run;
 
 **  Reduce dataset from patient level to date level (one obs per date reported)  **;
-Data Cnty_Cases_counted; set Cnty_Rpt_Date_sort;
+Data County_Cases_counted; set CO_county_cases_sort;
    by CountyAssigned ReportedDate;
 
    * set accumulator vars to 0 for first ReportedDate in group *;
@@ -90,14 +92,14 @@ Data Cnty_Cases_counted; set Cnty_Rpt_Date_sort;
 run;
 
 
-**  Sort by County and Date  **;
-  PROC sort data=Cnty_Cases_counted  
-             out= Rpt_Date_sort2; 
-      by CountyAssigned ReportedDate;
+**  Sort by Date  **;
+  PROC sort data=County_Cases_counted  
+             out= County_Cases_counted_sort; 
+      by ReportedDate;
 run;
 
 ** add ALL reported dates for populations with sparse data **;
-Data Colorado_dates;  merge Timeline  Rpt_Date_sort2;
+Data Colorado_County_dates;  merge Timeline  County_Cases_counted_sort;
    by ReportedDate;
 
    * backfill missing with 0 and add vars to describe population *;
@@ -111,26 +113,40 @@ Data Colorado_dates;  merge Timeline  Rpt_Date_sort2;
    TotalCases = NumProbable + NumConfirmed ;
    TotalDead = NumProbDead + NumConfDead ;
 
+   if ReportedDate > '20MAR22'd then DELETE;
+   if CountyAssigned = '' then DELETE;
 run;
-
+/*   PROC print data= Colorado_County_dates; where CountyAssigned =''; run;*/
 
 *** Check numbers ***;
 ***---------------***;
 
 * Starting dataset (Patient level) *;
-   PROC freq data= CO_cases ;  tables CaseStatus  Outcome ;  run;
+   PROC freq data= CO_county_cases ;  tables CountyAssigned * (CaseStatus  Outcome) / nopercent norow nocol ;  run;
 
  * Reduced dataset (Date level) *;
-  PROC means data= Colorado_dates  sum maxdec=0;
+  PROC means data= Colorado_County_dates  sum maxdec=0;
       var  NumProbable  NumConfirmed  TotalDead ;
+      class CountyAssigned;
 run;
 
 
 ***  Calculate Cumulatitive values and totals  ***;
 ***--------------------------------------------***;
 
-Data Cases_stats; set Colorado_dates;
-   by ReportedDate;
+
+**  Sort by County and Date  **;
+  PROC sort data=Colorado_County_dates  
+             out= Colorado_County_dates_sort; 
+      by CountyAssigned ReportedDate;
+run;
+
+
+Data Cases_County_stats; set Colorado_County_dates_sort;
+   by CountyAssigned ReportedDate;
+
+* set accumulator vars to 0 for first ReportedDate in group *;
+   if first.CountyAssigned then DO;  CumConfirmed=0;  CumProbable=0;  CumConfDead=0;  CumProbDead=0;   END;
 
 * calculate cumulative counts *;
    CumConfirmed + NumConfirmed;
@@ -169,21 +185,23 @@ run;
 ***  Evaluate outcome  ***;
 ***--------------------***;
 
-   PROC print data= Cases_stats l; 
+   PROC print data= Cases_County_stats l; 
       where ReportedDate ge '01MAR20'd;
+      id CountyAssigned;
       sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead;
 run;
 
-   PROC means data= Cases_stats n sum maxdec=0;
+   PROC means data= Cases_County_stats n sum maxdec=0;
       var NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
+      class CountyAssigned ;
 run;
 
 
 ***  Export data to CSV  ***;
 ***----------------------***;
 
-PROC EXPORT DATA= WORK.Cases_stats
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Cases_Counts032122.csv" 
+PROC EXPORT DATA= WORK.Cases_County_stats
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Cases_Counts_by_County032122.csv" 
             DBMS=CSV REPLACE;
             PUTNAMES=YES;
 RUN;

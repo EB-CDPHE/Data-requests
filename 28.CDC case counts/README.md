@@ -41,19 +41,18 @@ The Colorado_dates dataset that contains daily totals for cases and deaths by st
 ## Findings
 For this first weekly submission of historical counts, the total counts by status for cases and deaths was:
 
-![TotalCases](./images/Total_counts_CASES.jpg)
+![TotalCases](./Images/Total_counts_CASES.jpg)
 
-![TotalDeaths](./images/Total_counts_DEATHS.jpg)
-
+![TotalDeaths](./Images/Total_counts_CASES.jpg)
 #
 
 ## Response
-Final output from SAS was saved as a CSV file:  [Colorado Historical Data](Colorado_Historical_data.csv) CDC provided a template for recieving historical data. I re-ordered the columns in the CSV file to match their template and then copied the column headers. I saved the modifed csv file as and Excel file named [Bulk Historical Update Colorado](Bulk_Historical_Update_Colorado.xlsx). This was emailed to Sarah of the Aggregate Data team at CDC on September 24, 2021.
+The final dataset is exported as a CSV file. Here is the link to the final CSV file:  [Historical Counts for Colorado](). CDC provided a template for recieving historical data. I re-ordered the columns in the CSV file to match this template and then copied the column headers. I saved the modifed csv file as an Excel file named [Bulk Historical Update Colorado](). This was emailed to Sarah of the Aggregate Data team at CDC on March 22, 2022.
 
 #
 
-## Code
-#### The SAS program used to generate the response was [RFI.Historical_case_counts.sas](RFI.Historical_case_counts.sas). 
+### Updating this Request
+The SAS program used to generate the response was [RFI.Historical_case_counts.sas](RFI.Historical_case_counts.sas). 
 To update this response, the following would need to be done:
 1. Modify the section of SAS code that creates a timeline, i.e. continuous unbroken list of ReportedDate's from January 1, 2020 to present. Specifically, increase the number of iterations that the DO loop runs.
 

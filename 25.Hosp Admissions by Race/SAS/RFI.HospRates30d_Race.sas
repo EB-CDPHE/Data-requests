@@ -19,14 +19,14 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 
 
  * Programs run prior to this one *;
-/*--------------------------------*
+/*--------------------------------------------*
  |POPULATION DATA:
  | 1. Access.Populations_Race_Ethnicity.sas
  |COPHS DATA:
  | 1. Access.COPHS.sas
  | 2. Check.COPHS.sas
  | 3. Fix.COHPS.sas
- *--------------------------------*/
+ *--------------------------------------------*/
 
 
 *** Colorado Population counts by Race-Ethnicity ***;

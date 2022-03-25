@@ -785,10 +785,7 @@ proc contents data= Hosp_sort varnum ; run;
 
 *** Check values of Race variables ***;
 ***--------------------------------***;
-
-   PROC freq data= COPHS_read ;
-      tables  Race  Ethnicity ; 
-run;
+   PROC freq data= COPHS_read ;  tables  Race  Ethnicity ; run;
 
 /*-----------------------------------------------------------------------*
  |FINDINGS:

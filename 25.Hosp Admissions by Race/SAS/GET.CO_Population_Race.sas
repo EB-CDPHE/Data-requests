@@ -38,11 +38,16 @@ libname mysheets xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\25.Hosp Ad
 ** print tabs from spreadsheet **;
    proc print data=mysheets.DATA; run;
 
+**  freq distribution of race and ethnicity  **;
+   proc freq data=mysheets.DATA; tables race ethnicity; run;
+   proc freq data=mysheets.DATA; tables county_fips; run;
+
 ** Create SAS dataset from spreadsheet **;
 DATA County_Race_POP2020; length Race_Ethnicity $ 22 ;  set mysheets.DATA;
    where year=2020;
    rename sex=Gender;
    rename count=Population;
+   format County_Fips z3.;
 
 * create single Race - Ethnicity variable *;
    if Ethnicity = 'Hispanic Origin' then Race_Ethnicity='Hispanic Origin';
@@ -51,6 +56,12 @@ DATA County_Race_POP2020; length Race_Ethnicity $ 22 ;  set mysheets.DATA;
 run;
 
    PROC contents data=County_Race_POP2020  varnum ; title1 'County_Race_POP2020'; run;
+   proc freq data=County_Race_POP2020; tables county_fips; run;
+
+** Confirm assignment of Race and Ethnicity to single variable is correct **;
+   PROC freq data= County_Race_POP2020;  
+      tables Race_Ethnicity * Ethnicity * Race / list missing missprint; 
+run;
 
 ** Calculate 2020 Colorado Population count by Race and Ethnicity **;
    PROC means data=County_Race_POP2020  sum  maxdec=0;
@@ -65,45 +76,72 @@ run;
       class Race ;
 run;
 
-   PROC freq data= County_Race_POP2020;  
-      tables Race_Ethnicity * Ethnicity * Race / list ; 
-run;
+
 
 
 *** Add county name to county FIPS code ***;
 ***-------------------------------------***;
 
-   proc contents data= CntyCodes  varnum ; run;
+/*-------------------------------------------------------*
+ | The SDO data uses county FIPS to identify counties. 
+ | COPHS data uses upcase county names.
+ | Use CountyCodes spreadsheet to link FIPS and names.
+ | SOURCE:
+ | https://www.census.gov/geographies/reference-files/2020/demo/popest/2020-fips.html
+ | Select "2020 State, County, ... FIPS Codes"
+ *-------------------------------------------------------*/
 
-   PROC print data= CntyCodes; id County_Code; run;
+** Create libname with XLSX engine that points to XLSX file **;
+libname mycodes xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\25.Hosp Admissions by Race\Input data\countycodes.xlsx' ;
 
-DATA CountyCodes;  Set CntyCodes;
-   Rename County_Code = County_FIPS;
+
+** see contents of libref - one dataset for each tab of the spreadsheet **;
+   proc contents data= mycodes.Sheet1  varnum ; run;
+
+   PROC print data= mycodes.Sheet1; *id County_Code; run;
+
+DATA CountyCodes_ODD;  
+   Set mycodes.Sheet1(Rename= 
+                        (tmp_County_FIPS = County_FIPS
+                         tmp_County_Name = County_Name) );
+
+   County_FIPS = input(FIPS_C, best3.);
+   County_Name = upcase(compress(tmp_County_Name, 'County') )  ;
+   DROP tmp_:  ;
+   format County_Fips z3.;
+
+   if County_FIPS=. then delete;
 run;
-   proc contents data= CountyCodes varnum ; run;
+
+   proc contents data= CountyCodes_ODD varnum ; run;
+   proc print data= CountyCodes_ODD; id County_FIPS; run;
 
 
+** Add CountyCodes to County Population data **;
    proc sort data=County_Race_POP2020
                out=Pop_sort ;
       by County_FIPS ;
    proc sort data=CountyCodes
                out=Code_sort ;
       by County_FIPS ;
-Data County_Population;
-   merge Pop_sort Code_sort ;
+Data County_Population2;
+   merge  Code_sort  Pop_sort;
    by County_FIPS ;
 run;
 
-   PROC contents data=County_Population  varnum ; title1 'County_Population'; run;
+   PROC contents data=County_Population2  varnum ; title1 'County_Population2'; run;
 
 
 ** Check link between County FIPS code and County Name **;
-   PROC freq data= County_Population ;
+   PROC freq data= County_Population2;
       tables County_FIPS * County_Name / list ;
 run;
+/*
+ | N>40K missing !!
+*/
 
 ** Population count for Race_Ethnicity groups **;
-   PROC means data = County_Population  sum  maxdec=0;
+   PROC means data = DASH.County_Population  sum  maxdec=0;
       var Population;
       class Race_Ethnicity;
 run;
@@ -119,6 +157,11 @@ run;
 
 
 
+proc means data= dash.County_Population   n sum   maxdec=0;
+   where Race_Ethnicity = 'American Indian';
+   var population;
+   class County_Name;
+run;
 
 
 

@@ -36,11 +36,11 @@ libname mysheets xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\25.Hosp Ad
    PROC contents data=mysheets._all_  varnum ; title1; run;
 
 ** print tabs from spreadsheet **;
-   proc print data=mysheets.DATA; run;
+/*   proc print data=mysheets.DATA; run;*/
 
 **  freq distribution of race and ethnicity  **;
-   proc freq data=mysheets.DATA; tables race ethnicity; run;
-   proc freq data=mysheets.DATA; tables county_fips; run;
+/*   proc freq data=mysheets.DATA; tables race ethnicity; run;*/
+/*   proc freq data=mysheets.DATA; tables county_fips; run;*/
 
 ** Create SAS dataset from spreadsheet **;
 DATA County_Race_POP2020; length Race_Ethnicity $ 22 ;  set mysheets.DATA;
@@ -93,28 +93,27 @@ run;
 
 ** Create libname with XLSX engine that points to XLSX file **;
 libname mycodes xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\25.Hosp Admissions by Race\Input data\countycodes.xlsx' ;
-
+title;
 
 ** see contents of libref - one dataset for each tab of the spreadsheet **;
    proc contents data= mycodes.Sheet1  varnum ; run;
 
    PROC print data= mycodes.Sheet1; *id County_Code; run;
 
-DATA CountyCodes_ODD;  
+DATA CountyCodes;  
    Set mycodes.Sheet1(Rename= 
-                        (tmp_County_FIPS = County_FIPS
-                         tmp_County_Name = County_Name) );
+                        (County_FIPS = tmp_County_FIPS
+                         County_Name = tmp_County_Name) );
 
-   County_FIPS = input(FIPS_C, best3.);
-   County_Name = upcase(compress(tmp_County_Name, 'County') )  ;
+   County_FIPS = input(tmp_County_FIPS, best3.);
+   length County_Name $ 20;
+   County_Name = upcase( trim(tranwrd(tmp_County_Name, 'County','') ) )  ;
    DROP tmp_:  ;
-   format County_Fips z3.;
-
-   if County_FIPS=. then delete;
+   format County_Fips z3.  County_Name $20.;
 run;
 
-   proc contents data= CountyCodes_ODD varnum ; run;
-   proc print data= CountyCodes_ODD; id County_FIPS; run;
+   proc contents data= CountyCodes varnum ; title1 'CountyCodes';  run;
+   proc print data= CountyCodes; id County_FIPS;  run;
 
 
 ** Add CountyCodes to County Population data **;
@@ -124,24 +123,22 @@ run;
    proc sort data=CountyCodes
                out=Code_sort ;
       by County_FIPS ;
-Data County_Population2;
+Data County_Population;
    merge  Code_sort  Pop_sort;
    by County_FIPS ;
 run;
 
-   PROC contents data=County_Population2  varnum ; title1 'County_Population2'; run;
+   PROC contents data=County_Population  varnum ; title1 'County_Population'; run;
 
 
 ** Check link between County FIPS code and County Name **;
-   PROC freq data= County_Population2;
+   PROC freq data= County_Population;
       tables County_FIPS * County_Name / list ;
 run;
-/*
- | N>40K missing !!
-*/
+
 
 ** Population count for Race_Ethnicity groups **;
-   PROC means data = DASH.County_Population  sum  maxdec=0;
+   PROC means data = County_Population  sum  maxdec=0;
       var Population;
       class Race_Ethnicity;
 run;

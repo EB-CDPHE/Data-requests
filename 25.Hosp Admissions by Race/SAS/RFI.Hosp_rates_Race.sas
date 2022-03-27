@@ -23,7 +23,7 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
  | 1. Access.COPHS.sas
  | 2. Check.COPHS.sas
  | 3. Fix.COHPS.sas
- | 4. CO_Population_Race.sas
+ | 4. GET.CO_Population_Race.sas
  *--------------------------------*/
 
 
@@ -116,9 +116,12 @@ run;
 *** CHECK ***;
 *** Use output in spreadsheet to check calculation of moving average of hosp rates ***;
    proc freq data=DASH.COPHS_fix ;
-   where ('01DEC2021'd  le  Hosp_Admission le  '31DEC2021'd);
+   where ('01DEC2021'd  le  Hosp_Admission le  '31DEC2021'd)  AND Race_Ethnicity = 'American Indian/Alaskan Native' ;
    table Hosp_Admission * Race_Ethnicity   /out=REcases ;
 run;
+quit; run;
 
-
+   proc print data= DASH.COPHS_fix ;
+   where Race_Ethnicity = 'American Indian/Alaskan Native' ;
+run;
 

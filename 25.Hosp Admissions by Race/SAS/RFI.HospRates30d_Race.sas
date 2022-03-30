@@ -60,8 +60,6 @@ run;
 
 
 
-
-
 *** Create timeline of all dates ***;
 ***------------------------------***;
 
@@ -104,9 +102,11 @@ run;
    PROC freq data=COPHS_filter ; tables Race_Ethnicity; run;
 
 
+/*___________________________________________________________________________________________________________________________*/
+
 
 *** TEMPLATE for calculation of Hosp Rate by Race_Ethnicity ***;
-***_________________________________________________________***;
+***---------------------------------------------------------***;
 
 ** Put population count for Race group into macro var **;
 data _null_; set CO_Population ; 
@@ -205,11 +205,13 @@ proc datasets library=work NOlist ;
 quit;
 run;
 
+/*___________________________________________________________________________________________________________________________*/
+
 
 *** RUN MACRO for each Race-Ethnicity group ***;
 ***-----------------------------------------***;
 
-%include 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.RaceRates.sas';
+%include 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.RaceRates.sas';  run;
 
 
 %RaceRates(Hispanic (All Races), MovingAverage_Hispanic)

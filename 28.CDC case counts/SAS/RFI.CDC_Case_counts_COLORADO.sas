@@ -105,7 +105,7 @@ Data Colorado_dates;  merge Timeline  Cases_counted;
    TotalDead = NumProbDead + NumConfDead ;
 
    * clean up obs with missing data *;
-   if ReportedDate GE '23MAR22'd then DELETE;
+   if ReportedDate GE '30MAR22'd then DELETE;
 
 run;
 

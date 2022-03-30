@@ -59,12 +59,6 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
 
 
  C. Colorado age population
-   1. XXX for 1 year interval
-
-
-
-
-   2. race-estimates-county.csv for COUNTY population estimates by Race/Ethnicity, Age, and Gender
 
 
 */
@@ -141,10 +135,10 @@ DATA CO2020pop_Cnty;
 run;
 
  ** Contents of dataset **;
-  PROC contents data=CO2020pop  varnum ; title1 'CO2020pop'; run;
+  PROC contents data=CO2020pop_Cnty  varnum ; title1 'CO2020pop_Cnty'; run;
 
  ** View of dataset **;
-   proc print data=CO2020pop; run;
+   proc print data=CO2020pop_Cnty; run;
                                        
 
 
@@ -197,7 +191,6 @@ run;
 
 
 
-
 *** Code to access B.1  ***;
 ***---------------------***;
 
@@ -224,10 +217,22 @@ libname  B1Pop  xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal
 
    proc contents data= B1Pop.data  varnum ; run;
 
-/*
+
+   proc format;
+      value $RaceFmt
+      Hispanic_all_races = 'Hispanic (All Races)'
+      White_Non_Hispanic = 'White (Non-Hispanic)'
+      Black_Non_Hispanic = 'Black (Non-Hispanic)'
+      Native_American_Non_Hispanic = 'Native American/Alaskan Native (Non-Hispanic)'
+      Asian_Non_Hispanic = 'Asian/Pacific Islander (Non-Hispanic)'
+      Multiple_Races_Non_Hispanic = 'Multiple Races (Non-Hispanic)'
+      Other_Race_Non_Hispanic = 'Other Race (Non-Hispanic)' ;
+run;
+
+/*---------------------------------------------------------------------------------------------------------------*
  | Structure of this dataset is 'wide', i.e. column for each race.
  | This dataset needs to be transposed, i.e. variable for Race_Ethnicity and variable for Population (counts)
- */
+ *---------------------------------------------------------------------------------------------------------------*/
 
 /*____________________________________________________________________________________________________________________________________*/
 
@@ -269,7 +274,9 @@ run;
   PROC contents data=CO2020pop_Race  varnum ; title1 'CO2020pop_Race'; run;
 
  ** View of dataset **;
-   proc print data=CO2020pop_Race; run;
+   proc print data=CO2020pop_Race; 
+      format Race_Ethnicity $RaceFmt. ;
+run;
 
 
 /*____________________________________________________________________________________________________________________________________*/
@@ -294,9 +301,9 @@ DATA Cnty_Race_TEMP;
    DROP  GEOCODE  tmp_County ;
 run;
  ** Contents of dataset **;
-  PROC contents data=Cnty_Race_TEMP  varnum ; title1 'Cnty_Race_TEMP'; run;
+/*  PROC contents data=Cnty_Race_TEMP  varnum ; title1 'Cnty_Race_TEMP'; run;*/
  ** View of dataset **;
-   proc print data=Cnty_Race_TEMP; run;
+/*   proc print data=Cnty_Race_TEMP; run;*/
 
 
 ** Create SAS dataset from spreadsheet **;
@@ -328,18 +335,6 @@ run;
   PROC contents data=CO2020pop_Cnty_Race  varnum ; title1 'CO2020pop_Cnty_Race'; run;
 
  ** View of dataset **;
-
-   proc format;
-      value $RaceFmt
-      Hispanic_all_races = 'Hispanic (All Races)'
-      White_Non_Hispanic = 'White (Non-Hispanic)'
-      Black_Non_Hispanic = 'Black (Non-Hispanic)'
-      Native_American_Non_Hispanic = 'Native American/Alaskan Native (Non-Hispanic)'
-      Asian_Non_Hispanic = 'Asian/Pacific Islander (Non-Hispanic)'
-      Multiple_Races_Non_Hispanic = 'Multiple Races (Non-Hispanic)'
-      Other_Race_Non_Hispanic = 'Other Race (Non-Hispanic)' ;
-run;
-
    proc print data=CO2020pop_Cnty_Race; 
       format Race_Ethnicity $RaceFmt. ;
 run;
@@ -373,7 +368,7 @@ libname B2Pop xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\D
 
 ** Create SAS dataset from spreadsheet **;
 DATA CO2020est_Cnty_Race_Age_TEMP;  length Race_Ethnicity $ 22 ;  set B2Pop.DATA;
-   where year=2020;
+/*   where year=2020;*/
    rename sex=Gender;
    rename count=Population;
    format County_Fips z3. ;
@@ -437,6 +432,8 @@ run;
 Data CO2020est_Cnty_Race_Age_Sex;
    merge  Code_sort  Pop_sort;
    by County_FIPS ;
+
+   DROP Race Ethnicity;
 run;
 
 ** Check link between County FIPS code and County Name **;
@@ -455,6 +452,7 @@ run;
    PROC means data = CO2020est_Cnty_Race_Age_Sex  sum  maxdec=0;
       var Population;
       class Race_Ethnicity;
+/*      format Race_Ethnicity $RaceFmt. ;*/
 run;
 
  ** Summary of dataset - County **;

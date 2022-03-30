@@ -67,5 +67,4 @@ run;
    PROC contents data=COVID.CO_Population_Race_Ethnicity varnum; run;
 
    PROC print data=COVID.CO_Population_Race_Ethnicity ; run;
-   PROC freq data=COVID.CO_Population_Race_Ethnicity ; tables population; run;
 

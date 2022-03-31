@@ -43,16 +43,18 @@ For this first weekly submission of historical counts, the total counts by statu
 
 ![TotalCases](./Images/Total_counts_CASES.jpg)
 
-![TotalDeaths](./Images/Total_counts_CASES.jpg)
+![TotalDeaths](./Images/Total_counts_DEATHS.jpg)
 #
 
 ## Response
-The final dataset is exported as a CSV file. Here is the link to the final CSV file:  [Historical Counts for Colorado](). CDC provided a template for recieving historical data. I re-ordered the columns in the CSV file to match this template and then copied the column headers. I saved the modifed csv file as an Excel file named [Bulk Historical Update Colorado](). This was emailed to Sarah of the Aggregate Data team at CDC on March 22, 2022.
+The final dataset is exported as a CSV file. Here is the link to the final CSV file:  [Bulk_Colorado](). CDC provided a template for recieving historical data. I re-ordered the columns in the CSV file to match this template and then copied the column headers. I saved the modifed csv file as an Excel file named [Bulk Historical Update Colorado](). This was emailed to Sarah of the Aggregate Data team at CDC on March 22, 2022.
 
 #
 
 ### Updating this Request
-The SAS program used to generate the response was [RFI.Historical_case_counts.sas](RFI.Historical_case_counts.sas). 
+
+A new update: State-level historical counts no longer will be generated and sent to CDC.
+
 To update this response, the following would need to be done:
 1. Modify the section of SAS code that creates a timeline, i.e. continuous unbroken list of ReportedDate's from January 1, 2020 to present. Specifically, increase the number of iterations that the DO loop runs.
 

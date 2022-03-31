@@ -22,6 +22,18 @@ OPTIONS pageno=1;
  | 2. Fix.CEDRS.sas
  *--------------------------------*/
 
+/*
+ | What this program does:
+   a) Create timeline dataset of all dates in pandemic
+   b) Create local copy of CEDRS case data for selected variables
+   c) Reduce dataset from patient level to date level (one obs per date reported)
+   d) Add ALL reported dates (from timeline ds) for populations with sparse data
+   e) Calculate Daily Case counts by status
+   f) Calculate Cumulatitive values and totals
+   g) Need to re-order variables to match column headers in Template
+   h) Export final dataset to Excel workbook
+ */
+
 
 *** Create timeline of all dates ***;
 ***------------------------------***;
@@ -208,8 +220,8 @@ run;
 
 
 
-***  Export data to CSV  ***;
-***----------------------***;
+***  Export final dataset to Excel workbook  ***;
+***------------------------------------------***;
 
 PROC EXPORT DATA= WORK.Bulk_Daily_23MAR2022_Colorado 
             OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Bulk_Historical_Update_Colorado_2022-03-23.xlsx" 

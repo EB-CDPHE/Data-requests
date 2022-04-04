@@ -161,7 +161,7 @@ run;
 ** Create libname with XLSX engine that points to XLSX file **;
 libname A2Pop xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data\demographics\CountyRankings.xlsx' ; run;
 
-   proc contents data= mydemo.data  varnum ; run;
+   proc contents data= A2Pop.data  varnum ; run;
 
 ** Create SAS dataset from spreadsheet **;
 DATA CO2020est_Cnty;   
@@ -170,7 +170,7 @@ DATA CO2020est_Cnty;
    where County_FIPS ^= '000' ;          * For STATE-level use ='000' ;
                                          * For COUNTY-level use ^='000' ;
 
-   length County_Name $ 20;
+   length County_Name $ 22;
    County_Name = trim(tranwrd(Area, 'COUNTY','') ) ;
 
    Rename July_2020 = Population;

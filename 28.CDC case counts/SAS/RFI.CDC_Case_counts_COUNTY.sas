@@ -260,63 +260,12 @@ RUN;
 
 
 
-***  Calculate Cumulatitive values and totals  ***;
-***--------------------------------------------***;
 
 
-**  Sort by County and Date  **;
-/*  PROC sort data=Colorado_County_dates  */
-/*             out= Colorado_County_dates_sort; */
-/*      by CountyAssigned ReportedDate;*/
-/*run;*/
 
 
-/*Data Cases_County_stats; merge  Colorado_County_dates_sort  CO2020est_Cnty_sort  ;*/
-/*   by CountyAssigned ;*/
-/**/
-/*   if CountyAssigned = 'Unallocated Colorado' then DO;*/
-/*      county = 'Unallocated Colorado';*/
-/*      StateAbbr='CO';*/
-/*      StateFIPS='08';*/
-/*      countyFIPS='08000';*/
-/*   END;*/
-/**/
-/*run;*/
 
-* set accumulator vars to 0 for first ReportedDate in group *;
-/*   if first.CountyAssigned then DO;  CumConfirmed=0;  CumProbable=0;  CumConfDead=0;  CumProbDead=0;   END;*/
-
-* calculate cumulative counts *;
-/*   CumConfirmed + NumConfirmed;*/
-/*   CumProbable + NumProbable;*/
-/*   CumConfDead + NumConfDead;*/
-/*   CumProbDead + NumProbDead;*/
-
-* create total vars *;
-/*   TotalCumCases = CumProbable + CumConfirmed ;*/
-/*   TotalCumDead = CumProbDead + CumConfDead ;*/
-/**/
-/*   DailyChangeCases = TotalCumCases - lag(TotalCumCases); */
-/*   DailyChangeDead = TotalCumDead - lag(TotalCumDead);*/
-
-* add labels *;
-  * LABEL 
-      NumConfirmed = 'New confirmed cases for the day'
-      NumProbable = 'New probable cases for the day'
-      TotalCases = 'Total of Confirmed and Probable cases'
-
-      NumConfDead = 'Confirmed cases that died'
-      NumProbDead = 'Probable cases that died day'
-      TotalDead = 'Total of Confirmed and Probable deaths'
-
-      CumConfirmed = 'Cumulative total of confirmed cases'
-      CumProbable = 'Cumulative total of probable cases'
-      TotalCumCases = 'Cumulative total of all cases'
-
-      CumConfDead = 'Confirmed cases that died'
-      CumProbDead = 'Probable cases that died day'
-      TotalCumDead = 'Cumulative total of all deaths'  ;
-/*run;*/
+*** extra, leftover code ***;
 
    proc print data= Cases_County_stats ;
       id countyFIPS ; var county  stateAbbr stateFIPS  ReportedDate  NumConfirmed  NumConfDead ; 
@@ -333,28 +282,3 @@ run;
 run;
 
 
-
-
-***  Evaluate outcome  ***;
-***--------------------***;
-
-   PROC print data= Cases_County_stats l; 
-      where ReportedDate ge '01MAR20'd;
-      id CountyAssigned;
-      sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead;
-run;
-
-   PROC means data= Cases_County_stats n sum maxdec=0;
-      var NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
-      class CountyAssigned ;
-run;
-
-
-***  Export data to CSV  ***;
-***----------------------***;
-
-PROC EXPORT DATA= WORK.Cases_County_stats
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Cases_Counts_by_County032122.csv" 
-            DBMS=CSV REPLACE;
-            PUTNAMES=YES;
-RUN;

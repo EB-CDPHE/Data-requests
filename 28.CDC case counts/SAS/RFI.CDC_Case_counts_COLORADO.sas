@@ -41,7 +41,7 @@ OPTIONS pageno=1;
 DATA timeline;
    ReportedDate='01MAR20'd;
    output;
-   do t = 1 to 760;
+   do t = 1 to 770;
       ReportedDate+1;
       output;
    end;
@@ -117,7 +117,7 @@ Data Colorado_dates;  merge Timeline  Cases_counted;
    TotalDead = NumProbDead + NumConfDead ;
 
    * clean up obs with missing data *;
-   if ReportedDate GE '30MAR22'd then DELETE;
+   if ReportedDate GE '06APR22'd then DELETE;
 
 run;
 
@@ -186,7 +186,7 @@ run;
 ***-----------------***;
 
 ** Need to re-order variables to match column headers in Template **;
-DATA Bulk_Daily_23MAR2022_Colorado;
+DATA Bulk_Daily_06APR2022_Colorado;
    retain ReportedDate
       NumConfirmed  CumConfirmed    NumProbable  CumProbable    TotalCases  TotalCumCases
       NumConfDead   CumConfDead     NumProbDead  CumProbDead    TotalDead   TotalCumDead  ;                                                            ;
@@ -195,23 +195,23 @@ DATA Bulk_Daily_23MAR2022_Colorado;
    DROP  Daily:  ;
 run;
 
-   PROC contents data= Bulk_Daily_23MAR2022_Colorado varnum;  run;
+   PROC contents data= Bulk_Daily_06APR2022_Colorado varnum;  run;
 
 
 ***  Evaluate outcome  ***;
 ***--------------------***;
 
 title;
-   PROC print data= Bulk_Daily_23MAR2022_Colorado l; 
+   PROC print data= Bulk_Daily_06APR2022_Colorado l; 
       where ReportedDate ge '01MAR20'd;
       sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
 run;
 
-   PROC means data= Bulk_Daily_23MAR2022_Colorado n sum maxdec=0;
+   PROC means data= Bulk_Daily_06APR2022_Colorado n sum maxdec=0;
       var NumConfirmed  NumProbable  TotalCases   ;
    title1; title2 'Final counts: CASES';
 run;
-   PROC means data= Bulk_Daily_23MAR2022_Colorado n sum maxdec=0;
+   PROC means data= Bulk_Daily_06APR2022_Colorado n sum maxdec=0;
       var NumConfDead  NumProbDead  TotalDead   ;
    title1; title2 'Final counts: DEATHS';
 run;
@@ -223,8 +223,8 @@ run;
 ***  Export final dataset to Excel workbook  ***;
 ***------------------------------------------***;
 
-PROC EXPORT DATA= WORK.Bulk_Daily_23MAR2022_Colorado 
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Bulk_Historical_Update_Colorado_2022-03-23.xlsx" 
+PROC EXPORT DATA= WORK.Bulk_Daily_06APR2022_Colorado 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Bulk_Historical_Update_Colorado_2022-04-06.xlsx" 
             DBMS=EXCEL LABEL REPLACE;
      SHEET="Jurisdictional Aggregate Data"; 
 RUN;

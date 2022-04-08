@@ -2,7 +2,7 @@
 PROGRAM:  RFI.CDC_Case_counts_COUNTY.sas
 AUTHOR:   Eric Bush
 CREATED:  March 21, 2022
-MODIFIED:	
+MODIFIED: 040822:  Add in code for calculating cumulatitve values and totals	
 PURPOSE:	 CDC request for historical data 
 INPUT:	 COVID.County_Population   COVID.CEDRS_view_fix	
 OUTPUT:		
@@ -25,20 +25,22 @@ OPTIONS pageno=1;
 /*__________________________* 
  | What this program does:  |
  *_________________________________________________________________________________________________*
- | First section
+ | First data source:  LIBNAME = A2Pop; DATA = CountyRankings.XLSX
  | a) Pull out a section of code from the GET.Demographics.sas program, specifically section A2.
  |    Use this to obtain county level identifiers which links County name with County FIPS code.
  | b) Add in county level variables that are part of the Excel template, i.e. State Abbr 
  |    and State FIPS code. Also strip 'county' from County name variable. 
  | c) Create observation for "Unallocated" county and add to County dataset.
  |
- | Second section
+ | Second data source: LIBNAME = COVID;  DATA = CEDRS
  | a) Create a local copy of CEDRS dataset. Keep only four variables.
  |    Change County="INTERNATIONAL' to 'Unallocated';
  | b) sort by County and Date
  | c) reduce from Patient-level to Date-level dataset
  | d) count daily cases (i.e. sum within ReportedDate group) by Status.
  |    Drop patient level variables (CaseStatus and Outcome)
+ |
+ | Merged data sources:
  | e) Merge with Timeline and do the following:
  |    - backfill missing values with zeros
  |    - create Total variables that tally counts across status
@@ -142,7 +144,6 @@ run;
 
    PROC contents data=COVID.CEDRS_view_fix varnum ;  title1 'COVID.CEDRS_view_fix';  run;
 
-
 DATA CO_county_cases;  
    length CountyAssigned $ 22;
    set COVID.CEDRS_view_fix;
@@ -232,6 +233,32 @@ run;
   PROC means data= Colorado_County_dates  sum maxdec=0;
       var  NumProbable  NumConfirmed  TotalDead ;
       class CountyAssigned;
+run;
+
+
+
+***  Calculate Cumulatitive values and totals  ***;
+***--------------------------------------------***;
+
+Data County_Cases_stats; set Colorado_County_dates;
+   by CountyAssigned ;
+
+* Reset accumulator vars to 0 for each County *;
+   if first.CountyAssigned then DO;  CumConfirmed=0;  CumProbable=0;  CumConfDead=0;  CumProbDead=0;   END;
+
+* calculate cumulative counts *;
+   CumConfirmed + NumConfirmed;
+   CumProbable + NumProbable;
+   CumConfDead + NumConfDead;
+   CumProbDead + NumProbDead;
+
+* create total vars for cumulative counts *;
+   TotalCumCases = CumProbable + CumConfirmed ;
+   TotalCumDead = CumProbDead + CumConfDead ;
+
+* calculate daily changes *;
+   DailyChangeCases = TotalCumCases - lag(TotalCumCases); 
+   DailyChangeDead = TotalCumDead - lag(TotalCumDead);
 run;
 
 

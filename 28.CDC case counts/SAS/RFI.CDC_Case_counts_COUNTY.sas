@@ -22,17 +22,42 @@ OPTIONS pageno=1;
  | 2. Fix.CEDRS.sas
  *--------------------------------*/
 
+/*__________________________* 
+ | What this program does:  |
+ *_________________________________________________________________________________________________*
+ | First section
+ | a) Pull out a section of code from the GET.Demographics.sas program, specifically section A2.
+ |    Use this to obtain county level identifiers which links County name with County FIPS code.
+ | b) Add in county level variables that are part of the Excel template, i.e. State Abbr 
+ |    and State FIPS code. Also strip 'county' from County name variable. 
+ | c) Create observation for "Unallocated" county and add to County dataset.
+ |
+ | Second section
+ | a) Create a local copy of CEDRS dataset. Keep only four variables.
+ |    Change County="INTERNATIONAL' to 'Unallocated';
+ | b) sort by County and Date
+ | c) reduce from Patient-level to Date-level dataset
+ | d) count daily cases (i.e. sum within ReportedDate group) by Status.
+ |    Drop patient level variables (CaseStatus and Outcome)
+ | e) Merge with Timeline and do the following:
+ |    - backfill missing values with zeros
+ |    - create Total variables that tally counts across status
+ |    - truncate dataset to current date
+ | f) Check numbers by comparing totals from patient-level CEDRS dataset to processed dataset
+ | g) 
+ *_________________________________________________________________________________________________*/
 
 
-*** Get County FIPS and name link ***;
-***-------------------------------***:
+
+*** Get link between County FIPS and County name ***;
+***----------------------------------------------***:
 
 ** Create libname with XLSX engine that points to XLSX file **;
 libname A2Pop xlsx 'C:\Users\eabush\Documents\GitHub\Data-requests\0.Universal\Data\demographics\CountyRankings.xlsx' ; run;
 
    proc contents data= A2Pop.data  varnum ; run;
 
-** Create SAS dataset from spreadsheet **;
+** Create SAS dataset from SDO spreadsheet **;
 DATA CO2020est_Cnty;   
    set A2Pop.data;
 
@@ -53,6 +78,7 @@ DATA CO2020est_Cnty;
    KEEP countyFIPS  County_FIPS  StateAbbr  StateFIPS   CountyAssigned  County  ; 
 run;
 
+** Create observation for "Unallocated" county **;
 DATA Unallocated;  
    length CountyAssigned $ 22;
    CountyAssigned = 'Unallocated Colorado' ;
@@ -64,25 +90,32 @@ DATA Unallocated;
    countyFIPS='08000';
 run;
 
+** Add Unallocated county data to County dataset **;
 DATA CO_Counties;  set Unallocated  CO2020est_Cnty ;
 run;
 
- ** Contents of dataset **;
-  PROC contents data=CO_Counties  varnum ; title1 'CO_Counties'; run;
+** Contents of dataset **;
+   PROC contents data=CO_Counties  varnum ; title1 'CO_Counties'; run;
 
- ** View of dataset **;
-   proc print data=CO_Counties; 
+** View of dataset **;
+   PROC print data=CO_Counties; 
       id countyFIPS; var  county  StateAbbr  StateFIPS  County_FIPS  CountyAssigned ;
 run;
 
 
+** Create complete timeline for each County **;
+/*------------------------------------------**
+ | NOTE: This makes it so each County has a   
+ | row for every day of the pandemic. 
+ | UPDATE number of loops as needed.
+*--------------------------------------------*/
 DATA County_Timeline; set CO_Counties; 
    by CountyFIPS;
 
    if first.CountyFIPS then DO;
    ReportedDate='01MAR20'd;
    output;
-   do t = 1 to 770;
+   do t = 1 to 770;                                   * <--  UPDATE NUMBER OF LOOPS HERE;
       ReportedDate+1;
       output;
    end;
@@ -96,11 +129,11 @@ run;
       by CountyAssigned ReportedDate;
 run;
 
- ** Contents of dataset **;
-  PROC contents data=County_Timeline_sort  varnum ; title1 'County_Timeline_sort'; run;
-
  ** View of dataset **;
    proc print data= County_Timeline_sort;  run;
+
+ ** Contents of dataset **;
+/*  PROC contents data=County_Timeline_sort  varnum ; title1 'County_Timeline_sort'; run;*/
 
 
 
@@ -182,7 +215,7 @@ Data Colorado_County_dates;  merge County_Timeline_sort  County_Cases_counted;
    TotalCases = NumProbable + NumConfirmed ;
    TotalDead  = NumProbDead + NumConfDead ;
 
-   if ReportedDate > '04APR22'd then DELETE;
+   if ReportedDate > '05APR22'd then DELETE;                               * <-- CHANGE DATE HERE ;
 run;
 /*   PROC print data= Colorado_County_dates; where CountyAssigned =''; run;*/
    PROC contents data=Colorado_County_dates varnum ;  title1 'Colorado_County_dates';  run;
@@ -213,7 +246,7 @@ run;
 run;
 
 ** Need to re-order variables to match column headers in Template **;
-DATA Colo_County_04APR2022;
+DATA Colo_County_06APR2022;                                                                   * <-- CHANGE DATE HERE ;
    retain countyFIPS  county  StateAbbr  StateFIPS   ReportedDate  TotalCases  TotalDead  ;    
    set Colorado_County_dates_sort;
 
@@ -225,7 +258,7 @@ DATA Colo_County_04APR2022;
    KEEP  countyFIPS  county  StateAbbr  StateFIPS   ReportedDate  TotalCases  TotalDead  ;
 run;
 
-   PROC contents data= Colo_County_04APR2022  varnum;  run;
+   PROC contents data= Colo_County_06APR2022  varnum;  run;                                  * <-- CHANGE DATE HERE ;
 
 
 
@@ -233,23 +266,23 @@ run;
 ***--------------------***;
 
 title;
-   PROC print data= Colo_County_04APR2022 l; 
-      where ReportedDate ge '01MAR20'd;
-      sum  TotalCases  TotalDead  ;
-run;
-
-   PROC means data= Colo_County_04APR2022  sum maxdec=0;
+   PROC means data= Colo_County_06APR2022  sum maxdec=0;                                     * <-- CHANGE DATE HERE ;
       var   TotalCases  TotalDead;
    title1; title2 'Final counts';
 run;
+
+/*   PROC print data= Colo_County_06APR2022 l;                                                 * <-- CHANGE DATE HERE ;*/
+/*      where ReportedDate ge '01MAR20'd;*/
+/*      sum  TotalCases  TotalDead  ;*/
+/*run;*/
 
 
 
 ***  Export final dataset to Excel workbook  ***;
 ***------------------------------------------***;
-
-PROC EXPORT DATA= WORK.Colo_County_04APR2022 
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Colo_County_04APR2022.xlsx" 
+                                                                                           * vvv  CHANGE DATE HERE  vvv ;
+PROC EXPORT DATA= WORK.Colo_County_06APR2022 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Colo_County_06APR2022.xlsx" 
             DBMS=EXCEL LABEL REPLACE;
      SHEET="Jurisdictional Aggregate Data"; 
 RUN;

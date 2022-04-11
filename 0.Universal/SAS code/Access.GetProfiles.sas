@@ -66,7 +66,7 @@ run;
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
 DATA GetProfiles_read ;  
 /*   length ProfileID $ 9;  */
-   set GetProfiles_temp ;
+   set GetProfiles_temp_ ;
 
 /*   format ProfileID $9.;*/
 run;

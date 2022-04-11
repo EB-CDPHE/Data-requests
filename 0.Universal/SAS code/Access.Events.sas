@@ -55,7 +55,7 @@ DATA Events_temp;
                     CountedDate=tmp_CountedDate
                     DiagnosisDate=tmp_DiagnosisDate
                     OnsetDate=tmp_OnsetDate
-                    InvestigationStartDate=tmp_InvestigationStartDate
+                    InvestigationStartDate=tmp_InvestStartDate
                     InfectiousPeriodStart=tmp_InfectiousPeriodStart
                     InfectiousPeriodEnd=tmp_InfectiousPeriodEnd
                     CDCReportDate=tmp_CDCReportDate
@@ -63,7 +63,7 @@ DATA Events_temp;
                     ActualDeliveryDate=tmp_ActualDeliveryDate
                     AssignedDate=tmp_AssignedDate
                     AssignedDate2=tmp_AssignedDate2
-                    InvestigationCompletedDate=tmp_InvestigationCompletedDate
+                    InvestigationCompletedDate=tmp_InvestCompletedDate
                     ClosedDate=tmp_ClosedDate
                     DateCounted=tmp_DateCounted
                     SurveySentDate=tmp_SurveySentDate
@@ -80,7 +80,7 @@ DATA Events_temp;
    CountedDate = datepart(tmp_CountedDate);   format CountedDate yymmdd10.;
    DiagnosisDate = datepart(tmp_DiagnosisDate);   format DiagnosisDate yymmdd10.;
    OnsetDate = datepart(tmp_OnsetDate);   format OnsetDate yymmdd10.;
-   InvestigationStartDate = datepart(tmp_InvestigationStartDate);   format InvestigationStartDate yymmdd10.;
+   InvestigationStartDate = datepart(tmp_InvestStartDate);   format InvestigationStartDate yymmdd10.;
    InfectiousPeriodStart = datepart(tmp_InfectiousPeriodStart);   format InfectiousPeriodStart yymmdd10.;
    InfectiousPeriodEnd = datepart(tmp_InfectiousPeriodEnd);   format InfectiousPeriodEnd yymmdd10.;
    CDCReportDate = datepart(tmp_CDCReportDate);   format CDCReportDate yymmdd10.;
@@ -88,12 +88,12 @@ DATA Events_temp;
    ActualDeliveryDate = datepart(tmp_ActualDeliveryDate);   format ActualDeliveryDate yymmdd10.;
    AssignedDate = datepart(tmp_AssignedDate);   format AssignedDate yymmdd10.;
    AssignedDate2 = datepart(tmp_AssignedDate2);   format AssignedDate2 yymmdd10.;
-   InvestigationCompletedDate = datepart(tmp_InvestigationCompletedDate);   format InvestigationCompletedDate yymmdd10.;
+   InvestigationCompletedDate = datepart(tmp_InvestCompletedDate);   format InvestigationCompletedDate yymmdd10.;
    ClosedDate = datepart(tmp_ClosedDate);   format ClosedDate yymmdd10.;
    DateCounted = datepart(tmp_DateCounted);   format DateCounted yymmdd10.;
    SurveySentDate = datepart(tmp_SurveySentDate);   format SurveySentDate yymmdd10.;
    CoreDataOKDate = datepart(tmp_CoreDataOKDate);   format CoreDataOKDate yymmdd10.;
-   CreatedDate = datepart(tmp_CreateDate);   format CreatedDate yymmdd10.;
+   CreatedDate = datepart(tmp_CreatedDate);   format CreatedDate yymmdd10.;
    UpdatedDate = datepart(tmp_UpdatedDate);   format UpdatedDate yymmdd10.;
 
    DROP tmp_:  ;
@@ -117,5 +117,5 @@ run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=GetProfiles_read varnum; title1 'GetProfiles_read'; run;
+   PROC contents data=Events_read varnum; title1 'Events_read'; run;
 

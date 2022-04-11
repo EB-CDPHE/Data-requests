@@ -41,11 +41,9 @@ DATA Addresses_temp;
    set Addresses(rename=
                    (ProfileID=tmp_ProfileID 
                     DeactivatedDate=tmp_DeactivatedDate
-                    UpdateDate=tmp_UpdateDate
+                    UpdatedDate=tmp_UpdatedDate
                     CreatedDate=tmp_CreatedDate
-                    GeoCodedDate=tmp_GeoCodedDate
-
-)
+                    GeoCodedDate=tmp_GeoCodedDate )
                   ); 
  
 * Convert temporary numeric ID variable character ID var using the CATS function *;
@@ -53,14 +51,31 @@ DATA Addresses_temp;
 
 * Extract date part of a datetime variable  *;
    DeactivatedDate = datepart(tmp_DeactivatedDate);   format DeactivatedDate yymmdd10.;
-   UpdateDate = datepart(tmp_UpdateDate);   format UpdateDate yymmdd10.;
+   UpdatedDate = datepart(tmp_UpdatedDate);   format UpdatedDate yymmdd10.;
    CreatedDate = datepart(tmp_CreatedDate);   format CreatedDate yymmdd10.;
    GeoCodedDate = datepart(tmp_GeoCodedDate);   format GeoCodedDate yymmdd10.;
-
 
    DROP tmp_:  ;
 
 run;
 
+
+** 4. Shrink character variables in data set to shortest possible length (based on longest value) **;
+%inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
+
+ %shrink(Addresses_temp)
+
+
+** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
+DATA Addresses_read ;  
+/*   length ProfileID $ 9;  */
+   set Addresses_temp_ ;
+
+/*   format ProfileID $9.;*/
+run;
+
+
+**  7. PROC contents of final dataset  **;
+   PROC contents data=Addresses_read varnum; title1 'Addresses_read'; run;
 
 

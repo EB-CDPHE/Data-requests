@@ -41,7 +41,7 @@ run;
 ** Review contents of SAS dataset **;
 PROC contents data=Events  varnum ;  run;   
 
-/*proc freq data= Events;  tables DiseaseID   EventStatusID  Deleted ;  run;*/
+proc freq data= Events;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;

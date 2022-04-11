@@ -56,7 +56,6 @@ DATA Addresses_temp;
    GeoCodedDate = datepart(tmp_GeoCodedDate);   format GeoCodedDate yymmdd10.;
 
    DROP tmp_:  ;
-
 run;
 
 

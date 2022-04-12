@@ -59,3 +59,21 @@ DATA Codes_read;  set Codes_temp_;  run;
    PROC contents data=Codes_read varnum; title1 'Codes_read'; run; 
 
    PROC print data=Codes_read ; id CodeID; run; 
+
+
+
+*** Explore data ***;
+***--------------***;
+
+   proc print data=Codes_read;
+      where CodeID in (277, 278, 279);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+/*      tables ActiveAddressID ;*/
+/*      tables CountyAssignedID ;*/
+/*      tables EventStatusID ;*/
+      tables OutcomeID ;
+run;
+

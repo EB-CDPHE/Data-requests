@@ -4,8 +4,8 @@ AUTHOR:    Eric Bush
 CREATED:   April 11, 2022
 MODIFIED:  Created from Access.GetProfiles.sas
 PURPOSE:   Access SQL table on Events
-INPUT:	  dbo66.Events
-OUTPUT:		     Events_read
+INPUT:	  CEDRS66.Events
+OUTPUT:		       Events_read
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------*

@@ -27,8 +27,6 @@ LIBNAME CEDRS66   ODBC  dsn='CEDRS_III_Warehouse' schema=cedrs;  run;
 
 **  2. Create temp SAS dataset from SQL table  **;
 DATA Hospitalizations; set CEDRS66.Hospitalizations; 
-/*   if DiseaseID =159  AND   EventStatusID in (1, 2)   AND  Deleted=0 ;*/
-/*   if disease ='COVID-19'  AND   EventStatus in ('Probable','Confirmed')   AND  Deleted=0 ;*/
 run; 
 
 ** Review contents of SAS dataset **;

@@ -66,15 +66,18 @@ run;
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA Addresses_read ;  
-/*   length ProfileID $ 9;  */
-   set Addresses_temp_ ;
-
-/*   format ProfileID $9.;*/
+DATA Addresses_read ;  set Addresses_temp_ ;
 run;
-
 
 **  7. PROC contents of final dataset  **;
    PROC contents data=Addresses_read varnum; title1 'Addresses_read'; run;
 
+
+
+*** Explore data ***;
+***--------------***;
+
+   proc freq data=Addresses_read;
+      tables AddressID ;
+run;
 

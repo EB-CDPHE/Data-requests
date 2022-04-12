@@ -27,9 +27,27 @@ LIBNAME Lookup66 ODBC  dsn='CEDRS_III_Warehouse' schema=lookups;  run;
 
 **  2. Create temp SAS dataset from SQL table  **;
 DATA GetDiseases; set Lookup66.GetDiseases; 
-/*   if DiseaseID =159  AND   EventStatusID in (1, 2)   AND  Deleted=0 ;*/
-/*   if disease ='COVID-19'  AND   EventStatus in ('Probable','Confirmed')   AND  Deleted=0 ;*/
+/*   if DiseaseID =159  ;*/
 run; 
+/*--------------------------------------------------------------------------------------------------*
+ |NOTE: For DiseaseGroupName='COVID-19': DiseaseName='COVID-19', DiseaseID=159, DiseaseGroupID=9
+ *--------------------------------------------------------------------------------------------------*/
 
 ** Review contents of SAS dataset **;
-PROC contents data=GetDiseases  varnum ;  run;   
+PROC contents data=GetDiseases  varnum ;  run;  
+
+** 3. Modify SAS dataset per Findings **;
+/*DATA GetDiseases;   set GetDiseases;  run;*/
+
+** 4. Shrink character variables in data set to shortest possible length (based on longest value) **;
+%inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
+
+ %shrink(GetDiseases)
+
+** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
+DATA GetDiseases_read;  set GetDiseases_;  run;
+
+**  7. PROC contents of final dataset  **;
+   PROC contents data=GetDiseases_read varnum; title1 'GetDiseases_read'; run; 
+
+   PROC print data=GetDiseases_read ;  run; 

@@ -20,7 +20,6 @@ OUTPUT:		       GetProfiles_read
  | 7. PROC contents of final dataset
  *--------------------------------------------------------------------*/
 
-
 ** 1. Libname to access COVID19 database on dbo144 server using ODBC **;
 
 LIBNAME CEDRS66   ODBC  dsn='CEDRS_III_Warehouse' schema=cedrs;  run;
@@ -66,13 +65,8 @@ run;
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA Hospitalizations_read ;  
-/*   length ProfileID $ 9;  */
-   set Hospitalizations_temp_ ;
-
-/*   format ProfileID $9.;*/
+DATA Hospitalizations_read ;   set Hospitalizations_temp_ ;
 run;
-
 
 **  7. PROC contents of final dataset  **;
    PROC contents data=Hospitalizations_read varnum; title1 'Hospitalizations_read'; run;

@@ -20,7 +20,6 @@ OUTPUT:		        GetEventStatus_read
  | 7. PROC contents of final dataset
  *--------------------------------------------------------------------*/
 
-
 ** 1. Libname to access COVID19 database on dbo144 server using ODBC **;
 
 LIBNAME Lookup66 ODBC  dsn='CEDRS_III_Warehouse' schema=lookups;  run;

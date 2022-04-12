@@ -31,7 +31,6 @@ DATA ProfileRaces; set CEDRS66.ProfileRaces; run;
 ** Review contents of SAS dataset **;
 PROC contents data=ProfileRaces  varnum ;  run;   
 
-
 ** 3. Modify SAS dataset per Findings **;
 DATA ProfileRaces_temp;
 * rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
@@ -59,13 +58,8 @@ run;
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA ProfileRaces_read ;  
-/*   length ProfileID $ 9;  */
-   set ProfileRaces_temp_ ;
-
-/*   format ProfileID $9.;*/
+DATA ProfileRaces_read ;  set ProfileRaces_temp_ ;
 run;
-
 
 **  7. PROC contents of final dataset  **;
    PROC contents data=ProfileRaces_read varnum; title1 'ProfileRaces_read'; run;

@@ -71,9 +71,7 @@ DATA Codes_read;  set Codes_temp_;  run;
       format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
 run;
 
-/*      tables ActiveAddressID ;*/
-/*      tables CountyAssignedID ;*/
-/*      tables EventStatusID ;*/
-      tables OutcomeID ;
+   PROC freq data= Codes_read;
+      tables ConceptGroup;
 run;
 

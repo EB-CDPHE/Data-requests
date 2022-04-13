@@ -216,6 +216,7 @@ Data Colorado_County_dates;  merge County_Timeline_sort  County_Cases_counted;
    TotalCases = NumProbable + NumConfirmed ;
    TotalDead  = NumProbDead + NumConfDead ;
 
+   * clean up obs with missing data *;
    if ReportedDate > '05APR22'd then DELETE;                               * <-- CHANGE DATE HERE ;
 run;
 /*   PROC print data= Colorado_County_dates; where CountyAssigned =''; run;*/

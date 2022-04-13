@@ -4,8 +4,8 @@ AUTHOR:    Eric Bush
 CREATED:   April 11, 2022
 MODIFIED:  Created from Access.GetProfiles.sas
 PURPOSE:   Access SQL table on Events
-INPUT:	  CEDRS66.GetProfiles
-OUTPUT:		       GetProfiles_read
+INPUT:	  CEDRS66.Hospitalizations_read
+OUTPUT:		       Hospitalizations_read
 ***********************************************************************************************/
 
 /*--------------------------------------------------------------------*
@@ -70,3 +70,12 @@ run;
 
 **  7. PROC contents of final dataset  **;
    PROC contents data=Hospitalizations_read varnum; title1 'Hospitalizations_read'; run;
+
+
+*** Explore data ***;
+***--------------***;
+
+   proc freq data=Hospitalizations_read;
+      tables HospitalizationID ;
+run;
+

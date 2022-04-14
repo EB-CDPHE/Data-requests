@@ -41,7 +41,7 @@ OPTIONS pageno=1;
 DATA timeline;
    ReportedDate='01MAR20'd;
    output;
-   do t = 1 to 770;
+   do t = 1 to 773;                                      * <--  UPDATE NUMBER OF LOOPS HERE;
       ReportedDate+1;
       output;
    end;
@@ -117,7 +117,7 @@ Data Colorado_dates;  merge Timeline  Cases_counted;
    TotalDead = NumProbDead + NumConfDead ;
 
    * clean up obs with missing data *;
-   if ReportedDate GE '06APR22'd then DELETE;
+   if ReportedDate GE '13APR22'd then DELETE;                                * <-- CHANGE DATE HERE ;
 
 run;
 
@@ -186,32 +186,32 @@ run;
 ***-----------------***;
 
 ** Need to re-order variables to match column headers in Template **;
-DATA Bulk_Daily_06APR2022_Colorado;
+DATA Bulk_Daily_13APR2022_Colorado;                                                                * <-- CHANGE DATE HERE ;
    retain ReportedDate
       NumConfirmed  CumConfirmed    NumProbable  CumProbable    TotalCases  TotalCumCases
-      NumConfDead   CumConfDead     NumProbDead  CumProbDead    TotalDead   TotalCumDead  ;                                                            ;
+      NumConfDead   CumConfDead     NumProbDead  CumProbDead    TotalDead   TotalCumDead  ;     
    set Cases_stats;
 
    DROP  Daily:  ;
 run;
 
-   PROC contents data= Bulk_Daily_06APR2022_Colorado varnum;  run;
+   PROC contents data= Bulk_Daily_13APR2022_Colorado varnum;  run;                                * <-- CHANGE DATE HERE ;
 
 
 ***  Evaluate outcome  ***;
 ***--------------------***;
 
 title;
-   PROC print data= Bulk_Daily_06APR2022_Colorado l; 
-      where ReportedDate ge '01MAR20'd;
+   PROC print data= Bulk_Daily_13APR2022_Colorado l;                                               * <-- CHANGE DATE HERE ;
+      where ReportedDate ge '01MAR20'd;                                                            
       sum  NumConfirmed  NumProbable  TotalCases  NumConfDead  NumProbDead  TotalDead  ;
 run;
 
-   PROC means data= Bulk_Daily_06APR2022_Colorado n sum maxdec=0;
+   PROC means data= Bulk_Daily_13APR2022_Colorado n sum maxdec=0;                                  * <-- CHANGE DATE HERE ;
       var NumConfirmed  NumProbable  TotalCases   ;
    title1; title2 'Final counts: CASES';
 run;
-   PROC means data= Bulk_Daily_06APR2022_Colorado n sum maxdec=0;
+   PROC means data= Bulk_Daily_13APR2022_Colorado n sum maxdec=0;                                  * <-- CHANGE DATE HERE ;
       var NumConfDead  NumProbDead  TotalDead   ;
    title1; title2 'Final counts: DEATHS';
 run;
@@ -223,8 +223,9 @@ run;
 ***  Export final dataset to Excel workbook  ***;
 ***------------------------------------------***;
 
-PROC EXPORT DATA= WORK.Bulk_Daily_06APR2022_Colorado 
-            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Bulk_Historical_Update_Colorado_2022-04-06.xlsx" 
+                                                                                           * vvv  CHANGE DATE HERE  vvv ;
+PROC EXPORT DATA= WORK.Bulk_Daily_13APR2022_Colorado 
+            OUTFILE= "C:\Users\eabush\Documents\GitHub\Data-requests\28.CDC case counts\Output\Bulk_Historical_Update_Colorado_2022-04-13.xlsx" 
             DBMS=EXCEL LABEL REPLACE;
      SHEET="Jurisdictional Aggregate Data"; 
 RUN;

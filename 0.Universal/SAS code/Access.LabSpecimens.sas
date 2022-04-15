@@ -61,3 +61,7 @@ run;
 
 **  7. PROC contents of final dataset  **;
    PROC contents data=LabSpecimens_read varnum; title1 'LabSpecimens_read'; run;
+
+   proc freq data=LabSpecimens_read;
+      tables LITSSpecimenID ;
+run;

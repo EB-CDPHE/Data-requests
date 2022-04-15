@@ -56,8 +56,8 @@ DATA SurvForm_temp; set SurvForm(rename=
 * Extract date part of a datetime variable  *;
    CreatedDate = datepart(tmp_CreatedDate);   format CreatedDate yymmdd10.;
 
-/*   DROP tmp_: ;*/
-   Keep EventID ICU CreatedDate;
+   DROP tmp_: ;
+/*   Keep EventID ICU CreatedDate;*/
 run;
 
    PROC contents data=SurvForm_temp  ; run;
@@ -71,3 +71,15 @@ DATA SurvForm_read;
 run;
 
    PROC contents data=SurvForm_read  ; run;
+
+
+
+*** Explore data ***;
+***--------------***;
+
+   proc freq data=SurvForm_read;
+/*      tables ICU_SurvForm  ;*/
+      tables VaccineBreakthrough  ;
+/*      tables  ExposureOccurredCountyID ;*/
+
+run;

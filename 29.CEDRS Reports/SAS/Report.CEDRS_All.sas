@@ -48,12 +48,39 @@ run;
       by ProfileID;
 run;
 
-Data DeathList; merge Events_sort(in=c) GetProfiles_sort ;
+Data COVIDreports; merge Events_sort(in=c) GetProfiles_sort ;
    by ProfileID;
    if c=1;
 run;
 
-   PROC contents data= DeathList ; title1 'DeathList'; run;
+   PROC contents data= COVIDreports ; title1 'COVIDreports'; run;
+
+
+/*____________________________________________________________________________________*/
+
+
+   PROC sort data=COVIDreports
+               out=COVIDreports_sort ;
+      by EventID;
+run;
+   PROC sort data=LabSpecimens_read
+               out=LabSpecimens_sort ;
+      by EventID;
+run;
+   PROC sort data=Labs_read
+               out=Labs_sort ;
+      by EventID;
+run;
+
+Data COVIDreports_labs; merge COVIDreports_sort(in=r) LabSpecimens_sort  Labs_sort ;
+   by EventID;
+   if r=1;
+run;
+
+   PROC contents data= COVIDreports_labs ; title1 'COVIDreports_labs'; run;
+
+
+/*____________________________________________________________________________________*/
 
 
 
@@ -145,3 +172,55 @@ PROC SQL noprint;
    where ConceptGroup = 'CDPHEOccupation';
 
 %put &OccupationList;
+
+
+
+** Transmission Type **;
+
+      PROC freq data= SurvForm_read;
+         tables TransmissionTypeID ;
+run;
+
+   proc print data=Codes_read;
+      where CodeID in (3999,4000,4001,4002);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+
+** County **;
+
+      PROC freq data= SurvForm_read;
+         tables ExposureOccurredCountyID ;
+run;
+
+   proc print data=Codes_read;
+      where CodeID in (191,200,1676,4003);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+   proc print data=Codes_read;
+      where ConceptGroup = 'County_FIPS';
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format  ConceptGroup ConceptName   PreferredConceptName $25. ;
+run;
+
+
+** Specimen Type **;
+
+      PROC freq data= COVIDreports_labs;
+         tables Specimen * SpecimenTypeID / list ;
+run;
+
+
+   proc freq data=COVIDreports_labs;
+      tables LITSSpecimenID ;
+run;
+
+
+
+   PROC freq data= COVIDreports_labs order=freq;
+/*      tables ResultID ;*/
+      tables  QuantitativeResult;
+run;

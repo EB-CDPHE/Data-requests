@@ -8,7 +8,6 @@ INPUT:	  CEDRS66.Phones
 OUTPUT:		       Phones_read
 ***********************************************************************************************/
 
-
 ** 1. Libname to access COVID19 database on dbo144 server using ODBC **;
 
 LIBNAME CEDRS66   ODBC  dsn='CEDRS_III_Warehouse' schema=cedrs;  run;
@@ -18,7 +17,6 @@ DATA Phones; set CEDRS66.Phones; run;
 
 ** Review contents of SAS dataset **;
 PROC contents data=Phones  varnum ;  run;   
-
 
 ** 3. Modify SAS dataset per Findings **;
 DATA Phones_temp;
@@ -39,12 +37,10 @@ DATA Phones_temp;
    DROP tmp_:  ;
 run;
 
-
 ** 4. Shrink character variables in data set to shortest possible length (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
  %shrink(Phones_temp)
-
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
 DATA Phones_read ;  set Phones_temp_ ;

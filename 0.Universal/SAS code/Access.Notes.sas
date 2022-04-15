@@ -4,7 +4,7 @@ AUTHOR:    Eric Bush
 CREATED:   April 11, 2022
 MODIFIED:  Created from Access.GetProfiles.sas
 PURPOSE:   Access SQL table on Events
-INPUT:	  CEDRS66.Notes_read
+INPUT:	  CEDRS66.Notes
 OUTPUT:		       Notes_read
 ***********************************************************************************************/
 
@@ -33,6 +33,7 @@ PROC contents data=Notes  varnum ;  run;
 
 ** 3. Modify SAS dataset per Findings **;
 DATA Notes_temp;
+   length Comment $ 900;
 * rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
    set Notes(rename=
                    (ProfileID=tmp_ProfileID 
@@ -47,7 +48,7 @@ DATA Notes_temp;
    UpdateDate = datepart(tmp_UpdateDate);   format UpdateDate yymmdd10.;
    CreateDate = datepart(tmp_CreateDate);   format CreateDate yymmdd10.;
 
-   DROP tmp_:  Comment;  * Drop Comment variable because it has a length of $1024~~!! This messes up the Shrink macro;
+   DROP tmp_:  ;* Comment;  * Drop Comment variable because it has a length of $1024~~!! This messes up the Shrink macro;
 run;
 
 

@@ -4,8 +4,8 @@ AUTHOR:		Eric Bush
 CREATED:	   July 5, 2021
 MODIFIED:   
 PURPOSE:	   Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		dbo144.CEDRS_view
-OUTPUT:		COVID.CEDRS_view
+INPUT:		dbo144.SurveillanceFormCovid19
+OUTPUT:		       SurvForm_read
 ***********************************************************************************************/
 
 /*________________________________________________________________________________________________________*
@@ -79,7 +79,16 @@ run;
 
    proc freq data=SurvForm_read;
 /*      tables ICU_SurvForm  ;*/
-      tables VaccineBreakthrough  ;
+/*      tables VaccineBreakthrough  ;*/
 /*      tables  ExposureOccurredCountyID ;*/
+/*      tables LungDiseaseID DiabetesID  HeartDiseaseID  ImmunocompromisedID  */
+/*            ChronicRenalDiseaseID  ChronicLiverDiseaseID  ChronicOtherID       ChronicOtherDesc  ;*/
+/*      tables SmokerCurrentID  SmokerFormerID  VapeCurrentID  VapeFormerID ;*/
+/*      tables WorkOutHome14DaysPriorIllnessID ;*/
+/*      tables HealthcareWorkerID;*/
+/*      tables WorkBusinessType;*/
+/*      tables TravelInternationalID;*/
+/*      tables ContactSymptomaticID;*/
+      tables ContactConfirmedID;
 
 run;

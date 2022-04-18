@@ -4,8 +4,8 @@ AUTHOR:		Eric Bush
 CREATED:	   July 5, 2021
 MODIFIED:   
 PURPOSE:	   Connect to dphe144 "CEDRS_view" and create associated SAS dataset
-INPUT:		dbo144.CEDRS_view
-OUTPUT:		COVID.CEDRS_view
+INPUT:		dbo144.SurveillanceFormSymptoms
+OUTPUT:		       SurvFormSymp.read
 ***********************************************************************************************/
 
 /*________________________________________________________________________________________________________*
@@ -87,7 +87,8 @@ DATA SurvFormSymp_read;  set SurvFormSymp_temp_;  run;
 
    proc freq data=SurvFormSymp_read;
 /*      tables Symptoms SymptomResolved ;*/
-      tables Fever  FeverOver100_4  FeverChills ;
+/*      tables Fever  FeverOver100_4  FeverChills ;*/
+      tables AnyCough  RunnyNose  BodyAches  SoreThroat Dyspnea  Headache  Diarrhea  Vomiting  AbdoPain  TasteSmell;
 
 run;
 

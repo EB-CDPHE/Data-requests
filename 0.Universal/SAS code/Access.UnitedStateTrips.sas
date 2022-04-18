@@ -4,8 +4,8 @@ AUTHOR:    Eric Bush
 CREATED:   April 17, 2022
 MODIFIED:  Created from Access.GetProfiles.sas
 PURPOSE:   Access SQL table on Events
-INPUT:	  CEDRS66.ForeignTrips
-OUTPUT:		       ForeignTrips_read
+INPUT:	  CEDRS66.USA_Trips
+OUTPUT:		       USA_Trips_read
 ***********************************************************************************************/
 
 

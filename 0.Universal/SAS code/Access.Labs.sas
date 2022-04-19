@@ -50,3 +50,10 @@ run;
 
 **  7. PROC contents of final dataset  **;
    PROC contents data=Labs_read varnum; title1 'Labs_read'; run;
+
+
+*** Explore data ***;
+   PROC freq data= Labs_read ;
+      where TestTypeID = 437 and ResultID ^in (1067, 1068, 1070, 9);
+      tables TestTypeID * ResultID / list;
+run;

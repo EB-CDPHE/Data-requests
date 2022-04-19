@@ -40,6 +40,18 @@ run;
 
 ** Review contents of SAS dataset **;
 PROC contents data=Events  varnum ;  run;   
+/*_______________________________________________________________________*
+ |NOTE:
+ | EventStatusID=263 for EventStatus='Confirmed'
+ | EventStatusID=264 for EventStatus='Does not meet case definition'
+ | EventStatusID=265 for EventStatus='Probable'
+ | EventStatusID=266 for EventStatus='Suspect'
+ | EventStatusID=267 for EventStatus='Unknown'
+ |
+ | OutcomeID=277 for Outcome='Alive'
+ | OutcomeID=278 for Outcome='Patient Died' 
+ | OutcomeID=278 for Outcome='Unknown' 
+ *_______________________________________________________________________*/
 
 proc freq data= Events;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
 
@@ -48,8 +60,7 @@ proc freq data= Events;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  r
 DATA Events_temp;
 * rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
    set Events(rename=
-                   (EventID=tmp_EventID 
-                    ProfileID=tmp_ProfileID 
+                   (ProfileID=tmp_ProfileID 
 
                     ReportedDate=tmp_ReportedDate
                     CountedDate=tmp_CountedDate
@@ -117,5 +128,27 @@ run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=Events_read varnum; title1 'Events_read'; run;
+   PROC contents data=Events_read ; title1 'Events_read'; run;
+
+
+*** Explore data ***;
+***--------------***;
+
+   proc freq data=Events_read;
+      tables DiseaseID ;
+run;
+
+   proc freq data=Events_read;
+/*      tables HospitalizedID ;*/
+/*      tables HomelessID ;*/
+/*      tables LiveInInstitution ;*/
+/*      tables ExposureFacilityID ;*/
+/*      tables InvestigationStatusID ;*/
+/*      tables OnsetDateUnavailable ;*/
+/*      tables PregnantID ;*/
+/*      tables OutbreakID ;*/
+      tables PregnantID ;
+
+run;
+
 

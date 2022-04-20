@@ -60,8 +60,9 @@ DATA LabSpecimens_read ;  set LabSpecimens_temp_ ;
 run;
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=LabSpecimens_read varnum; title1 'LabSpecimens_read'; run;
+   PROC contents data=LabSpecimens_read ; title1 'LabSpecimens_read'; run;
 
    proc freq data=LabSpecimens_read;
-      tables LITSSpecimenID ;
+/*      tables LITSSpecimenID ;*/
+      tables SpecimenTypeID ;
 run;

@@ -78,17 +78,5 @@ run;
 ***--------------***;
 
    proc freq data=SurvForm_read;
-/*      tables ICU_SurvForm  ;*/
-/*      tables VaccineBreakthrough  ;*/
-/*      tables  ExposureOccurredCountyID ;*/
-/*      tables LungDiseaseID DiabetesID  HeartDiseaseID  ImmunocompromisedID  */
-/*            ChronicRenalDiseaseID  ChronicLiverDiseaseID  ChronicOtherID       ChronicOtherDesc  ;*/
-/*      tables SmokerCurrentID  SmokerFormerID  VapeCurrentID  VapeFormerID ;*/
-/*      tables WorkOutHome14DaysPriorIllnessID ;*/
-/*      tables HealthcareWorkerID;*/
-/*      tables WorkBusinessType;*/
-/*      tables TravelInternationalID;*/
-/*      tables ContactSymptomaticID;*/
-      tables ContactConfirmedID;
-
+      tables ExpoWoreFaceMaskFrequencyID;
 run;

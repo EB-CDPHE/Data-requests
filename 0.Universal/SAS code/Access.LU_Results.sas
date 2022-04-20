@@ -43,6 +43,8 @@ run;
 ***--------------***;
 
    PROC freq data= LU_Results_read;
+/*      where ResultID ^in (1067, 1068, 1070, 9);*/
+      where (1061 LE ResultID LE 1235 ) and ResultID ^in (1067, 1068, 1070);
       tables ResultID * ResultText  /list;
 /*      tables  ResultText;*/
 run;

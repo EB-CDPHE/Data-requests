@@ -34,12 +34,12 @@ LIBNAME CEDRS66   ODBC  dsn='CEDRS_III_Warehouse' schema=cedrs;  run;
 
 
 **  2. Create temp SAS dataset from SQL table  **;
-DATA Events; set CEDRS66.Events; 
-   if DiseaseID =159  AND   Deleted=0 ;
+DATA EventsFlu; set CEDRS66.Events; 
+   if DiseaseID =127  AND   Deleted=0 ;
 run; 
 
 ** Review contents of SAS dataset **;
-PROC contents data=Events  varnum ;  run;   
+PROC contents data=EventsFlu  varnum ; title1 'EventsFlu'; run;   
 /*_______________________________________________________________________*
  |NOTE:
  | EventStatusID=263 for EventStatus='Confirmed'
@@ -53,7 +53,7 @@ PROC contents data=Events  varnum ;  run;
  | OutcomeID=278 for Outcome='Unknown' 
  *_______________________________________________________________________*/
 
-proc freq data= Events;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
+proc freq data= EventsFlu;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;
@@ -139,7 +139,7 @@ run;
 run;
 
    proc freq data=Events_read;
-/*      tables HospitalizedID ;*/
+      tables HospitalizedID ;
 /*      tables HomelessID ;*/
 /*      tables LiveInInstitution ;*/
 /*      tables ExposureFacilityID ;*/
@@ -147,7 +147,7 @@ run;
 /*      tables OnsetDateUnavailable ;*/
 /*      tables PregnantID ;*/
 /*      tables OutbreakID ;*/
-      tables PregnantID ;
+/*      tables PregnantID ;*/
 
 run;
 

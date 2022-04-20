@@ -53,13 +53,13 @@ PROC contents data=EventsRSV  varnum ; title1 'EventsRSV'; run;
  | OutcomeID=278 for Outcome='Unknown' 
  *_______________________________________________________________________*/
 
-proc freq data= EventsFlu;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
+proc freq data= EventsRSV;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;
-DATA Events_temp;
+DATA EventsRSV_temp;
 * rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
-   set Events(rename=
+   set EventsRSV(rename=
                    (ProfileID=tmp_ProfileID 
 
                     ReportedDate=tmp_ReportedDate
@@ -115,26 +115,26 @@ run;
 ** 4. Shrink character variables in data set to shortest possible length (based on longest value) **;
 %inc 'C:\Users\eabush\Documents\My SAS Files\Code\Macro.shrink.sas' ;
 
- %shrink(Events_temp)
+ %shrink(EventsRSV_temp)
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA Events_read ;  
+DATA EventsRSV_read ;  
 /*   length ProfileID $ 9;  */
-   set Events_temp_ ;
+   set EventsRSV_temp_ ;
 
 /*   format ProfileID $9.;*/
 run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=Events_read ; title1 'Events_read'; run;
+   PROC contents data=EventsRSV_read ; title1 'EventsRSV_read'; run;
 
 
 *** Explore data ***;
 ***--------------***;
 
-   proc freq data=Events_read;
+   proc freq data=EventsRSV_read;
       tables DiseaseID ;
 run;
 

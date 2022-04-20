@@ -4,7 +4,7 @@ AUTHOR:    Eric Bush
 CREATED:   April 11, 2022
 MODIFIED:  Created from Access.GetProfiles.sas
 PURPOSE:   Access SQL table on Events
-INPUT:	  CEDRS66.ProfileRaces_read
+INPUT:	  CEDRS66.ProfileRaces
 OUTPUT:		       ProfileRaces_read
 ***********************************************************************************************/
 
@@ -65,4 +65,12 @@ run;
    PROC contents data=ProfileRaces_read varnum; title1 'ProfileRaces_read'; run;
 
 
+
+
+*** Explore data ***;
+***--------------***;
+
+   proc freq data=ProfileRaces_read;
+      tables RaceID ;
+run;
 

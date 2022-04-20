@@ -49,7 +49,7 @@ DATA Labs_read ;  set Labs_temp_ ;
 run;
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=Labs_read varnum; title1 'Labs_read'; run;
+   PROC contents data=Labs_read ; title1 'Labs_read'; run;
 
 
 *** Explore data ***;

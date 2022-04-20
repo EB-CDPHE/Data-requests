@@ -35,7 +35,7 @@ DATA LU_Results_read ;  set Results_temp_ ;
 run;
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=LU_Results_read varnum; title1 'LU_Results_read'; run;
+   PROC contents data=LU_Results_read ; title1 'LU_Results_read'; run;
 
 
 
@@ -43,9 +43,9 @@ run;
 ***--------------***;
 
    PROC freq data= LU_Results_read;
-/*      where ResultID ^in (1067, 1068, 1070, 9);*/
-      where (1061 LE ResultID LE 1235 ) and ResultID ^in (1067, 1068, 1070);
-      tables ResultID * ResultText  /list;
+      where ResultID in (1017, 1018, 1020);
+/*      where (1061 LE ResultID LE 1235 ) and ResultID ^in (1067, 1068, 1070);*/
+      tables ResultID * ResultText /list;
 /*      tables  ResultText;*/
 run;
 

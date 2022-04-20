@@ -151,6 +151,16 @@ run;
 run;
 
 
+** Age **;
+
+   proc print data=Codes_read;
+      where CodeID in (848,851,853,854,855);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+
+
 ** Occupation **;
 
    proc print data=Codes_read;
@@ -224,3 +234,126 @@ run;
 /*      tables ResultID ;*/
       tables  QuantitativeResult;
 run;
+
+** Symptoms **;
+
+   proc print data=Codes_read;
+      where CodeID in (4030,4031,4032,4033, 4034);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName    $35.  ConceptGroup   $15.  Value   5.;
+run;
+
+   proc print data=Codes_read;
+      where CodeID in (4014,4015,4016);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName    $35.  ConceptGroup   $15.  Value   5.;
+run;
+
+
+ * International Travel *;
+   proc print data=Codes_read;
+      where CodeID in (512, 742, 774,3737);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+   proc print data=Codes_read;
+      where ConceptGroup = 'Country';
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format  ConceptGroup ConceptName   PreferredConceptName $25. ;
+run;
+
+
+ * USA Travel *;
+   proc print data=Codes_read;
+      where CodeID in (70, 18, 24,15);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+  proc print data=Codes_read;
+      where ConceptGroup = 'State_FIPS';
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format  ConceptGroup ConceptName   PreferredConceptName $25. ;
+run;
+
+** Case classification **;
+   proc print data=Codes_read;
+      where CodeID in (4067, 4068, 4069);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName $90. ConceptGroup  $20. ;
+run;
+
+
+** Self isolation **;
+   proc print data=Codes_read;
+      where CodeID in (2309, 2310);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $20. ;
+run;
+
+
+** Hosp admission  **;
+   proc print data=Codes_read;
+      where CodeID in (4035, 4036, 4037, 4038);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $30. ;
+run;
+
+
+** Occupation  **;
+   proc print data=Codes_read;
+      where CodeID in (4039, 4040, 4041, 4042, 4043, 4044);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+   proc print data=Codes_read;
+      where CodeID in (4045, 4046, 4047, 4048, 4049, 4050);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+
+** Frequency  **;
+   proc print data=Codes_read;
+      where CodeID in (4059, 4060, 4061, 4062, 4063);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+
+** Variant **;
+
+   PROC freq data= COVIDreports_labs order=freq;
+      where (1061 LE ResultID LE 1235 ) and ResultID ^in (1067, 1068, 1070);
+      tables  ResultText;
+run;
+
+
+   PROC freq data= COVIDreports_labs order=freq;
+      where TestTypeID = 437 and ResultID = 1069;
+      tables  QuantitativeResult;
+run;
+
+
+** Status - Flu**;
+
+   proc print data=Codes_read;
+      where CodeID in (263,265,266,267);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+
+** Status - RSV**;
+
+   proc print data=Codes_read;
+      where CodeID in (263,265,266,267);
+      id CodeID; var ConceptName  PreferredConceptName  ConceptGroup  Value;
+      format ConceptName  PreferredConceptName  ConceptGroup  $25. ;
+run;
+
+
+
+

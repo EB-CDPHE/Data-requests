@@ -34,7 +34,7 @@ DATA LU_TestTypes_read ;  set LU_TestTypes_temp_ ;
 run;
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=LU_TestTypes_read varnum; title1 'LU_TestTypes_read'; run;
+   PROC contents data=LU_TestTypes_read ; title1 'LU_TestTypes_read'; run;
 
 
 
@@ -42,6 +42,8 @@ run;
 ***--------------***;
 
    PROC freq data= LU_TestTypes_read;
+      where TestTypeID in (99,115,229,377,434,435,439);
       tables  TestType * TestTypeID / list;
+      format TestType  $30.;
 run;
 

@@ -73,6 +73,7 @@ run;
    PROC freq data= Employment_read;
 /*      tables EmploymentID;*/
 /*      tables OccupationID;*/
-      tables OtherOccupation;
+/*      tables OtherOccupation;*/
+      tables EmployerLocation;
 run;
 

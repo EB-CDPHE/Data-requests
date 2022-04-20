@@ -39,7 +39,7 @@ DATA Events; set CEDRS66.Events;
 run; 
 
 ** Review contents of SAS dataset **;
-PROC contents data=Events  varnum ;  run;   
+PROC contents data=Events  varnum ; title1 'Events'; run;   
 /*_______________________________________________________________________*
  |NOTE:
  | EventStatusID=263 for EventStatus='Confirmed'

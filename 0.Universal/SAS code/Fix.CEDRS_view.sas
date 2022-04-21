@@ -53,6 +53,9 @@ DATA COVID.CEDRS_view_fix ;  set CEDRS_view_read ;
 ** 3) impute missing collectiondates **;
    if CollectionDate = . then CollectionDate = ReportedDate;
 
+** 4) Premature reports of death **;
+   if EventID in ('2134051','2137499') then Outcome='Alive';
+
 run;
 
 
@@ -62,8 +65,15 @@ run;
 run;
 
 
-
-
+/*   proc freq data= CEDRS_view_read; tables Outcome; run;*/
+/*   proc print data= CEDRS_view_read;*/
+/*   where EventID in ('2134051','2137499');*/
+/*   id EventID; var ProfileID ReportedDate  CaseStatus  Outcome  ;*/
+/*run;*/
+/*   proc print data= COVID.CEDRS_view_fix;*/
+/*   where EventID in ('2134051','2137499');*/
+/*   id EventID; var ProfileID ReportedDate  CaseStatus  Outcome  ;*/
+/*run;*/
 
 
 *** 3.  Post-edit checks ***;

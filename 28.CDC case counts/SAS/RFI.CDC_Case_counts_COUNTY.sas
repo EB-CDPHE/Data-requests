@@ -2,7 +2,8 @@
 PROGRAM:  RFI.CDC_Case_counts_COUNTY.sas
 AUTHOR:   Eric Bush
 CREATED:  March 21, 2022
-MODIFIED: 040822:  Add in code for calculating cumulatitve values and totals	
+MODIFIED: 042622: Tweak code per comments from Tiffany
+          040822:  Add in code for calculating cumulatitve values and totals	
 PURPOSE:	 CDC request for historical data 
 INPUT:	 COVID.County_Population   COVID.CEDRS_view_fix	
 OUTPUT:		
@@ -268,22 +269,22 @@ run;
 ***-----------------***;
 
  ** Sort dataset **;
-   PROC sort data=Colorado_County_dates
-               out=Colorado_County_dates_sort ;
-      by countyFIPS  ReportedDate ;
+   PROC sort data=County_Cases_stats
+               out=County_Cases_stats_sort ;
+      by ReportedDate  countyFIPS ;
 run;
 
 ** Need to re-order variables to match column headers in Template **;
 DATA Colo_County_06APR2022;                                                                   * <-- CHANGE DATE HERE ;
-   retain countyFIPS  county  StateAbbr  StateFIPS   ReportedDate  TotalCases  TotalDead  ;    
-   set Colorado_County_dates_sort;
+   retain countyFIPS  county  StateAbbr  StateFIPS   ReportedDate  TotalCumCases  TotalCumDead   TotalCases  TotalDead  ;    
+   set County_Cases_stats_sort;
 
    Label
       ReportedDate = 'date'
-      TotalCases = 'confirmed'
-      TotalDead = 'deaths'  ;
+      TotalCumCases = 'confirmed'
+      TotalCumDead = 'deaths'  ;
 
-   KEEP  countyFIPS  county  StateAbbr  StateFIPS   ReportedDate  TotalCases  TotalDead  ;
+   KEEP  countyFIPS  county  StateAbbr  StateFIPS   ReportedDate   TotalCumCases  TotalCumDead    TotalCases  TotalDead  ;
 run;
 
    PROC contents data= Colo_County_06APR2022  varnum;  run;                                  * <-- CHANGE DATE HERE ;

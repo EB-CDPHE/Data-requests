@@ -24,7 +24,7 @@ OUTPUT:		       Events_read
 ** 1. Libname to access COVID19 database on dbo144 server using ODBC **;
 
 LIBNAME CEDRS66   ODBC  dsn='CEDRS_III_Warehouse' schema=cedrs;  run;
-
+title;
 /*_______________________________________________________*
  |NOTE:  
  | ** DiseaseID=159 for Disease='COVID-19'
@@ -34,12 +34,12 @@ LIBNAME CEDRS66   ODBC  dsn='CEDRS_III_Warehouse' schema=cedrs;  run;
 
 
 **  2. Create temp SAS dataset from SQL table  **;
-DATA Events; set CEDRS66.Events; 
-   if DiseaseID =159  AND   Deleted=0 ;
+DATA Events_Full; set CEDRS66.Events; 
+/*   if DiseaseID =159  AND   Deleted=0 ;*/
 run; 
 
 ** Review contents of SAS dataset **;
-PROC contents data=Events  varnum ; title1 'Events'; run;   
+PROC contents data=Events_Full  varnum ; title1 'Events'; run;   
 /*_______________________________________________________________________*
  |NOTE:
  | EventStatusID=263 for EventStatus='Confirmed'
@@ -53,13 +53,13 @@ PROC contents data=Events  varnum ; title1 'Events'; run;
  | OutcomeID=278 for Outcome='Unknown' 
  *_______________________________________________________________________*/
 
-proc freq data= Events;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
+proc freq data= Events_Full;  tables DiseaseID  OutcomeID EventStatusID  Deleted ;  run;
 
 
 ** 3. Modify SAS dataset per Findings **;
 DATA Events_temp;
 * rename vars in set statement using "tmp_" prefix to preserve var name in output dataset;
-   set Events(rename=
+   set Events_Full(rename=
                    (ProfileID=tmp_ProfileID 
 
                     ReportedDate=tmp_ReportedDate
@@ -119,7 +119,7 @@ run;
 
 
 ** 6. Rename "shrunken" SAS dataset by removing underscore (at least) which was added by macro **;
-DATA Events_read ;  
+DATA Events__full_read ;  
 /*   length ProfileID $ 9;  */
    set Events_temp_ ;
 
@@ -128,7 +128,7 @@ run;
 
 
 **  7. PROC contents of final dataset  **;
-   PROC contents data=Events_read ; title1 'Events_read'; run;
+   PROC contents data=Events__full_read ; title1 'Events__full_read'; run;
 
 
 *** Explore data ***;

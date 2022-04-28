@@ -1,9 +1,9 @@
-On Friday April 22 Eduardo asked me to check the backlog files that were provided to him. There were two files to compare which he had placed on the [K: drive](K:\CEDRS\CEDRS COVID Report Outputs with and without Backlog Exclusions - April 2022).
+On Friday April 22 Eduardo asked me to check the backlog files that were provided to him. There were two files to compare which he had placed on the K: drive - (K:\CEDRS\CEDRS COVID Report Outputs with and without Backlog Exclusions - April 2022).
 The two files were:
 1. Report Novel Coronavirus Listing - Excluded Backlog Output - 4.27.2022.xlsx
 2. Report Novel Coronavirus Listing - Original Stored Proc Output - 4.27.2022.xlsx
 
-I copied these files to my [C: drive](C:\Users\eabush\Documents\My SAS Files\Data). I opened the two files and save as:
+I copied these files to C:\Users\eabush\Documents\My SAS Files\Data. I opened the two files and save as:
 1. Excluded_Backlog_Output.xlsx
 2. Original_Stored_Output.xlsx
 

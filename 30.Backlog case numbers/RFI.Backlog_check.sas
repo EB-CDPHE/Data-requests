@@ -32,22 +32,27 @@ libname DASH 'C:\Users\eabush\Documents\GitHub\Dashboard data' ;  run;
  *_________________________________________________________________________________________________*/
 
 
-*** Libname statements for two workbooks:  ***;
+
+*** Accessing the two workbooks  ***;
+***------------------------------***;
 
 ** Create libname with XLSX engine that points to XLSX file **;
 libname  BackLog   xlsx 'C:\Users\eabush\Documents\My SAS Files\Data\Excluded_Backlog_Output.xlsx'; run;
 libname  BackLog2  xlsx 'C:\Users\eabush\Documents\My SAS Files\Data\Original_Stored_Output.xlsx' ; run;
 
-** Proc Contents **;
+** Proc Contents pointing to the two workbooks **;
    proc contents data= BackLog.data  varnum ; run;
    proc contents data= BackLog2.data  varnum ; run;
 
 
 
+*** Summary of the first workbook - Excluded  ***;
+***-------------------------------------------***;
 
 ** Create SAS dataset from spreadsheet **;
 DATA BL_Excluded;   
    set BackLog.data;
+* if file has full complement of variables then use KEEP statement *;
 /*   keep  ReportedDate CaseStatus ;*/
 run;
 

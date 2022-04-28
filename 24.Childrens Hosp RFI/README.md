@@ -14,7 +14,7 @@ Here are the SAS programs used to respond to this data request:
 |Run order|SAS program|
 |---------|-----------|
 |1.|[Access.CEDRS_view](../0.Universal/SAS%20code/Access.CEDRS_view.sas) pulls data from dbo144 COVID19 and curates it.|
-|2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data in CEDRS.|
+|2.|[FIX.CEDRS_view](../0.Universal/SAS%20code/Fix.CEDRS_view.sas) edits data pulled from CEDRS.|
 |3.|[RFI.Pediatric_cases.sas](./SAS/RFI.Pediatric_cases.sas) filters CEDRS data to population defined above.|
 
 The RFI.Pediatric_cases.sas program filters CEDRS data, explores the variables, generates the two response tables (cases by Ethnicity and cases by Race) and outputs data into Tableau directory.

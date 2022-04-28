@@ -3,9 +3,9 @@ CDC scrapes the CDPHE website daily to capture Colorado case counts. It calculat
 
 Some of the background regarding this request is part of a lengthy email [chain](../28/../28.CDC%20case%20counts/Documents/CDC_Historical_Case_Count_RFI_032122.pdf) between CDPHE and the CDC Aggregate Data team. The original request came in March 14, 2022. I was tasked with it on March 21, 2022.  The email contains the specific data elements requested. 
 
-**Population**:  Confirmed and probable cases in CEDRS by ReportedDate. Include cases unallocated to a county, i.e. `CountyAssigned="INTERNATIONAL"` **Groups**: Case status (confirmed and probable) and Outcome (Patient died) for all of Colorado and by Colorado county.  **Data requested**: Daily count of confirmed, probable, and total cases. Daily count of deaths for confirmed and probable cases, and total deaths. For each of these outcomes a cumulative daily total was calcualted. Daily change in cumulative totals was calcuated for total cases and total deaths. 
+**Population**:  Confirmed and probable cases in CEDRS by ReportedDate. INCLUDE cases unallocated to a county, i.e. `CountyAssigned="INTERNATIONAL"` **Groups**: Case status (confirmed and probable) and Outcome (Patient died) for all of Colorado and by Colorado county.  **Data requested**: Daily count of confirmed, probable, and total cases. Daily count of deaths for confirmed and probable cases, and total deaths. For each of these outcomes a cumulative daily total was calcualted. Daily change in cumulative totals was calcuated for total cases and total deaths. 
 
-The CDC Aggregate Data team provided a [template](./Documents/Bulk_Historical_Update_Template.xlsx) as before. This is to capture Colorado level numbers. I don't think there is a template for County level numbers.
+The CDC Aggregate Data team provided a [template](./Documents/Bulk_Historical_Update_Template.xlsx) as before. This is to capture Colorado level numbers. There is another template specifically for County level numbers.
 
 ## Code
 Here are the SAS programs used to respond to this data request:
@@ -19,7 +19,7 @@ Here are the SAS programs used to respond to this data request:
 
 The RFI.CDC_Case_counts_COLORADO.sas program is based on [RFI.Historical_case_counts.sas](../12.Historical case counts by status/RFI.Historical_case_counts.sas). It creates a "timeline" - a SAS dataset that contains every date value from 3/1/20 to present.
 
-An unfiltered copy of CEDRS_view_fix is made and `CountyAssigned = "INTERNATIONAL"` is changed to `CountyAssigned = "UNALLOCATED"` as this is how CDC displays case counts for patients where assigned county is out-of-State. The only variables kept are ReportedDate, County, case status, and outcome.
+An unfiltered copy of CEDRS_view_fix is made and `CountyAssigned = "INTERNATIONAL"` is changed to `CountyAssigned = "UNALLOCATED"` as this is how CDC displays case counts for patients where assigned county is out-of-State. This is only necessary for the COUNTY program, not the State-level program. The only variables kept are ReportedDate, County, case status, and outcome.
 
 The patient-level dataset is reduced to a single record per day. Each record contains accumulated number of cases and deaths by case status, i.e. confirmed, probable. 
 
@@ -35,7 +35,7 @@ After this section, a table of case counts before and after the data manipulatio
 
 ![CaseCountsAfter](Images/Case_counts_end.png)
 
-The Colorado_dates dataset that contains daily totals for cases and deaths by status is read again date and cummulative totals are added to the dataset and daily changes are calculated. Labels are defined to match the 12 column headers in the template spreadsheet.
+The Colorado_dates dataset that contains daily totals for cases and deaths by status is read again. Date and cummulative totals are added to the dataset and daily changes are calculated. Labels are defined to match the 12 column headers in the template spreadsheet and a retain statement is used to order the variables according to the order of the Excel workbook columns.
 
 #
 ## Findings
@@ -46,12 +46,10 @@ For this first weekly submission of historical counts, the total counts by statu
 ![TotalDeaths](./Images/Total_counts_DEATHS.jpg)
 #
 
-## Response
+## Initial Response
 The final dataset is exported as a CSV file. Here is the link to the final CSV file:  [Bulk_Colorado](). CDC provided a template for recieving historical data. I re-ordered the columns in the CSV file to match this template and then copied the column headers. I saved the modifed csv file as an Excel file named [Bulk Historical Update Colorado](). This was emailed to Sarah of the Aggregate Data team at CDC on March 22, 2022.
 
-#
-
-### Updating this Request
+### First Update to this Request
 
 A new update: State-level historical counts no longer will be generated and sent to CDC.
 
@@ -61,7 +59,9 @@ To update this response, the following would need to be done:
 2. Follow steps to create an updated version of COVID.CEDRS_view_fix dataset to pull the latest data on reported COVID cases in Colorado.
 
 The final dataset was exported to create the CSV file for the responding to this data request. The code generated by the export wizard was [Export.COHxData.sas](Export.COHxData.sas)
+
+## Weekly Response
+Similar to the initial response but Proc Export is used to output data directly into an Excel workbook. See [recent_example](./Output/Bulk_Historical_Update_Colorado_2022-04-27.xlsx). A retain statement was used to re-order the variables to match order of columns in Excel workbook.
 #
-**Issues:**
-* Nothing yet. 
+The SOP for weekly updates can be found here:  https://docs.google.com/document/d/1Fp5pB6K2HmJBnjhD9NMnSaO_vVWUf3eeBKWS8k15NLc/edit
 

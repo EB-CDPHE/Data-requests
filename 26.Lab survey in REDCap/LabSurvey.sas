@@ -35,12 +35,12 @@ run;
       tables  l_covid19_complete ;
       tables  l_covid19_complete * anycovidtestingonsite  *  anycovidtestingoffsite / list  missing  missprint ;
 run;
-/*
+/*____________________________________________________________________________________*
  FINDINGS:
- | n=94 records, of which n=34 are incomplete.
- | n=7 of the 34 incomplete records answered screeener questions
- | n=5 of those 7 indicated they did offsite testing and 2 only did onsite testing. 
- */
+   n=94 records, of which n=34 are incomplete.
+   n=7 of the 34 incomplete records answered screeener questions
+   n=5 of those 7 indicated they did offsite testing and 2 only did onsite testing. 
+ *____________________________________________________________________________________*/
 
 ** Print responses to screener questions for the n=7 incomplete records **;
    PROC print data= L_Covid ;
@@ -61,13 +61,13 @@ run;
 /*      var  Rpt_LPHA_email  Rpt_LPHA_fax  Rpt_LPHA_Other ;  * how rpt to LDPHA *;*/
 /*      var  Cares_Act_aware  Cares_Act_comply ;  * last two questions; */
 run;
-/*
+/*_________________________________________________________________________________________________________________*
  FINDINGS for the 5 incomplete records that did off-site testing:
- |    n=2 didn't answer any of the follow questions to off-site testing.
- |    n=1 didn't answer any further questions
- |    n=1 answered item 7 (DateCOVIDtestingOnsite) but no further questions.
- |    n=1 answered all questions in the survey.  KEEP this record. Don't know why it is considered incomplete. 
- */
+    n=2 didn't answer any of the follow questions to off-site testing.
+    n=1 didn't answer any further questions
+    n=1 answered item 7 (DateCOVIDtestingOnsite) but no further questions.
+    n=1 answered all questions in the survey.  KEEP this record. Don't know why it is considered incomplete. 
+ *_________________________________________________________________________________________________________________*/
 
 
 ** Determine where the 2 incomplete records that did ONLY on-site testing dropped out of survey **;
@@ -98,11 +98,19 @@ DATA L_complete;   set L_Covid;
         
    if offsiteotherlab = . then offsiteotherlab = 0;
 
+** impute missing values as 0 (no) **;
    array TT{6} TestType_PCR  TestType_OMA  TestType_Antigen  TestType_Serology  TestType_WGS  TestType_Other;
    if sum(of TT{*}) ne (TestType_PCR + TestType_OMA + TestType_Antigen + TestType_Serology + TestType_WGS + TestType_Other) then 
       do p=1 to 6;
          if TT{p}=. then TT{p}=0;
       end;
+
+   array PCRtype{6} PCRtest1  PCRtest2  PCRtest3  PCRtest4  PCRtest5  PCRtest_Other;
+   if sum(of PCRtype{*}) ne (PCRtest1 + PCRtest2 + PCRtest3 + PCRtest4 + PCRtest5 + PCRtest_Other) then 
+      do p=1 to 6;
+         if PCRtype{p}=. then PCRtype{p}=0;
+      end;
+           
 
    Label
       PCRtest1  = 'Xpert Xpress'
@@ -160,8 +168,8 @@ run;
 run;
 /*____________________________________________________________________________________________*
  FINDINGS:
- | About two thirds of the 40 labs (n=27) that used off-site testing used a commercial lab.
- | Almost half (n=19) used off-site Hospital Network central lab and n=16 used PH lab.
+  About two thirds of the 40 labs (n=27) that used off-site testing used a commercial lab.
+  Almost half (n=19) used off-site Hospital Network central lab and n=16 used PH lab.
  *____________________________________________________________________________________________*/
 
 
@@ -264,7 +272,8 @@ run;
 
    PROC FREQ data= L_complete;
       where AnyCovidTestingOnsite =1 AND TestType_PCR=1;
-      tables  TestType_PCR  PCRtest1  PCRtest2  PCRtest3  PCRtest4  PCRtest5   PCRtest_Other / missing missprint;
+/*      tables  TestType_PCR  PCRtest1  PCRtest2  PCRtest3  PCRtest4  PCRtest5   PCRtest_Other / missing missprint;*/
+      tables    PCRtest1 * PCRtest2 * PCRtest3 * PCRtest4 * PCRtest5 / list missing missprint;
 run;
 
 

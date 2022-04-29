@@ -36,11 +36,11 @@ run;
       tables  l_covid19_complete * anycovidtestingonsite  *  anycovidtestingoffsite / list  missing  missprint ;
 run;
 /*
-FINDINGS:
+ FINDINGS:
  | n=94 records, of which n=34 are incomplete.
  | n=7 of the 34 incomplete records answered screeener questions
  | n=5 of those 7 indicated they did offsite testing and 2 only did onsite testing. 
-*/
+ */
 
 ** Print responses to screener questions for the n=7 incomplete records **;
    PROC print data= L_Covid ;
@@ -62,12 +62,12 @@ run;
 /*      var  Cares_Act_aware  Cares_Act_comply ;  * last two questions; */
 run;
 /*
-FINDINGS for the 5 incomplete records that did off-site testing:
+ FINDINGS for the 5 incomplete records that did off-site testing:
  |    n=2 didn't answer any of the follow questions to off-site testing.
  |    n=1 didn't answer any further questions
  |    n=1 answered item 7 (DateCOVIDtestingOnsite) but no further questions.
  |    n=1 answered all questions in the survey.  KEEP this record. Don't know why it is considered incomplete. 
-*/
+ */
 
 
 ** Determine where the 2 incomplete records that did ONLY on-site testing dropped out of survey **;
@@ -93,24 +93,32 @@ DATA L_complete;   set L_Covid;
    NumOffSiteLabs = sum(OffsiteHospLab,  offsitephlab,  offsitecommlab,  offsiteotherlab);
    Label NumOffSiteLabs = 'Number of types of off-site labs used';
 
+   NumPlatforms = sum(TestType_PCR,  TestType_OMA,  TestType_Antigen,  TestType_Serology, TestType_WGS);
+   Label NumPlatforms = 'Number of testing platforms Labs used on-site';
+        
    if offsiteotherlab = . then offsiteotherlab = 0;
 run;
 
-*** Survey Screeners ***;
+
+***  On-site and Off-site COVID testing by Labs  ***;
+***----------------------------------------------***;
+
    PROC FREQ data= L_complete;
-      tables  anycovidtestingonsite * anycovidtestingoffsite  ;
+      tables  AnyCovidTestingOnsite * anycovidtestingoffsite  ;
 run;
-/*
-FINDINGS:
- | n=52 good surveys (as of 4/28)
- |   n=2 did off-site testing only
- |   n=50 did on-site testing; 
- |     n=12 did on-site testing only 
- |     n=38 did both on-site and off-site testing
-*/
+/*______________________________________________________*
+ FINDINGS:
+  n=52 good surveys (as of 4/28)
+    n=2 did off-site testing only
+    n=50 did on-site testing; 
+      n=12 did on-site testing only 
+      n=38 did both on-site and off-site testing
+ *______________________________________________________*/
 
 
-*** Off-site Testing ***;
+*** Off-site Testing - Types of Labs used ***;
+***---------------------------------------***;
+
    PROC FREQ data= L_complete;
       tables  anycovidtestingoffsite  NumOffSiteLabs ;
 run;
@@ -119,28 +127,31 @@ run;
       where  anycovidtestingoffsite =1 ;
       tables OffsiteHospLab * offsitephlab * offsitecommlab * offsiteotherlab / list  missing  missprint ;
 run;
-/*
+/*____________________________________________________________________________________________*
  FINDINGS:
- | n=23 of the 40 labs that used off-site testing only used one type of off-site lab.
- | Usually either Hospital Network central lab (n=10) or Commercial lab (n=10)
- | (the other two labs that only used one type of off-site lab used PH lab)
- |
- | n=10 used two types of off-site labs. All but one used commercial lab.
- | Most also used PH lab (n=6) and others also used Hospital Network central lab (n=3).
- */
+  n=23 of the 40 labs that used off-site testing only used one type of off-site lab.
+  Usually either Hospital Network central lab (n=10) or Commercial lab (n=10)
+  (the other two labs that only used one type of off-site lab used PH lab)
+ 
+  n=10 used two types of off-site labs. All but one used commercial lab.
+  Most also used PH lab (n=6) and others also used Hospital Network central lab (n=3).
+ *____________________________________________________________________________________________*/
+
 
    PROC FREQ data= L_complete ;
       where  anycovidtestingoffsite =1 ;
       tables  OffsiteHospLab  OffsitePHlab  OffsiteCommLab  offsiteotherlab  ;
 run;
-/*
+/*____________________________________________________________________________________________*
  FINDINGS:
  | About two thirds of the 40 labs (n=27) that used off-site testing used a commercial lab.
  | Almost half (n=19) used off-site Hospital Network central lab and n=16 used PH lab.
- */
+ *____________________________________________________________________________________________*/
 
-*** Reasons for using off-site lab ***;
-***--------------------------------***;
+
+
+*** Off-site Testing - Reasons for using off-site Lab ***;
+***---------------------------------------------------***;
 
    proc format;
       value OffRsnFmt 1='Routine Practice' 2='Capacity limitations' 3='Instrument errors' 4='Supply chain issues' ;
@@ -151,11 +162,11 @@ run;
       tables   OffsiteCommLab  OffsiteCommLab_Yes  ;
       format OffsiteCommLab_Yes OffRsnFmt. ;
 run;
-/*
+/*____________________________________________________________________________________________*
  FINDINGS:
- | The primary reason for using an off-site commercial lab was roughly equal between:
- | Routine practice (n=8),  Capacity limitations (n=8),  and Supply chain issues (n=10)
- */
+  The primary reason for using an off-site commercial lab was roughly equal between:
+  Routine practice (n=8),  Capacity limitations (n=8),  and Supply chain issues (n=10)
+ *____________________________________________________________________________________________*/
 
 
 ** Hospital Network central lab **;
@@ -164,12 +175,12 @@ run;
       tables   OffsiteHospLab  OffsiteHospLab_Yes  ;
       format OffsiteHospLab_Yes OffRsnFmt. ;
 run;
-/*
+/*____________________________________________________________________________________________*
  FINDINGS:
- | The primary reason for using a Hospital Network central lab for off-site testing was 
- |    Capacity limitations (n=14) though some also cited 
- |    Supply chain issues (n=5)
- */
+  The primary reason for using a Hospital Network central lab for off-site testing was 
+     Capacity limitations (n=14) though some also cited 
+     Supply chain issues (n=5)
+ *____________________________________________________________________________________________*/
 
 
 ** Public Health lab **;
@@ -178,11 +189,41 @@ run;
       tables   OffsitePHlab  OffsitePHlab_Yes  ;
       format OffsitePHlab_Yes OffRsnFmt. ;
 run;
-/*
+/*____________________________________________________________________________________________*
  FINDINGS:
- | The primary reason for using a Public Health lab for off-site testing was either
- |    Supply chain issues (n=6) or Routine practice (n=5)
- |    A few labs indicated they primarily used PH lab for off-site testing for surge (n=3)
- */
+  The primary reason for using a Public Health lab for off-site testing was either
+     Supply chain issues (n=6) or Routine practice (n=5)
+     A few labs indicated they primarily used PH lab for off-site testing for surge (n=3)
+ *____________________________________________________________________________________________*/
 
+
+*** On-site Testing - Types of platforms used ***;
+***-------------------------------------------***;
+
+   PROC FREQ data= L_complete;
+      tables  AnyCovidTestingOnsite  ;
+run;
+
+   proc format;
+      value NumAccFmt 1-9999='1-<10k'  10000-24999='10k-25k'  25000-high='25k or more';
+
+   PROC FREQ data= L_complete;
+      where AnyCovidTestingOnsite =1 ;
+      tables    DateCOVIDtestingOnsite  Num_Specimens  ;
+      format DateCOVIDtestingOnsite  month.   Num_Specimens NumAccFmt. ;
+run;
+
+
+   PROC FREQ data= L_complete;
+      where AnyCovidTestingOnsite =1 ;
+      tables  TestType_PCR  TestType_OMA  TestType_Antigen  TestType_Serology  TestType_WGS  TestType_Other  / missing missprint;
+run;
+
+
+   PROC FREQ data= L_complete;
+      where AnyCovidTestingOnsite =1 ;
+/*      tables  NumPlatforms  / missing missprint;*/
+      tables  NumPlatforms * TestType_PCR * TestType_OMA * TestType_Antigen * TestType_Serology * TestType_WGS    /list missing missprint;
+
+run;
 

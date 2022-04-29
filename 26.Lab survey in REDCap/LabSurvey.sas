@@ -97,8 +97,24 @@ DATA L_complete;   set L_Covid;
    Label NumPlatforms = 'Number of testing platforms Labs used on-site';
         
    if offsiteotherlab = . then offsiteotherlab = 0;
-run;
 
+   array TT{6} TestType_PCR  TestType_OMA  TestType_Antigen  TestType_Serology  TestType_WGS  TestType_Other;
+   if sum(of TT{*}) ne (TestType_PCR + TestType_OMA + TestType_Antigen + TestType_Serology + TestType_WGS + TestType_Other) then 
+      do p=1 to 6;
+         if TT{p}=. then TT{p}=0;
+      end;
+
+   Label
+      PCRtest1  = 'Xpert Xpress'
+      PCRtest2  = 'Abbott RealTime'
+      PCRtest3  = 'Simplexa COVID-19 Direct'
+      PCRtest4  = 'Biofire'
+      PCRtest5  = 'Panther Fusion ' 
+      PCRtest_Other = 'Other PCR test'
+   ;
+
+run;
+   proc contents data= L_complete; run;
 
 ***  On-site and Off-site COVID testing by Labs  ***;
 ***----------------------------------------------***;
@@ -214,7 +230,7 @@ run;
 run;
 
 
-   PROC FREQ data= L_complete;
+   PROC FREQ data= L_Covid;
       where AnyCovidTestingOnsite =1 ;
       tables  TestType_PCR  TestType_OMA  TestType_Antigen  TestType_Serology  TestType_WGS  TestType_Other  / missing missprint;
 run;
@@ -223,7 +239,46 @@ run;
    PROC FREQ data= L_complete;
       where AnyCovidTestingOnsite =1 ;
 /*      tables  NumPlatforms  / missing missprint;*/
-      tables  NumPlatforms * TestType_PCR * TestType_OMA * TestType_Antigen * TestType_Serology * TestType_WGS    /list missing missprint;
-
+/*      tables  NumPlatforms * TestType_PCR * TestType_OMA * TestType_Antigen * TestType_Serology * TestType_WGS    /list missing missprint;*/
+      tables TestType_PCR * TestType_OMA   /list missing missprint;
 run;
+
+   PROC FREQ data= L_complete;
+      where AnyCovidTestingOnsite =1 AND NumPlatforms=1;
+      tables  TestType_PCR * TestType_OMA * TestType_Antigen * TestType_Serology * TestType_WGS    /list missing missprint;
+run;
+
+/*____________________________________________________________________________________________*
+ FINDINGS:
+  All but two of the 50 labs doing on-site testing for COVID19 used 
+   PCR(n=38) or OMA(n=24). Usually with no other platforms being used 
+   though n=10 labs used PCR and OMA. 
+   n=11 Labs used an Antigen test and n=4 conducted serologic testing.
+ *____________________________________________________________________________________________*/
+
+
+
+
+*** PCR testing ***;
+***-------------***;
+
+   PROC FREQ data= L_complete;
+      where AnyCovidTestingOnsite =1 AND TestType_PCR=1;
+      tables  TestType_PCR  PCRtest1  PCRtest2  PCRtest3  PCRtest4  PCRtest5   PCRtest_Other / missing missprint;
+run;
+
+
+
+*** Reporting of Results ***;
+***----------------------***;
+
+   PROC FREQ data= L_complete;
+      where AnyCovidTestingOnsite =1   AND  (TestType_PCR=1  OR  TestType_OMA=1 );
+      tables  Rpt_PCR_CDPHE   Rpt_PCR_LPHA  Rpt_PCR_Other
+              Rpt_OMA_CDPHE   Rpt_OMA_LPHA  Rpt_OMA_Other / missing missprint;
+run;
+
+
+
+
 
